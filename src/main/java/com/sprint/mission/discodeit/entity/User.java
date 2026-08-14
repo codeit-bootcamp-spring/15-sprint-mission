@@ -10,40 +10,32 @@ public class User {
     private Long updatedAt;
     private String name;
     private String email;
+    private String password;
 
     //생성자 초기화
-    public User(String name, String email) {
+    public User(String name, String email, String password) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.name = name;
         this.email = email;
+        this.password = password;
     }
 
     //메서드
 
 
-    public UUID getId() {
-        return id;
-    }
+    public UUID getId() { return id; }
 
-    public long getCreatedAt() {
-        return createdAt;
-    }
+    public long getCreatedAt() { return createdAt; }
 
-    public long getUpdatdAt() {
-        return  updatedAt;
-    }
+    public long getUpdatdAt() { return  updatedAt; }
 
-    public  String getName() {
-        return name;
-    }
+    public  String getName() { return name; }
 
-    public String getEmail() {
-        return email;
-    }
+    public String getEmail() { return email; }
 
-    public void setUpdatedAt() {
-        return;
-    }
+    public String getPassword() { return password; }
+
+    public void setUpdatedAt() { return; }
 
 }
