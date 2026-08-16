@@ -9,7 +9,11 @@ import java.util.Set;
 public class Message extends BaseClass  {
     private final User user;
     private String message;
+
+    //////////////////////////////////
     private final Map<Reaction, Set<User>> reactionMap = new HashMap<>();
+    //메세지에 좋아요, 싫어요를 누를 수 있는 기능
+    //////////////////////////////////
 
     public Message(User user , String messageString){
         this.user=user;

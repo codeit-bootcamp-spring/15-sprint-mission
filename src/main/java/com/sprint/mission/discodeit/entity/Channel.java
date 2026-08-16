@@ -7,9 +7,12 @@ import java.util.Map;
 
 //멤버(권한), 메세지
 public class Channel {
+    ///////////////////////////////////////////
     private final Map<User, ChannelRole> userMap = new HashMap<>();
+    //채널에 속한 멤버들과 멤버의 권한(관리자,일반 등등)
     private final List<Message> messages = new ArrayList<>();
-
+    //채널에 대화한 메세지를 list로 기록
+    ///////////////////////////////////////////
     public Channel(){
         super();
     }
