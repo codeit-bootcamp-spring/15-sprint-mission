@@ -12,7 +12,7 @@ import java.util.UUID;
 //반응 숫자 맵
 public class JCFMessageService implements MessageService{
     final Map<UUID, Message>  messageMap = new HashMap<>();//UUID=message
-    final Map<UUID ,Map<Reaction, Set<User>>> reactionMap = new HashMap<>();//UUID=message
+    final Map<UUID ,Map<Reaction, Set<UUID>>> reactionMap = new HashMap<>();//key 메세지, value-value 유저
     //2nf?
     Message testMessage;
 

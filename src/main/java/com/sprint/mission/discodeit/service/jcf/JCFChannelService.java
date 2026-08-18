@@ -11,8 +11,8 @@ import java.util.*;
 //(멤버,권한) 맵
 public class JCFChannelService implements ChannelService{
 
-    final Map<UUID, Map<User, ChannelRole>> userRoleMap = new HashMap<>();
-    final Map<UUID, List<Message>>  messagesListMap = new HashMap<>();
+    final Map<UUID, Map<UUID, ChannelRole>> userRoleMap = new HashMap<>();//key channel, value-value user
+    final Map<UUID, List<UUID>>  messagesListMap = new HashMap<>();//key channel, value message
     final Set<Channel>  channelSet = new HashSet<>();
     //final Map<UUID, >
 
@@ -74,6 +74,19 @@ public class JCFChannelService implements ChannelService{
             }
         }
 
+    }
+
+    /////////////////////////////////////////////////
+    public void addUser(UUID channelId, UUID userId, ChannelRole channelRole) {
+        if(userRoleMap.containsKey(channelId)){
+            userRoleMap.get(channelId).put(userId, channelRole);
+        }
+    }
+
+    public void removeUser(UUID channelId, UUID userId) {
+        if(userRoleMap.containsKey(channelId)){
+            userRoleMap.get(channelId).remove(userId);
+        }
     }
 
 
