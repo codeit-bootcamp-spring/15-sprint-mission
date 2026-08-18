@@ -56,9 +56,14 @@ public class JCFChannelService implements ChannelService{
 
     @Override
     public void update(UUID id, String name) {
+        boolean cheekID=false;
         for(Channel channel : channelSet){
             if(channel.getId().equals(id)){
                 channel.update(name);
+                cheekID=true;
+            }
+            if(!cheekID){
+                throw new IllegalArgumentException("해당 id가 없습니다.");
             }
         }
 

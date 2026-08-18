@@ -1,7 +1,4 @@
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelRole;
-import com.sprint.mission.discodeit.entity.NitroLevel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -22,6 +19,10 @@ public class Main {
                 NitroLevel.CLASSIC
         );
 
+
+
+
+
         userServiceservice.read();
 
         User testUser = userServiceservice.getTestUser();
@@ -34,28 +35,47 @@ public class Main {
         messageService.read();
 
 
-        System.out.printf("\n\n\n채널 생성");
-        channelService.create("자바15");
-        channelService.read();
+        messageService.toggleReaction(messageService.getTestMessage().getId(),
+                userServiceservice.getTestUser().getId(),
+                Reaction.ANGRY);
 
-        channelService.addMessage(channelService.getTestChannel().getId()
-                ,userServiceservice.getTestUser().getId()
-                ,messageService.getTestMessage().getId());
+        userServiceservice.create(
+                "test@test.com",
+                "1234",
+                "철수2",
+                NitroLevel.CLASSIC
+        );
 
-        channelService.putUser(channelService.getTestChannel().getId(),userServiceservice.getTestUser().getId(),ChannelRole.ADMIN);
+        messageService.toggleReaction(messageService.getTestMessage().getId(),
+                userServiceservice.getTestUser().getId(),
+                Reaction.ANGRY);
 
-        channelService.addMessage(channelService.getTestChannel().getId()
-                ,userServiceservice.getTestUser().getId()
-                ,messageService.getTestMessage().getId());
 
-        channelService.addMessage(channelService.getTestChannel().getId()
-                ,userServiceservice.getTestUser().getId()
-                ,messageService.getTestMessage().getId());
 
-        channelService.addMessage(channelService.getTestChannel().getId()
-                ,userServiceservice.getTestUser().getId()
-                ,messageService.getTestMessage().getId());
+        userServiceservice.create(
+                "test@test.com",
+                "1234",
+                "철수3",
+                NitroLevel.CLASSIC
+        );
 
-        System.out.printf("dbg");
+        messageService.toggleReaction(messageService.getTestMessage().getId(),
+                userServiceservice.getTestUser().getId(),
+                Reaction.ANGRY);
+
+
+
+        System.out.println(messageService.getReactionCount(messageService.getTestMessage().getId(),
+                Reaction.ANGRY));
+
+        messageService.toggleReaction(messageService.getTestMessage().getId(),
+                userServiceservice.getTestUser().getId(),
+                Reaction.ANGRY);
+
+        System.out.println(messageService.getReactionCount(messageService.getTestMessage().getId(),
+                Reaction.ANGRY));
+
+
+
     }
 }
