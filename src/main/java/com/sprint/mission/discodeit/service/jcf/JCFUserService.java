@@ -3,13 +3,13 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.NitroLevel;
 import com.sprint.mission.discodeit.entity.User;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserService implements UserService{
 
     final Map<UUID, User> userMap = new HashMap<>();
+    User testUser;//테스트
+
 
 
     private final static JCFUserService instance = new JCFUserService();
@@ -25,6 +25,7 @@ public class JCFUserService implements UserService{
     public void create(String email, String password, String name, NitroLevel nitroLevel) {
         User user = new User(email,password,name,nitroLevel);//이메일,비번,닉넴,니트로
         userMap.put(user.getId(),user);
+        testUser = user;
 
     }
 
@@ -40,13 +41,24 @@ public class JCFUserService implements UserService{
 
     }
 
+
+
     @Override
-    public void update() {
+    public void update(UUID id, String email, String password, String name, NitroLevel nitroLevel) {
+        if(!userMap.containsKey(id)){
+            throw new IllegalArgumentException("해당 id가 없습니다.");
+        }
+        userMap.get(id).update(email,password,name,nitroLevel);
 
     }
 
     @Override
-    public void delete() {
-
+    public void delete(UUID id) {
+        userMap.remove(id);
     }
+
+
+    public User getTestUser() {
+        return testUser;
+    }//테스트
 }

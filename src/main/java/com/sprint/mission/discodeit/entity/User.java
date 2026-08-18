@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import java.time.Instant;
+
 //계정,비번,닉,등급?
 public class User extends BaseClass{
     private String email;
@@ -43,6 +45,18 @@ public class User extends BaseClass{
     public void setNitroLevel(NitroLevel nitroLevel) {
         this.nitroLevel = nitroLevel;
     }
+
+    public void update(String email, String password, String name, NitroLevel nitroLevel) {
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new IllegalArgumentException("메일 형식이 아님.");
+        }
+        this.email=email;
+        this.password=password;
+        this.name=name;
+        this.nitroLevel=nitroLevel;
+        setUpdatedAt(Instant.now().toEpochMilli());
+    }
+
 
 
     public String getEmail() {

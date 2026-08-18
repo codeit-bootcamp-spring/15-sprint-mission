@@ -2,10 +2,12 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.NitroLevel;
 
+import java.util.UUID;
+
 public interface UserService {
     void create(String email, String password, String name, NitroLevel nitroLevel);
     void read();
-    void update();
-    void delete();
+    void update(UUID id, String email, String password, String name, NitroLevel nitroLevel);
+    void delete(UUID id);
 
 }
