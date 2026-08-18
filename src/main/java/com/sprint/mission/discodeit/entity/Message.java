@@ -19,6 +19,19 @@ public class Message {
         this.content = content;
     }
 
+    public UUID getChannelId() {
+        return channelId;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    public void setContent(String content) {
+        this.content = content;
+        this.updatedAt = System.currentTimeMillis();
+    }
+
     public UUID getId() {
         return id;
     }
@@ -27,7 +40,7 @@ public class Message {
         return createdAt;
     }
 
-    public long getUpdatdAt() {
+    public long getUpdatedAt() {
         return updatedAt;
     }
 

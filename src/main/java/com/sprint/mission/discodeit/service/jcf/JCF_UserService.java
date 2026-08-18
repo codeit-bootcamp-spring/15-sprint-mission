@@ -18,12 +18,17 @@ public class JCF_UserService implements UserService {
 
     @Override
     public User create(String name, String email, String password) {
-        return data.put();
+
+        User user = new User(name, email, password);
+
+        data.put(user.getId(), user);
+
+        return user;
     }
 
     @Override
     public User read(UUID id) {
-        return null;
+        return data.get(id);
     }
 
     @Override
@@ -33,11 +38,21 @@ public class JCF_UserService implements UserService {
 
     @Override
     public User update(UUID id, String name, String email, String password) {
-        return null;
+        User user = data.get(id);
+
+        if (user == null) {
+            return null;
+        }
+
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(password);
+
+        return user;
     }
 
     @Override
     public void delete(UUID id) {
-
+        data.remove(id);
     }
 }

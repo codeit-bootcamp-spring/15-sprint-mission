@@ -21,6 +21,10 @@ public class Channel {
         this.updatedAt = System.currentTimeMillis();
     }
 
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
     public UUID getId() {
         return id;
     }
