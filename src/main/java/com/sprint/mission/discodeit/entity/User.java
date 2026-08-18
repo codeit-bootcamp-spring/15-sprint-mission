@@ -9,8 +9,8 @@ public class User {
     private Long createAt;
     private Long updateAt;
 
-    public User(UUID id,String nickName){
-        this.id = id;
+    public User(String nickName){
+        this.id = UUID.randomUUID();
         this.nickName = nickName;
         this.createAt = System.currentTimeMillis();
         this.updateAt = this.createAt;

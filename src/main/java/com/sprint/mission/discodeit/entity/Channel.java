@@ -12,8 +12,8 @@ public class Channel {
     private Long updateAt;
     private List<User> userList;
 
-    public Channel(UUID id,String channelName){
-        this.id = id;
+    public Channel(String channelName){
+        this.id = UUID.randomUUID();
         this.channelName = channelName;
         this.createAt = System.currentTimeMillis();
         this.updateAt = this.createAt;

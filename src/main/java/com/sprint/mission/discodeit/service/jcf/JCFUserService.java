@@ -18,8 +18,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public void createUser(UUID id,String nickname) {
-        data.put(id,new User(id,nickname));
+    public User createUser(String nickname) {
+        User user = new User(nickname);
+        data.put(user.getId(),user);
+        return user;
     }
 
     @Override

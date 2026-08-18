@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface UserService {
 
-    void createUser(UUID id,String nickname);
+    User createUser(String nickname);
 
     User getUser(UUID id);
 
