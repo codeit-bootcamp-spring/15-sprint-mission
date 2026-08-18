@@ -1,50 +1,42 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.jcf.JCF_UserService;
+import java.util.Scanner;
 
 public class JavaApplication {
-
     public static void main(String[] args) {
+// 여기서 서비스 객체 생성 및 테스트 코드 작성
+        boolean running = true;
+        Scanner sc = new Scanner(System.in);
 
-        JCF_UserService userService = new JCF_UserService();
+        while (running) {
+            System.out.println("===== 짭스코드 =====");
+            System.out.println("1. 로그인");
+            System.out.println("2. 계정 만들기");
+            System.out.println("0. 종료");
 
-        // 1. 등록
-        User user = userService.create(
-                "철수",
-                "chulsoo@test.com",
-                "1234"
-        );
 
-        System.out.println("등록: " + user.getName());
+            int choice = sc.nextInt();
+            sc.nextLine();
+            switch (choice) {
+                case 1: // 로그인메뉴
+                    System.out.println("1. 아이디");
+                    System.out.println("2. 비밀번호");
 
-        // 2. 단건 조회
-        User foundUser = userService.read(user.getId());
 
-        System.out.println("단건 조회: " + foundUser.getName());
+                    break;
+                case 2: // 계정 만들기 메뉴
+                    System.out.println("새로운 계정을 생성합니다.");
 
-        // 3. 다건 조회
-        System.out.println("전체 조회: " + userService.readAll());
+                    break;
+                case 0: //프로그램 종료 메뉴
+                    System.out.println("프로그램을 종료합니다");
+                    running = false;
+                    break;
+                default:
+                    System.out.println("잘못된 입력입니다. 다시 선택해주세요.");
+            }
+        }
 
-        // 4. 수정
-        userService.update(
-                user.getId(),
-                "김철수",
-                "kim@test.com",
-                "5678"
-        );
 
-        // 5. 수정된 데이터 조회
-        User updatedUser = userService.read(user.getId());
-
-        System.out.println("수정 후 이름: " + updatedUser.getName());
-
-        // 6. 삭제
-        userService.delete(user.getId());
-
-        // 7. 삭제 확인
-        User deletedUser = userService.read(user.getId());
-
-        System.out.println("삭제 후 조회: " + deletedUser);
     }
 }
