@@ -38,16 +38,24 @@ public class Main {
         channelService.create("자바15");
         channelService.read();
 
+        channelService.addMessage(channelService.getTestChannel().getId()
+                ,userServiceservice.getTestUser().getId()
+                ,messageService.getTestMessage().getId());
 
+        channelService.putUser(channelService.getTestChannel().getId(),userServiceservice.getTestUser().getId(),ChannelRole.ADMIN);
 
+        channelService.addMessage(channelService.getTestChannel().getId()
+                ,userServiceservice.getTestUser().getId()
+                ,messageService.getTestMessage().getId());
 
-        System.out.printf("\n\n\n채널 업뎃");
-        channelService.update(channelService.getTestChannel().getId(),"스프링15");
-        channelService.read();
+        channelService.addMessage(channelService.getTestChannel().getId()
+                ,userServiceservice.getTestUser().getId()
+                ,messageService.getTestMessage().getId());
 
-        System.out.printf("\n\n\n채널 삭제");
-        channelService.delete(channelService.getTestChannel().getId());
-        channelService.read();
+        channelService.addMessage(channelService.getTestChannel().getId()
+                ,userServiceservice.getTestUser().getId()
+                ,messageService.getTestMessage().getId());
 
+        System.out.printf("dbg");
     }
 }

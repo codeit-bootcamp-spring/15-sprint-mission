@@ -77,7 +77,7 @@ public class JCFChannelService implements ChannelService{
     }
 
     /////////////////////////////////////////////////
-    public void addUser(UUID channelId, UUID userId, ChannelRole channelRole) {
+    public void putUser(UUID channelId, UUID userId, ChannelRole channelRole) {
         if(userRoleMap.containsKey(channelId)){
             userRoleMap.get(channelId).put(userId, channelRole);
         }
@@ -88,6 +88,24 @@ public class JCFChannelService implements ChannelService{
             userRoleMap.get(channelId).remove(userId);
         }
     }
+
+    public void addMessage(UUID channelId, UUID userId, UUID messageId) {
+        if(userRoleMap.containsKey(channelId)){
+            if(userRoleMap.get(channelId).containsKey(userId)){
+                messagesListMap.get(channelId).add(messageId);
+            }
+        }
+    }
+
+    public void removeMessage(UUID channelId, UUID messageId) {
+        if(userRoleMap.containsKey(channelId)){
+            if(userRoleMap.get(channelId).containsKey(messageId)){
+                messagesListMap.get(channelId).remove(messageId);
+            }
+        }
+    }
+
+
 
 
     ///////////////////////////////////////////
