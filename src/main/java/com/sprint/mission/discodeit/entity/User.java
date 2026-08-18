@@ -1,0 +1,49 @@
+package com.sprint.mission.discodeit.entity;
+
+import java.time.Instant;
+import java.util.UUID;
+
+public class User {
+    private UUID id;
+    private String nickName;
+    private Long createAt;
+    private Long updateAt;
+
+    public User(UUID id,String nickName){
+        this.id = id;
+        this.nickName = nickName;
+        this.createAt = System.currentTimeMillis();
+        this.updateAt = this.createAt;
+    }
+
+    public void updateUser(String nickName){
+        this.nickName = nickName;
+        this.updateAt = System.currentTimeMillis();
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getNickName() {
+        return nickName;
+    }
+
+    public Long getCreateAt() {
+        return createAt;
+    }
+
+    public Long getUpdateAt() {
+        return updateAt;
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", nickName=" + nickName +
+                ", createAt=" + Instant.ofEpochMilli(createAt) +
+                ", updateAt=" + Instant.ofEpochMilli(updateAt) +
+                '}';
+    }
+}
