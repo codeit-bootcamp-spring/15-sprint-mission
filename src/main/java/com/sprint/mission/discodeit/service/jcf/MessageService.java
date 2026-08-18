@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.jcf;
 
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.NitroLevel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.UUID;
 
 public interface MessageService {
-    void create();
+    void create(User user, String message);
     void read();
-    void update();
-    void delete();
+    void update(UUID id , String message);
+    void delete(UUID id);
 }

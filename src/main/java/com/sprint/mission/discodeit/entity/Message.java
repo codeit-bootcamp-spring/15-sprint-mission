@@ -15,9 +15,9 @@ public class Message extends BaseClass  {
     //메세지에 좋아요, 싫어요를 누를 수 있는 기능
     //////////////////////////////////
 
-    public Message(User user , String messageString){
+    public Message(User user , String message){
         this.user=user;
-        this.message=messageString;
+        this.message=message;
     }
 
     public User getUser() {
@@ -29,6 +29,11 @@ public class Message extends BaseClass  {
     }
 
 
+
+    public void update(String message){
+        this.message=message;
+        setUpdatedAt();
+    }
 
     public void setMessage(String messageString) {
         this.message = messageString;

@@ -54,7 +54,7 @@ public class User extends BaseClass{
         this.password=password;
         this.name=name;
         this.nitroLevel=nitroLevel;
-        setUpdatedAt(Instant.now().toEpochMilli());
+        setUpdatedAt();
     }
 
 

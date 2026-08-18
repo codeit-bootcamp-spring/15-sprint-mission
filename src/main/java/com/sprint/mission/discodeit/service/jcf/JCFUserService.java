@@ -23,9 +23,9 @@ public class JCFUserService implements UserService{
 
     @Override
     public void create(String email, String password, String name, NitroLevel nitroLevel) {
-        User user = new User(email,password,name,nitroLevel);//이메일,비번,닉넴,니트로
-        userMap.put(user.getId(),user);
-        testUser = user;
+        User userCreate = new User(email,password,name,nitroLevel);//이메일,비번,닉넴,니트로
+        userMap.put(userCreate.getId(),userCreate);
+        testUser = userCreate;
 
     }
 
@@ -37,6 +37,7 @@ public class JCFUserService implements UserService{
             System.out.println("ID: " + entry.getKey());
             System.out.println("이름: " + entry.getValue().getName());
             System.out.println("이메일: " + entry.getValue().getEmail());
+            System.out.println("수정시간: " + entry.getValue().getUpdatedAt());
         }
 
     }
@@ -58,6 +59,7 @@ public class JCFUserService implements UserService{
     }
 
 
+    //////////////////////////////////////////////////
     public User getTestUser() {
         return testUser;
     }//테스트

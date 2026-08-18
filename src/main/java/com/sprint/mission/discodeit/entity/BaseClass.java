@@ -15,8 +15,8 @@ abstract public class BaseClass {
         this.updatedAt=now;
     }
 
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+    public void setUpdatedAt() {
+        this.updatedAt = Instant.now().toEpochMilli();
     }
 
     public UUID getId() {
