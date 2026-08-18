@@ -7,7 +7,7 @@ import java.util.*;
 
 public class JCFUserService implements UserService{
 
-    final Map<UUID, User> userMap = new HashMap<>();
+    final Map<UUID, User> userMap = new HashMap<>();//UUID = user
     User testUser;//테스트
 
 
