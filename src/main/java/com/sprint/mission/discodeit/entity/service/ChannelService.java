@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.entity.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 public interface ChannelService {

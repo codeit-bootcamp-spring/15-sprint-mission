@@ -25,6 +25,10 @@ public class JCFUserService implements UserService {
         return data.get(id);
     }
 
+    public Map<UUID, User> getData() {
+        return data;
+    }
+
     @Override
     public List<User> readAll() {
         // 데이터의 밸류값이 리스트 형태로 저장됨.
@@ -45,6 +49,8 @@ public class JCFUserService implements UserService {
     public boolean deleteById(UUID id) {
         return data.remove(id, data.get(id));
     }
+
+
 
 
 }

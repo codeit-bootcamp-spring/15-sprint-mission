@@ -21,6 +21,10 @@ public class JCFChannelService implements ChannelService {
         return channel;
     }
 
+    public Map<UUID, Channel> getData() {
+        return data;
+    }
+
     @Override
     public Channel getById(UUID id) {
         return data.get(id);
