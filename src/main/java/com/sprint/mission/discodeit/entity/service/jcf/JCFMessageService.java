@@ -46,10 +46,10 @@ public class JCFMessageService implements MessageService {
                 return message;
             }
             else {
-                throw new IllegalArgumentException("존재하지 않는 유저 아이디입니다. " + user.getId());
+                throw new IllegalArgumentException("존재하지 않는 채널 아이디입니다. " + channel.getId());
             }
         } else {
-            throw new IllegalArgumentException("존재하지 않는 채널 아이디입니다. " + user.getId());
+            throw new IllegalArgumentException("존재하지 않는 유저 아이디입니다. " + user.getId());
         }
     }
 
@@ -67,6 +67,8 @@ public class JCFMessageService implements MessageService {
     public Message update(UUID id, String content) {
         data.get(id).update(content);
         data.put(id, data.get(id));
+
+
         return data.get(id);
     }
 

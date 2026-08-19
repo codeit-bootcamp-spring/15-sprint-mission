@@ -39,7 +39,6 @@ public class FileChannelService implements ChannelService, Serializable {
 
     @Override
     public Channel getById(UUID id) {
-        // 파일 내에 있는 객체를 채널의 id를 이용해 특정 객체를 역직렬화한다.
         return data.get(id);
     }
 
@@ -50,11 +49,30 @@ public class FileChannelService implements ChannelService, Serializable {
 
     @Override
     public Channel update(UUID id, String name, String topic) {
-        return null;
+        data.get(id).update(name, topic); // 조회
+        data.put(id, data.get(id)); // 추가
+
+        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+             ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(data);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return data.get(id);
     }
 
     @Override
     public boolean deletebyID(UUID id) {
-        return false;
+        boolean result = data.remove(id, data.get(id));
+        // 삭제 여부를 result에 저장
+        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+             ObjectOutputStream oos = new ObjectOutputStream(fos);
+        ) {
+            oos.writeObject(result);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 }
