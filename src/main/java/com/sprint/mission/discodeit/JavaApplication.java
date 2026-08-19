@@ -127,14 +127,24 @@ public class JavaApplication {
                                             }
 
                                             System.out.print("수정할 채널 선택 > ");
+                                            System.out.println("만약 수정할 채널이 없다면\"0\"을 입력하세요.");
                                             int channelNumber1 = sc.nextInt();
                                             sc.nextLine();
 
                                             Channel selectedChannel1 =
                                                     channels1.get(channelNumber1 - 1);
 
+                                            if (channelNumber1 == 0) {
+                                                break;
+                                            }
+
                                             System.out.print("새 채널명 > ");
+                                            System.out.println("만약 채널을 잘못 선택 했다면\"0\"을 입력하세요.");
                                             String newChannelName = sc.nextLine();
+
+                                            if (newChannelName.equals("0")) {
+                                                break;
+                                            }
 
                                             channelService.update(
                                                     selectedChannel1.getId(),
@@ -152,15 +162,25 @@ public class JavaApplication {
                                             }
 
                                             System.out.print("채널 선택 > ");
+                                            System.out.println("만약 선택할 채널이 없다면\"0\"을 입력하세요.");
                                             int channelNumber = sc.nextInt();
-                                            sc.nextLine();
 
+                                            sc.nextLine();
                                             Channel selectedChannel = channels.get(channelNumber - 1);
+
+                                            if (channelNumber == 0) {
+                                                break;
+                                            }
 
                                             UUID channelId = selectedChannel.getId();
 
                                             System.out.print("메시지 > ");
+                                            System.out.println("만약 입력할 메시지가 없다면\"0\"을 입력하세요.");
                                             String content = sc.nextLine();
+
+                                            if (content.equals("0")) {
+                                                break;
+                                            }
 
                                             messageService.create(channelId, currentUser.getId(), content);
 
@@ -207,14 +227,24 @@ public class JavaApplication {
                                             }
 
                                             System.out.print("수정할 메시지 선택 > ");
+                                            System.out.println("만약 수정할 메시지가 없다면\"0\"을 입력하세요.");
+
                                             int message1Number = sc.nextInt();
                                             sc.nextLine();
+
+                                            if (message1Number == 0) {
+                                                break;
+                                            }
 
                                             Message selectedMessage =
                                                     messages1.get(message1Number - 1);
 
                                             System.out.print("새 내용 > ");
+                                            System.out.println("만약 수정할 메시지가 없다면\"0\"을 입력하세요.");
                                             String newContent = sc.nextLine();
+                                            if (newContent.equals("0")) {
+                                                break;
+                                            }
 
                                             messageService.update(
                                                     selectedMessage.getId(),
@@ -249,8 +279,13 @@ public class JavaApplication {
                         System.out.print("이름: ");
                         String name = sc.nextLine();
 
-                        System.out.print("이메일: ");
+                        System.out.println("이메일 형식만 입력이 가능합니다..");
+                        System.out.print("이메일 (0: 뒤로가기): ");
                         String email = sc.nextLine();
+
+                        if (email.equals("0")) {
+                            break;
+                        }
 
                         String emailRegex =
                                 "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
@@ -260,8 +295,13 @@ public class JavaApplication {
                             break;
                         }
 
-                        System.out.print("비밀번호: ");
+                        System.out.println("비밀번호는 8자 이상이며 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다.");
+                        System.out.print("비밀번호 (0: 뒤로가기): ");
                         String password = sc.nextLine();
+
+                        if (password.equals("0")) {
+                            break;
+                        }
 
                         String passwordRegex =
                                 "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$";
