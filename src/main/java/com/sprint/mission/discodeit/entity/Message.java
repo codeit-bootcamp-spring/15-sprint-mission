@@ -4,7 +4,7 @@ import java.util.*;
 
 //누가,머라고,반응,
 public class Message extends BaseClass  {
-    private final UUID userid;
+    private final UUID userId;
     private String message;
 
     //////////////////////////////////
@@ -12,13 +12,13 @@ public class Message extends BaseClass  {
     //메세지에 좋아요, 싫어요를 누를 수 있는 기능
     //////////////////////////////////
 
-    public Message(UUID userid , String message){
-        this.userid=userid;
+    public Message(UUID userId , String message){
+        this.userId=userId;
         this.message=message;
     }
 
-    public UUID getUserid() {
-        return userid;
+    public UUID getUserId() {
+        return userId;
     }
 
     public String getMessage() {

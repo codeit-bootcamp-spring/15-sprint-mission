@@ -27,6 +27,8 @@ public class JCFChannelService implements ChannelService{
         return instance;
     }
 
+    JCFMessageService messageService = JCFMessageService.getInstance();
+
 
 
 
@@ -79,6 +81,8 @@ public class JCFChannelService implements ChannelService{
             }
         }
 
+        messageService.delete_ChannelToMessage(id);
+
     }
 
     /////////////////////////////////////////////////
@@ -111,6 +115,18 @@ public class JCFChannelService implements ChannelService{
     }
 
 
+    public void delete_UserToChannel(UUID userId){
+        for(Map<UUID, ChannelRole> entry : userRoleMap.values()){
+            entry.remove(userId);
+        }
+
+    }
+
+    public void delete_MessageToChannel(UUID messageId){
+        for(List<UUID> messageList : messagesListMap.values()){
+            messageList.remove(messageId);
+        }
+    }
 
 
     ///////////////////////////////////////////

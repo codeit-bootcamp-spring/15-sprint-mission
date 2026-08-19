@@ -20,6 +20,9 @@ public class JCFUserService implements UserService{
         return instance;
     }
 
+    JCFChannelService channelService = JCFChannelService.getInstance();
+    JCFMessageService messageService = JCFMessageService.getInstance();
+
 
     @Override
     public void create(String email, String password, String name, NitroLevel nitroLevel) {
@@ -56,6 +59,8 @@ public class JCFUserService implements UserService{
     @Override
     public void delete(UUID id) {
         userMap.remove(id);
+        messageService.delete_UserToMessage(id);
+        channelService.delete_UserToChannel(id);
     }
 
 

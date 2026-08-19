@@ -22,9 +22,13 @@ public class JCFMessageService implements MessageService{
     }
 
 
+    JCFChannelService channelService = JCFChannelService.getInstance();
+
+
+
     @Override
-    public void create(UUID userid, String message) {
-        Message messageCreate = new Message(userid,message);
+    public void create(UUID userId, String message) {
+        Message messageCreate = new Message(userId,message);
         messageMap.put(messageCreate.getId(),messageCreate);
         reactionMap.put(messageCreate.getId(),new HashMap<>());
         testMessage = messageCreate;
@@ -53,15 +57,18 @@ public class JCFMessageService implements MessageService{
     @Override
     public void delete(UUID id) {
         messageMap.remove(id);
+        reactionMap.remove(id);
+        channelService.delete_MessageToChannel(id);
+
 
     }
     ////////////////////////////////////////
-    public void toggleReaction(UUID messageid, UUID userid, Reaction reaction) {
+    public void toggleReaction(UUID messageid, UUID userId, Reaction reaction) {
         reactionMap.get(messageid).computeIfAbsent(reaction, key -> new HashSet<>());
-        if(reactionMap.get(messageid).get(reaction).contains(userid)){
-            reactionMap.get(messageid).get(reaction).remove(userid);
+        if(reactionMap.get(messageid).get(reaction).contains(userId)){
+            reactionMap.get(messageid).get(reaction).remove(userId);
         }else {
-            reactionMap.get(messageid).get(reaction).add(userid);
+            reactionMap.get(messageid).get(reaction).add(userId);
         }
     }
 
@@ -78,13 +85,19 @@ public class JCFMessageService implements MessageService{
 
     }
 
-    public void delete_UserToMessage(UUID userid){
-        for(Map.Entry<Reaction, Set<UUID>> entry : reactionMap.get(userid).entrySet()){
-            if(entry.getValue().contains(userid)){
-                entry.getValue().remove(userid);
+    public void delete_UserToMessage(UUID userId){
+        for(Map<Reaction, Set<UUID>> entry : reactionMap.values()){
+            for(Reaction reaction : entry.keySet()){
+                entry.get(reaction).remove(userId);
             }
         }
+    }
 
+    public void delete_ChannelToMessage(UUID channelId){
+        for(UUID id : channelService.messagesListMap.get(channelId)){
+            messageMap.remove(id);
+            reactionMap.remove(id);
+        }
     }
 
 

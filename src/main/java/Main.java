@@ -25,10 +25,10 @@ public class Main {
 
         userServiceservice.read();
 
-        User testUser = userServiceservice.getTestUser();
-        UUID testUserID = userServiceservice.getTestUser().getId();
+      //  User testUser = userServiceservice.getTestUser();
+      //  UUID testUserID = userServiceservice.getTestUser().getId();
 
-        messageService.create(testUser.getId(),"와랄랄루");
+        messageService.create(userServiceservice.getTestUser().getId(),"와랄랄루");
 
 
         System.out.println("\n\n\n메세지 생성");
@@ -51,6 +51,8 @@ public class Main {
                 Reaction.ANGRY);
 
 
+        messageService.delete_UserToMessage(userServiceservice.getTestUser().getId());
+
 
         userServiceservice.create(
                 "test@test.com",
@@ -62,6 +64,8 @@ public class Main {
         messageService.toggleReaction(messageService.getTestMessage().getId(),
                 userServiceservice.getTestUser().getId(),
                 Reaction.ANGRY);
+
+
 
 
 
