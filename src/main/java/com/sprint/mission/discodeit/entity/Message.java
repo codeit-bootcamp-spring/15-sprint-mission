@@ -8,7 +8,7 @@ public class Message extends BaseClass  {
     private String message;
 
     //////////////////////////////////
-    private final Map<Reaction, Set<User>> reactionMap = new HashMap<>();
+    //private final Map<Reaction, Set<User>> reactionMap = new HashMap<>();
     //메세지에 좋아요, 싫어요를 누를 수 있는 기능
     //////////////////////////////////
 
@@ -32,11 +32,11 @@ public class Message extends BaseClass  {
         setUpdatedAt();
     }
 
-    public void setMessage(String messageString) {
+    /*public void setMessage(String messageString) {
         this.message = messageString;
-    }
+    }*/
 
-    public void buttonReaction(User user , Reaction reaction) {
+    /*public void buttonReaction(User user , Reaction reaction) {
         reactionMap.computeIfAbsent(reaction, key -> new HashSet<>());
         if(reactionMap.get(reaction).contains(user)){
             reactionMap.get(reaction).remove(user);
@@ -52,7 +52,7 @@ public class Message extends BaseClass  {
         }else {
             return 0;
         }
-    }
+    }*/
 
 
 

@@ -25,7 +25,7 @@ public class User extends BaseClass{
 
 
 
-    public void setEmail(String email) {
+    /*public void setEmail(String email) {
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
             throw new IllegalArgumentException("메일 형식이 아님.");
@@ -44,7 +44,7 @@ public class User extends BaseClass{
 
     public void setNitroLevel(NitroLevel nitroLevel) {
         this.nitroLevel = nitroLevel;
-    }
+    }*/
 
     public void update(String email, String password, String name, NitroLevel nitroLevel) {
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
