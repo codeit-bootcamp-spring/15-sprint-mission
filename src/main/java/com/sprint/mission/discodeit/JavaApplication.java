@@ -25,7 +25,7 @@ public class JavaApplication {
         JCF_ChannelService channelService = new JCF_ChannelService();
         JCF_MessageService messageService = new JCF_MessageService();
 
-        //테스트 메시지(차후에 지울것)
+        //테스트 메시지(테스트후에 주석처리하세요.)
         Channel testChannel = channelService.readAll().get(0);
         User testUser = userService.readAll().get(0);
         messageService.create(
@@ -37,6 +37,11 @@ public class JavaApplication {
                 testChannel.getId(),
                 testUser.getId(),
                 "두번째 테스트 메시지입니다. ##"
+        );
+        messageService.create(
+                testChannel.getId(),
+                testUser.getId(),
+                "세번째 테스트 메시지입니다. 오늘은 날씨가 흐립니다."
         );
 
 
@@ -240,20 +245,37 @@ public class JavaApplication {
                         break;
 
 
-                    case 2: // 계정 만들기 메뉴
+                    case 2: { // 계정 만들기 메뉴
                         System.out.print("이름: ");
                         String name = sc.nextLine();
 
                         System.out.print("이메일: ");
                         String email = sc.nextLine();
 
+                        String emailRegex =
+                                "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$";
+
+                        if (!email.matches(emailRegex)) {
+                            System.out.println("올바른 이메일 형식이 아닙니다.");
+                            break;
+                        }
+
                         System.out.print("비밀번호: ");
                         String password = sc.nextLine();
+
+                        String passwordRegex =
+                                "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[!@#$%^&*]).{8,}$";
+                        if (!password.matches(passwordRegex)) {
+                            System.out.println("비밀번호는 8자 이상이며 대문자, 소문자, 숫자, 특수문자를 포함해야 합니다."
+                            );
+                            break;
+                        }
 
                         userService.create(name, email, password);
 
                         System.out.println("계정이 생성되었습니다.");
                         break;
+                    }
 
                     case 0: //프로그램 종료 메뉴
                         System.out.println("프로그램을 종료합니다");

@@ -15,7 +15,7 @@ public class JCF_UserService implements UserService {
     public JCF_UserService() {
         this.data = new HashMap<>();
 
-        // 테스트용 임시 계정(사용후 삭제)
+        // 테스트용 임시 계정(사용후 주석처리하세요)
         User testUser = new User(
                 "테스트유저",
                 "test@test.com",

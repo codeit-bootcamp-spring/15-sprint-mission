@@ -15,7 +15,7 @@ public class JCF_ChannelService implements ChannelService {
     public JCF_ChannelService() {
         this.data = new HashMap<>();
 
-    //테스트용 채널입니다.(사용후 삭제)
+    //테스트용 채널입니다.(사용후 주석처리하세요)
     Channel testChannel = new Channel("testChannel");
     data.put(testChannel.getId(), testChannel);
     }
