@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface MessageService {
 
-    Message create(UUID channelId, String content);
+    Message create(UUID channelId, UUID userId, String content);
 
     Message read(UUID id);
 

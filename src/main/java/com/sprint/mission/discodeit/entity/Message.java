@@ -10,13 +10,17 @@ public class Message {
     private Long createdAt;
     private Long updatedAt;
     private UUID channelId;
+    private UUID userId;
     private String content;
 
-    public Message(UUID channelId, String content) {
+
+    public Message(UUID channelId, UUID userId, String content) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.channelId = channelId;
+        this.userId = userId;
         this.content = content;
+
     }
 
     public UUID getChannelId() {
@@ -36,6 +40,10 @@ public class Message {
         return id;
     }
 
+    public UUID getUserId() {
+        return userId;
+    }
+
     public long getCreatedAt() {
         return createdAt;
     }
@@ -43,7 +51,5 @@ public class Message {
     public long getUpdatedAt() {
         return updatedAt;
     }
-
-
 
 }

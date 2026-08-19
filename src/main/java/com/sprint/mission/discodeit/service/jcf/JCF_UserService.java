@@ -14,6 +14,14 @@ public class JCF_UserService implements UserService {
 
     public JCF_UserService() {
         this.data = new HashMap<>();
+
+        // 테스트용 임시 계정(사용후 삭제)
+        User testUser = new User(
+                "테스트유저",
+                "test@test.com",
+                "1234"
+        );
+        data.put(testUser.getId(), testUser);
     }
 
     @Override
@@ -33,7 +41,7 @@ public class JCF_UserService implements UserService {
 
     @Override
     public List<User> readAll() {
-        return List.of();
+        return List.copyOf(data.values());
     }
 
     @Override

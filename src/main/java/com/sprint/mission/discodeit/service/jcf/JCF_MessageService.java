@@ -17,9 +17,9 @@ public class JCF_MessageService implements MessageService {
     }
 
     @Override
-    public Message create(UUID channelId, String content) {
+    public Message create(UUID channelId, UUID userId, String content) {
 
-        Message message = new Message(channelId, content);
+        Message message = new Message(channelId, userId, content);
 
         data.put(message.getId(), message);
 
