@@ -1,13 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 //누가,머라고,반응,
 public class Message extends BaseClass  {
-    private final User user;
+    private final UUID userid;
     private String message;
 
     //////////////////////////////////
@@ -15,13 +12,13 @@ public class Message extends BaseClass  {
     //메세지에 좋아요, 싫어요를 누를 수 있는 기능
     //////////////////////////////////
 
-    public Message(User user , String message){
-        this.user=user;
+    public Message(UUID userid , String message){
+        this.userid=userid;
         this.message=message;
     }
 
-    public User getUser() {
-        return user;
+    public UUID getUserid() {
+        return userid;
     }
 
     public String getMessage() {

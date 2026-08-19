@@ -23,8 +23,8 @@ public class JCFMessageService implements MessageService{
 
 
     @Override
-    public void create(User user, String message) {
-        Message messageCreate = new Message(user,message);
+    public void create(UUID userid, String message) {
+        Message messageCreate = new Message(userid,message);
         messageMap.put(messageCreate.getId(),messageCreate);
         reactionMap.put(messageCreate.getId(),new HashMap<>());
         testMessage = messageCreate;
@@ -35,7 +35,7 @@ public class JCFMessageService implements MessageService{
         for (Map.Entry<UUID, Message> entry : messageMap.entrySet()) {
             System.out.println("ID: " + entry.getValue().getId());
             System.out.println("메세지: " + entry.getValue().getMessage());
-            System.out.println("보낸사람: " + entry.getValue().getUser().getName());
+            System.out.println("보낸사람: " + entry.getValue().getId());
             System.out.println("수정시간: " + entry.getValue().getUpdatedAt());
         }
 
@@ -78,18 +78,17 @@ public class JCFMessageService implements MessageService{
 
     }
 
-    /*
-    public void buttonReaction(User user , Reaction reaction) {
-        reactionMap.computeIfAbsent(reaction, key -> new HashSet<>());
-        if(reactionMap.get(reaction).contains(user)){
-            reactionMap.get(reaction).remove(user);
-        }else {
-            reactionMap.get(reaction).add(user);
-
+    public void delete_UserToMessage(UUID userid){
+        for(Map.Entry<Reaction, Set<UUID>> entry : reactionMap.get(userid).entrySet()){
+            if(entry.getValue().contains(userid)){
+                entry.getValue().remove(userid);
+            }
         }
+
     }
 
-     */
+
+
 
     //////////////////////////////////
     public Message getTestMessage() {

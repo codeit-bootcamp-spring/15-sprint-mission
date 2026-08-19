@@ -40,15 +40,15 @@ public class Channel extends BaseClass{
         userMap.remove(user);
     }
 
-    public ChannelRole getRole(User user) {
+    /*public ChannelRole getRole(User user) {
         return userMap.get(user);
     }
 
     public void addMessage(Message message) {
-        if(userMap.containsKey(message.getUser())){
+        if(userMap.containsKey(message.getUserid())){
             messages.add(message);
         }
-    }
+    }*/
 
 
 

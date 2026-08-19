@@ -28,7 +28,7 @@ public class Main {
         User testUser = userServiceservice.getTestUser();
         UUID testUserID = userServiceservice.getTestUser().getId();
 
-        messageService.create(testUser,"와랄랄루");
+        messageService.create(testUser.getId(),"와랄랄루");
 
 
         System.out.println("\n\n\n메세지 생성");
