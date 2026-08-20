@@ -19,7 +19,7 @@ public class ServiceFactory {
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public ServiceFactory() { // 스프링 권장 : 생성자로 의존성 주입
+    public ServiceFactory() { // 생성자로 의존성 주입
         this.userService = new FileUserService();
         this.channelService = new FileChannelService();
         this.messageService = new FileMessageService(this.userService, this.channelService);

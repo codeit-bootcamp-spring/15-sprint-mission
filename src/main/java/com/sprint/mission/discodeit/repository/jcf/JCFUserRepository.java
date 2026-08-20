@@ -3,9 +3,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFUserRepository implements UserRepository {
 
@@ -23,6 +21,10 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public User load(UUID id) {
         return data.get(id);
+    }
+
+    public List<User> loadValue() {
+        return new ArrayList<>(data.values());
     }
 
     @Override

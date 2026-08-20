@@ -6,18 +6,22 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.service.ChannelService;
 import com.sprint.mission.discodeit.entity.service.MessageService;
 import com.sprint.mission.discodeit.entity.service.UserService;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
 
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data; // 저장 로직
+    // private final Map<UUID, Message> data; // 저장 로직
     private final ChannelService ChannelService;
     private final UserService UserService;
+    private final JCFMessageRepository jcfMessageRepository;
+
 
     public JCFMessageService(UserService userService, ChannelService channelService) {
         this.ChannelService = channelService;
         this.UserService = userService;
-        this.data = new LinkedHashMap<>(); // 저장 로직
+        // this.data = new LinkedHashMap<>(); // 저장 로직
+        this.jcfMessageRepository = new JCFMessageRepository();
     }
 
 
@@ -30,7 +34,7 @@ public class JCFMessageService implements MessageService {
         if (user1 != null) {
             if (channel1 != null) {
                 Message message = new Message(content, user.getId(), channel.getId());
-                data.put(message.getId(), message);
+                jcfMessageRepository.save(message);
                 return message;
             }
             else {
@@ -43,25 +47,25 @@ public class JCFMessageService implements MessageService {
 
     @Override
     public Message getById(UUID id) {
-        return data.get(id);
+        return jcfMessageRepository.load(id);
     } // 저장 로직
 
     @Override
     public List<Message> readAll() {
-        return new ArrayList<>(data.values());
+        return jcfMessageRepository.loadValue();
     } // 저장 로직
 
     @Override
     public Message update(UUID id, String content) {
-        Message message = data.get(id); // 저장 로직
+        Message message = jcfMessageRepository.load(id); // 저장 로직
         message.update(content);
-        data.put(id, message);
+        jcfMessageRepository.save(message);
         return message;
     }
 
     @Override
     public boolean deleteByID(UUID id) {
-        return data.remove(id, data.get(id)); // 저장 로직
+        return jcfMessageRepository.delete(id); // 저장 로직
     }
 
     // data 필드를 활용해 생성, 조회, 수정, 삭제하는 메소드를 구현하세요.
