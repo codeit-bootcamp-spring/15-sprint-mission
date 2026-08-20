@@ -63,25 +63,34 @@ public class JCFMessageService implements MessageService{
 
     }
     ////////////////////////////////////////
-    public void toggleReaction(UUID messageid, UUID userId, Reaction reaction) {
-        reactionMap.get(messageid).computeIfAbsent(reaction, key -> new HashSet<>());
-        if(reactionMap.get(messageid).get(reaction).contains(userId)){
-            reactionMap.get(messageid).get(reaction).remove(userId);
+    public void toggleReaction(UUID messageId, UUID userId, Reaction reaction) {
+        reactionMap.get(messageId).computeIfAbsent(reaction, key -> new HashSet<>());
+        if(reactionMap.get(messageId).get(reaction).contains(userId)){
+            reactionMap.get(messageId).get(reaction).remove(userId);
         }else {
-            reactionMap.get(messageid).get(reaction).add(userId);
+            reactionMap.get(messageId).get(reaction).add(userId);
         }
     }
 
-    public int getReactionCount(UUID messageid,Reaction reaction){
-        if(reactionMap.containsKey(messageid)){
+    public void printReactionCount(UUID messageid){
+        if(!reactionMap.containsKey(messageid)){
+            for (Reaction reaction : reactionMap.get(messageid).keySet()){
+                System.out.println(reaction + " : 의 수 " + reactionMap.get(messageid).get(reaction).size());
+            }
+        }
+        else {
+            throw new IllegalArgumentException("해당 id가 없습니다.");
+        }
+
+        /*if(reactionMap.containsKey(messageid)){
             if(reactionMap.get(messageid).containsKey(reaction)){
-                return reactionMap.get(messageid).get(reaction).size();
+                System.out.println(reactionMap.get(messageid).get(reaction).size());
             }else {
-                return 0;
+                System.out.println(0);
             }
         }else  {
             throw new IllegalArgumentException("해당 id가 없습니다.");
-        }
+        }*/
 
     }
 

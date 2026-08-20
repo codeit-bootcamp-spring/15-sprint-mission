@@ -69,15 +69,13 @@ public class Main {
 
 
 
-        System.out.println(messageService.getReactionCount(messageService.getTestMessage().getId(),
-                Reaction.ANGRY));
+
 
         messageService.toggleReaction(messageService.getTestMessage().getId(),
                 userServiceservice.getTestUser().getId(),
                 Reaction.ANGRY);
 
-        System.out.println(messageService.getReactionCount(messageService.getTestMessage().getId(),
-                Reaction.ANGRY));
+
 
 
 
