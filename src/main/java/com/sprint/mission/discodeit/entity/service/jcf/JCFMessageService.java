@@ -10,14 +10,14 @@ import com.sprint.mission.discodeit.entity.service.UserService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data;
+    private final Map<UUID, Message> data; // 저장 로직
     private final ChannelService ChannelService;
     private final UserService UserService;
 
     public JCFMessageService(UserService userService, ChannelService channelService) {
         this.ChannelService = channelService;
         this.UserService = userService;
-        this.data = new LinkedHashMap<>();
+        this.data = new LinkedHashMap<>(); // 저장 로직
     }
 
 
@@ -25,19 +25,7 @@ public class JCFMessageService implements MessageService {
     // 메시지를 생성할 때 필요한 모델의 데이터? 보내는 사람 이름, 전화번호
     @Override
     public Message createMessage(String content, User user, Channel channel) {
-        // 객체를 넘겨받아서,
-        // 각 객체의 아이디가 Map에 포함돼 있는지 유효성 검증을 해야한다.
-//        if (userMap.containsKey(user.getId())) {
-//            if (channelMap.containsKey(channel.getId())) {
-//                Message message = new Message(content, user.getId(), channel.getId());
-//                data.put(message.getId(), message);
-//                return message;
-//            }
-//        }
-
-        // 유저 아이디를 유저 객체에서 가져온다.
-        // 그 객체가 null이 아닌지를 판별한다. -> 유효성 검즏
-        User user1 = this.UserService.getById(user.getId());
+        User user1 = this.UserService.getById(user.getId()); // 비즈니스 로직
         Channel channel1 = this.ChannelService.getById(channel.getId());
         if (user1 != null) {
             if (channel1 != null) {
@@ -56,25 +44,24 @@ public class JCFMessageService implements MessageService {
     @Override
     public Message getById(UUID id) {
         return data.get(id);
-    }
+    } // 저장 로직
 
     @Override
     public List<Message> readAll() {
         return new ArrayList<>(data.values());
-    }
+    } // 저장 로직
 
     @Override
     public Message update(UUID id, String content) {
-        data.get(id).update(content);
-        data.put(id, data.get(id));
-
-
-        return data.get(id);
+        Message message = data.get(id); // 저장 로직
+        message.update(content);
+        data.put(id, message);
+        return message;
     }
 
     @Override
     public boolean deleteByID(UUID id) {
-        return data.remove(id, data.get(id));
+        return data.remove(id, data.get(id)); // 저장 로직
     }
 
     // data 필드를 활용해 생성, 조회, 수정, 삭제하는 메소드를 구현하세요.

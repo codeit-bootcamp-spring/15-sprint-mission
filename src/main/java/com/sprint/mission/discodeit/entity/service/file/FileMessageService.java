@@ -22,7 +22,7 @@ public class FileMessageService implements MessageService, Serializable {
     public FileMessageService(UserService userService, ChannelService channelService) {
         this.ChannelService = channelService;
         this.UserService = userService;
-        this.data = new LinkedHashMap<>();
+        this.data = new LinkedHashMap<>(); // 저장 로직
     }
 
 
@@ -35,7 +35,7 @@ public class FileMessageService implements MessageService, Serializable {
                 Message message = new Message(content, user.getId(), channel.getId());
                 data.put(message.getId(), message);
                 // 직렬화
-                try (FileOutputStream fos = new FileOutputStream("message.ser");
+                try (FileOutputStream fos = new FileOutputStream("message.ser"); // 저장 로직
                      ObjectOutputStream oos = new ObjectOutputStream(fos);
                 ) {
                     oos.writeObject(data);
@@ -55,15 +55,16 @@ public class FileMessageService implements MessageService, Serializable {
     @Override
     public Message getById(UUID id) {
         return data.get(id);
-    }
+    } // 저장 로직
 
     public List<Message> readAll() {
         return new ArrayList<>(data.values());
-    }
+    } // 저장 로직
 
     @Override
     public Message update(UUID id, String content) {
-        data.get(id).update(content);
+        Message message = data.get(id); // 저장 로직
+        message.update(content); // 저장 로직
         data.put(id, data.get(id));
         // 직렬화
         try (FileOutputStream fos = new FileOutputStream("message.ser");
@@ -74,13 +75,13 @@ public class FileMessageService implements MessageService, Serializable {
             e.printStackTrace();
         }
 
-        return data.get(id);
+        return message;
     }
 
     @Override
     public boolean deleteByID(UUID id) {
-        boolean result = data.remove(id, data.get(id));
-        try (FileOutputStream fos = new FileOutputStream("message.ser");
+        boolean result = data.remove(id, data.get(id)); // 저장 로직
+        try (FileOutputStream fos = new FileOutputStream("message.ser"); // 저장 로직
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(data);

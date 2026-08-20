@@ -8,44 +8,42 @@ import java.util.*;
 
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data;
+    private final Map<UUID, Channel> data; // 저장 로직
 
     public JCFChannelService() {
         this.data = new LinkedHashMap<>();
-    }
+    }  // 저장 로직
 
     @Override
     public Channel createChannel(String name, String topic) {
         Channel channel = new Channel(name, topic);
-        data.put(channel.getId(), channel);
+        data.put(channel.getId(), channel); // 저장 로직
         return channel;
     }
 
-    public Map<UUID, Channel> getData() {
-        return data;
-    }
 
     @Override
     public Channel getById(UUID id) {
         return data.get(id);
-    }
+    } // 저장 로직
 
     @Override
     public List<Channel> readAll() {
         return new ArrayList<>(data.values());
-    }
+    } // 저장 로직
 
     @Override
     public Channel update(UUID id, String name, String topic) {
         // 수정 : 조회 + 추가
-        data.get(id).update(name, topic);
+        Channel channel = data.get(id); // 저장 로직
+        channel.update(name, topic); // 저장 로직
         data.put(id, data.get(id));
-        return data.get(id);
+        return channel;
     }
 
     @Override
     public boolean deletebyID(UUID id) {
-        return data.remove(id, data.get(id));
+        return data.remove(id, data.get(id)); // 저장 로직
     }
 
 

@@ -21,8 +21,8 @@ public class FileChannelService implements ChannelService, Serializable {
     public Channel createChannel(String name, String topic) {
         // 새로운 채널을 생성해주고, 그 생성한 채널을 파일에 직렬화하여 넣어주는 로직.
         Channel channel = new Channel(name, topic);
-        data.put(channel.getId(), channel);
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        data.put(channel.getId(), channel); // 저장 로직
+        try (FileOutputStream fos = new FileOutputStream("channel.ser"); // 저장 로직
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(data);
@@ -36,33 +36,34 @@ public class FileChannelService implements ChannelService, Serializable {
     @Override
     public Channel getById(UUID id) {
         return data.get(id);
-    }
+    } // 저장 로직
 
     @Override
     public List<Channel> readAll() {
         return new ArrayList<>(data.values());
-    }
+    } // 저장 로직
 
     @Override
     public Channel update(UUID id, String name, String topic) {
-        data.get(id).update(name, topic); // 조회
-        data.put(id, data.get(id)); // 추가
+        Channel channel = data.get(id);
+        channel.update(name, topic); // 조회 // 저장 로직
+        data.put(id, channel); // 추가 // 저장 로직
 
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        try (FileOutputStream fos = new FileOutputStream("channel.ser"); // 저장 로직
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(data);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return data.get(id);
+        return channel;
     }
 
     @Override
     public boolean deletebyID(UUID id) {
-        boolean result = data.remove(id, data.get(id));
+        boolean result = data.remove(id, data.get(id)); // 저장 로직
         // 삭제 여부를 result에 저장
-        try (FileOutputStream fos = new FileOutputStream("channel.ser");
+        try (FileOutputStream fos = new FileOutputStream("channel.ser"); // 저장 로직
              ObjectOutputStream oos = new ObjectOutputStream(fos);
         ) {
             oos.writeObject(result);
