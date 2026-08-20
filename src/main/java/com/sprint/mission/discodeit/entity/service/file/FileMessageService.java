@@ -19,7 +19,7 @@ public class FileMessageService implements MessageService, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public FileMessageService(Map<UUID, Message> data, ChannelService channelService, UserService userService) {
+    public FileMessageService(UserService userService, ChannelService channelService) {
         this.ChannelService = channelService;
         this.UserService = userService;
         this.data = new LinkedHashMap<>();

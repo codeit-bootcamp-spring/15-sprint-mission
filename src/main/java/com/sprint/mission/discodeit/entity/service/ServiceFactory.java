@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.entity.service;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.service.file.FileChannelService;
+import com.sprint.mission.discodeit.entity.service.file.FileMessageService;
+import com.sprint.mission.discodeit.entity.service.file.FileUserService;
 import com.sprint.mission.discodeit.entity.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.entity.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.entity.service.jcf.JCFUserService;
@@ -17,9 +20,9 @@ public class ServiceFactory {
     private final MessageService messageService;
 
     public ServiceFactory() { // 스프링 권장 : 생성자로 의존성 주입
-        this.userService = new JCFUserService();
-        this.channelService = new JCFChannelService();
-        this.messageService = new JCFMessageService(this.userService, this.channelService);
+        this.userService = new FileUserService();
+        this.channelService = new FileChannelService();
+        this.messageService = new FileMessageService(this.userService, this.channelService);
     }
     // -> getter setter
 

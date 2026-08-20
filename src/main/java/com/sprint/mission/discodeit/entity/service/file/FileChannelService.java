@@ -4,11 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.service.ChannelService;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-
+import java.util.*;
 
 
 public class FileChannelService implements ChannelService, Serializable {
@@ -17,8 +13,8 @@ public class FileChannelService implements ChannelService, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public FileChannelService(Map<UUID, Channel> data) {
-        this.data = data;
+    public FileChannelService() {
+        this.data = new LinkedHashMap<>();
     }
 
     @Override

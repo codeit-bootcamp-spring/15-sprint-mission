@@ -5,10 +5,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.service.UserService;
 
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class FileUserService implements UserService, Serializable {
 
@@ -17,8 +14,8 @@ public class FileUserService implements UserService, Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    public FileUserService(Map<UUID, User> data) {
-        this.data = data;
+    public FileUserService() {
+        this.data = new LinkedHashMap<>();
     }
 
     @Override
