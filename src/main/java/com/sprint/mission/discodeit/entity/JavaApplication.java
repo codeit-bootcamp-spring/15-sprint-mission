@@ -8,6 +8,20 @@ import com.sprint.mission.discodeit.entity.service.UserService;
 import java.util.*;
 
 public class JavaApplication {
+    static User setupUser(UserService userService) {
+        User user = userService.createUser("태민", "0107389256");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.createChannel("공지", "공지채널");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, User user, Channel channel) {
+        Message message = messageService.createMessage("안녕하세영", user, channel);
+        System.out.println("메시지 생성: " +"메시지 ID: " + message.getId() + " 내용: " + message.getContent());
+    }
     public static void main(String[] args) {
 
         ServiceFactory serviceFactory = new ServiceFactory();
@@ -16,50 +30,29 @@ public class JavaApplication {
         MessageService m = serviceFactory.getMessageService();
         UserService u = serviceFactory.getUserService();
 
-        List<UUID> arrayList = new ArrayList<UUID>();
-
-        // 채널 CRUD
-        System.out.println("<< 채널 생성 >>");
-        ch.createChannel("양띵", "마크");
-        ch.createChannel("블루위키", "마크");
-
-        System.out.println("<< 단건 조회 >> ");
-        List<Channel> channels = ch.readAll();
-        System.out.println("ID: "+ channels.get(0).getId() + " 채널명: "+ channels.get(0).getChannelName() + " 주제: "+ channels.get(0).getTopic());
-
-        System.out.println("<< 다건 조회 >>");
-        for (Channel channel : ch.readAll()) {
-            System.out.println("ID: "+ channel.getId() + " 채널명: "+ channel.getChannelName() + " 주제: "+ channel.getTopic());
-        }
-
-        System.out.println("<< 수정 >> ");
-        Channel result = ch.update(ch.readAll().get(0).getId(), "츄", "뷰티");
-
-        System.out.println("<< 수정된 데이터 조회 >> ");
-        System.out.println("ID: "+ result.getId() + " 채널명: "+ result.getChannelName() + " 주제: "+ result.getTopic());
-
-        System.out.println("<< index 0 삭제 >> ");
-        ch.deletebyID(ch.readAll().get(0).getId());
-
-        System.out.println("<< 삭제 후 조회 >>");
-        for (Channel channel : ch.readAll()) {
-            System.out.println("ID: "+ channel.getId() + " 채널명: "+ channel.getChannelName() + " 주제: "+ channel.getTopic());
-        }
+        User user = setupUser(u);
+        // 셋업
+        Channel channel = setupChannel(ch);
+        // 테스트
+        System.out.println("<< AOP 테스트 >>");
+        messageCreateTest(m, user, channel);
         System.out.println();
 
         // 유저 CRUD
+        System.out.println("<-- 유저 CRUD -->");
         System.out.println("<< 유저 생성 >>");
         u.createUser("최태민", "0108059765");
         u.createUser("진현선", "0107045043");
         u.createUser("김진모", "0102239994");
+
 
         System.out.println("<< 단건 조회 >>");
         List<User> users = u.readAll();
         System.out.println("ID: "+ users.get(0).getId() + " 휴대폰 번호: "+ users.get(0).getPhoneNum());
 
         System.out.println("<< 다건 조회 >>");
-        for (User user : u.readAll()) {
-            System.out.println("ID: "+ user.getId()+ " 이름: " + user.getName() + " 휴대폰 번호: "+ user.getPhoneNum());;
+        for (User user1 : u.readAll()) {
+            System.out.println("ID: "+ user1.getId()+ " 이름: " + user1.getName() + " 휴대폰 번호: "+ user1.getPhoneNum());;
         }
 
         System.out.println("<< 수정 >>");
@@ -72,12 +65,45 @@ public class JavaApplication {
         u.deleteById(u.readAll().get(1).getId());
 
         System.out.println("<< 삭제 후 조회 >>");
-        for (User user : u.readAll()) {
-            System.out.println("ID: " + user.getId() + " 이름: " + user.getName() + " 휴대폰 번호: " + user.getPhoneNum());
+        for (User user2 : u.readAll()) {
+            System.out.println("ID: " + user2.getId() + " 이름: " + user2.getName() + " 휴대폰 번호: " + user2.getPhoneNum());
         }
+        System.out.println();
+
+        // 채널 CRUD
+        System.out.println("<-- 채널 CRUD -->");
+        System.out.println("<< 채널 생성 >>");
+
+        ch.createChannel("자유", "수다");
+        ch.createChannel("스터디", "공부");
+
+        System.out.println("<< 단건 조회 >> ");
+        List<Channel> channels = ch.readAll();
+        System.out.println("ID: "+ channels.get(0).getId() + " 채널명: "+ channels.get(0).getChannelName() + " 주제: "+ channels.get(0).getTopic());
+
+        System.out.println("<< 다건 조회 >>");
+        for (Channel channel2 : ch.readAll()) {
+            System.out.println("ID: "+ channel2.getId() + " 채널명: "+ channel2.getChannelName() + " 주제: "+ channel2.getTopic());
+        }
+
+        System.out.println("<< 수정 >> ");
+        Channel result = ch.update(ch.readAll().get(1).getId(), "게임채널", "게임");
+
+        System.out.println("<< 수정된 데이터 조회 >> ");
+        System.out.println("ID: "+ result.getId() + " 채널명: "+ result.getChannelName() + " 주제: "+ result.getTopic());
+
+        System.out.println("<< index 0 삭제 >> ");
+        ch.deletebyID(ch.readAll().get(0).getId());
+
+        System.out.println("<< 삭제 후 조회 >>");
+        for (Channel channel3 : ch.readAll()) {
+            System.out.println("ID: "+ channel3.getId() + " 채널명: "+ channel3.getChannelName() + " 주제: "+ channel3.getTopic());
+        }
+
 
         // 메시지 CRUD
         System.out.println();
+        System.out.println("<-- 메시지 CRUD -->");
         System.out.println("<< 메시지 생성 >>");
         m.createMessage("코드잇 스프린트는 정말 유익해", u.readAll().get(0), ch.readAll().get(0));
         m.createMessage("배고파", u.readAll().get(1), ch.readAll().get(0));
