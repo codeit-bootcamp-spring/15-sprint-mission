@@ -5,6 +5,9 @@ public class ManagerTest {
 
         Manager.getInstance().userManager();
 
+
+        Manager.getInstance().userManager();
+
         Manager.getInstance().userManager();
     }
 }

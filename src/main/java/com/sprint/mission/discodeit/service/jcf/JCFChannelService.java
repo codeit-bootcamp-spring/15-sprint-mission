@@ -16,7 +16,7 @@ public class JCFChannelService implements ChannelService{
     final Set<Channel>  channelSet = new HashSet<>();
     //final Map<UUID, >
 
-    ////////////////////
+    ////////////////////테스트용 나중에 삭제
     public Map<UUID, List<UUID>> getMessagesListMap() {
         return messagesListMap;
     }

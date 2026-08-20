@@ -22,6 +22,9 @@ public class JCFUserService implements UserService{
 
 
 
+    public Set<User> getUsers(){
+        return new HashSet<>(userMap.values());
+    }
 
     @Override
     public void create(String email, String password, String name, NitroLevel nitroLevel) {
@@ -39,6 +42,7 @@ public class JCFUserService implements UserService{
             System.out.println("ID: " + entry.getKey());
             System.out.println("이름: " + entry.getValue().getName());
             System.out.println("이메일: " + entry.getValue().getEmail());
+            System.out.println("니트로: " + entry.getValue().getNitroLevel().toString());
             System.out.println("수정시간: " + entry.getValue().getUpdatedAt());
         }
 
