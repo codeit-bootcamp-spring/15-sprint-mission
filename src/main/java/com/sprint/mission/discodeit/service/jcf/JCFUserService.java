@@ -20,8 +20,7 @@ public class JCFUserService implements UserService{
         return instance;
     }
 
-    JCFChannelService channelService = JCFChannelService.getInstance();
-    JCFMessageService messageService = JCFMessageService.getInstance();
+
 
 
     @Override
@@ -59,8 +58,8 @@ public class JCFUserService implements UserService{
     @Override
     public void delete(UUID id) {
         userMap.remove(id);
-        messageService.delete_UserToMessage(id);
-        channelService.delete_UserToChannel(id);
+        JCFMessageService.getInstance().delete_UserToMessage(id);
+        JCFChannelService.getInstance().delete_UserToChannel(id);
     }
 
 

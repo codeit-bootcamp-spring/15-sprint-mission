@@ -22,16 +22,17 @@ public class JCFMessageService implements MessageService{
     }
 
 
-    JCFChannelService channelService = JCFChannelService.getInstance();
 
 
 
     @Override
-    public void create(UUID userId, String message) {
+    public void create(UUID channelId,UUID userId, String message) {
         Message messageCreate = new Message(userId,message);
         messageMap.put(messageCreate.getId(),messageCreate);
         reactionMap.put(messageCreate.getId(),new HashMap<>());
         testMessage = messageCreate;
+        JCFChannelService.getInstance()
+                .addMessage(channelId, userId, messageCreate.getId());
     }
 
     @Override
@@ -58,7 +59,8 @@ public class JCFMessageService implements MessageService{
     public void delete(UUID id) {
         messageMap.remove(id);
         reactionMap.remove(id);
-        channelService.delete_MessageToChannel(id);
+        JCFChannelService.getInstance()
+                .delete_MessageToChannel(id);
 
 
     }
@@ -73,12 +75,11 @@ public class JCFMessageService implements MessageService{
     }
 
     public void printReactionCount(UUID messageid){
-        if(!reactionMap.containsKey(messageid)){
+        if(reactionMap.containsKey(messageid)){
             for (Reaction reaction : reactionMap.get(messageid).keySet()){
                 System.out.println(reaction + " : 의 수 " + reactionMap.get(messageid).get(reaction).size());
             }
-        }
-        else {
+        } else {
             throw new IllegalArgumentException("해당 id가 없습니다.");
         }
 
@@ -103,7 +104,7 @@ public class JCFMessageService implements MessageService{
     }
 
     public void delete_ChannelToMessage(UUID channelId){
-        for(UUID id : channelService.messagesListMap.get(channelId)){
+        for(UUID id : JCFChannelService.getInstance().messagesListMap.get(channelId)){
             messageMap.remove(id);
             reactionMap.remove(id);
         }

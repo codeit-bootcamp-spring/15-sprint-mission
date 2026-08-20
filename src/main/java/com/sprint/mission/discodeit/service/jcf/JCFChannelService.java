@@ -16,7 +16,12 @@ public class JCFChannelService implements ChannelService{
     final Set<Channel>  channelSet = new HashSet<>();
     //final Map<UUID, >
 
+    ////////////////////
+    public Map<UUID, List<UUID>> getMessagesListMap() {
+        return messagesListMap;
+    }
 
+    ////////////////////////////
     Channel testChannel;
 
     private final static JCFChannelService instance = new JCFChannelService();
@@ -27,15 +32,17 @@ public class JCFChannelService implements ChannelService{
         return instance;
     }
 
-    JCFMessageService messageService = JCFMessageService.getInstance();
+
 
 
 
 
     @Override
     public void create(String name) {
-        if(channelSet.contains(name)){
-            throw new IllegalArgumentException("이미 존재하는 채널명");
+        for (Channel channel : channelSet) {
+            if (channel.getName().equals(name)) {
+                throw new IllegalArgumentException("이미 존재하는 채널명");
+            }
         }
 
         Channel channelCreate = new Channel(name);
@@ -64,24 +71,23 @@ public class JCFChannelService implements ChannelService{
                 channel.update(name);
                 cheekID=true;
             }
-            if(!cheekID){
-                throw new IllegalArgumentException("해당 id가 없습니다.");
-            }
+        }
+        if(!cheekID){
+            throw new IllegalArgumentException("해당 id가 없습니다.");
         }
 
     }
 
     @Override
     public void delete(UUID id) {
+
+        JCFMessageService.getInstance().delete_ChannelToMessage(id);
+
         userRoleMap.remove(id);
         messagesListMap.remove(id);
-        for(Channel channel : channelSet){
-            if (channel.getId().equals(id)) {
-                channelSet.remove(channel);
-            }
-        }
+        channelSet.removeIf(channel -> channel.getId().equals(id));
 
-        messageService.delete_ChannelToMessage(id);
+
 
     }
 
@@ -106,13 +112,13 @@ public class JCFChannelService implements ChannelService{
         }
     }
 
-    public void removeMessage(UUID channelId, UUID messageId) {
+   /* public void removeMessage(UUID channelId, UUID messageId) {
         if(userRoleMap.containsKey(channelId)){
             if(userRoleMap.get(channelId).containsKey(messageId)){
                 messagesListMap.get(channelId).remove(messageId);
             }
         }
-    }
+    }*/
 
 
     public void delete_UserToChannel(UUID userId){
