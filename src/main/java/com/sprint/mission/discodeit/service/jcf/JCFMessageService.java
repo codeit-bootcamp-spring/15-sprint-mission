@@ -28,11 +28,14 @@ public class JCFMessageService implements MessageService{
     @Override
     public void create(UUID channelId,UUID userId, String message) {
         Message messageCreate = new Message(userId,message);
+
+        JCFChannelService.getInstance()
+                .addMessage(channelId, userId, messageCreate.getId());
+
         messageMap.put(messageCreate.getId(),messageCreate);
         reactionMap.put(messageCreate.getId(),new HashMap<>());
         testMessage = messageCreate;
-        JCFChannelService.getInstance()
-                .addMessage(channelId, userId, messageCreate.getId());
+
     }
 
     @Override
@@ -66,6 +69,14 @@ public class JCFMessageService implements MessageService{
     }
     ////////////////////////////////////////
     public void toggleReaction(UUID messageId, UUID userId, Reaction reaction) {
+        if(!messageMap.containsKey(messageId)){
+            throw new IllegalArgumentException("메세지 ID가 없습니다.");
+        }
+
+        if(!JCFUserService.getInstance().userMap.containsKey(userId)){
+            throw new IllegalArgumentException("유저 ID가 없습니다.");
+        }
+
         reactionMap.get(messageId).computeIfAbsent(reaction, key -> new HashSet<>());
         if(reactionMap.get(messageId).get(reaction).contains(userId)){
             reactionMap.get(messageId).get(reaction).remove(userId);
@@ -102,14 +113,20 @@ public class JCFMessageService implements MessageService{
             }
         }
     }
-
+///////////////////////////////////
+    //
     public void delete_ChannelToMessage(UUID channelId){
+        /*if(JCFChannelService.getInstance().userRoleMap.containsKey(channelId)){
+            throw  new IllegalArgumentException("채널 id가 없습니다");
+        }*/
+
+        //채널에 속한 메세지들을 jcf에서 제거
         for(UUID id : JCFChannelService.getInstance().messagesListMap.get(channelId)){
             messageMap.remove(id);
             reactionMap.remove(id);
         }
     }
-
+////////////////////////////////////
 
 
 

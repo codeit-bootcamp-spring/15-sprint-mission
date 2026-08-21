@@ -59,8 +59,6 @@ public class JCFChannelService implements ChannelService{
             System.out.println("채널명: " + channel.getName());
             System.out.println("수정시간: " + channel.getUpdatedAt());
         }
-
-
     }
 
     @Override
@@ -68,6 +66,7 @@ public class JCFChannelService implements ChannelService{
         boolean cheekID=false;
 
         for (Channel channel : channelSet) {
+
             if (channel.getName().equals(name)) {
                 throw new IllegalArgumentException("이미 존재하는 채널명");
             }
@@ -88,23 +87,30 @@ public class JCFChannelService implements ChannelService{
     @Override
     public void delete(UUID id) {
 
-        JCFMessageService.getInstance().delete_ChannelToMessage(id);
+        if(userRoleMap.containsKey(id)){
+            JCFMessageService.getInstance().delete_ChannelToMessage(id);
+        }
 
         userRoleMap.remove(id);
         messagesListMap.remove(id);
         channelSet.removeIf(channel -> channel.getId().equals(id));
-
-
-
     }
 
     /////////////////////////////////////////////////
     public void putUser(UUID channelId, UUID userId, ChannelRole channelRole) {
-        if(userRoleMap.containsKey(channelId)){
-            userRoleMap.get(channelId).put(userId, channelRole);
+        if(!userRoleMap.containsKey(channelId)){
+            throw new IllegalArgumentException("해당 채널 id가 없습니다.");
         }
+        if(!JCFUserService.getInstance().userMap.containsKey(userId)){
+            throw new IllegalArgumentException("해당 유저 id가 없습니다.");
+        }
+
+        userRoleMap.get(channelId).put(userId, channelRole);
     }
     public void printUsers(UUID channelId) {
+        if(!userRoleMap.containsKey(channelId)){
+            throw new IllegalArgumentException("해당 채널 id가 없습니다.");
+        }
         for(Map.Entry<UUID, ChannelRole> map : userRoleMap.get(channelId).entrySet()){
             System.out.println(map.getKey());
             System.out.println(JCFUserService.getInstance().getUsername(map.getKey()) + "의 권한 :" + map.getValue());
@@ -118,11 +124,19 @@ public class JCFChannelService implements ChannelService{
     }
 
     public void addMessage(UUID channelId, UUID userId, UUID messageId) {
-        if(userRoleMap.containsKey(channelId)){
+        if(!userRoleMap.containsKey(channelId)){
+            throw new IllegalArgumentException("채널 id가 없습니다.");
+        }
+
+        if(!userRoleMap.get(channelId).containsKey(userId)){
+            throw new IllegalArgumentException("유저 id가 없거나 유저가 채널 소속이 아닙니다.");
+        }
+        messagesListMap.get(channelId).add(messageId);
+        /*if(userRoleMap.containsKey(channelId)){
             if(userRoleMap.get(channelId).containsKey(userId)){
                 messagesListMap.get(channelId).add(messageId);
             }
-        }
+        }*/
     }
 
    /* public void removeMessage(UUID channelId, UUID messageId) {

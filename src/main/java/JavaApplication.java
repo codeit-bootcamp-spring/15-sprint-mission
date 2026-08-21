@@ -6,6 +6,8 @@ public class JavaApplication {
         int choose;
         boolean loop = true;
 
+        Manager.getInstance().createTestUnit();
+
 
 
         Scanner sc = new Scanner(System.in);
