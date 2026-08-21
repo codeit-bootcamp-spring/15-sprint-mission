@@ -66,6 +66,13 @@ public class JCFChannelService implements ChannelService{
     @Override
     public void update(UUID id, String name) {
         boolean cheekID=false;
+
+        for (Channel channel : channelSet) {
+            if (channel.getName().equals(name)) {
+                throw new IllegalArgumentException("이미 존재하는 채널명");
+            }
+        }
+
         for(Channel channel : channelSet){
             if(channel.getId().equals(id)){
                 channel.update(name);
@@ -95,6 +102,12 @@ public class JCFChannelService implements ChannelService{
     public void putUser(UUID channelId, UUID userId, ChannelRole channelRole) {
         if(userRoleMap.containsKey(channelId)){
             userRoleMap.get(channelId).put(userId, channelRole);
+        }
+    }
+    public void printUsers(UUID channelId) {
+        for(Map.Entry<UUID, ChannelRole> map : userRoleMap.get(channelId).entrySet()){
+            System.out.println(map.getKey());
+            System.out.println(JCFUserService.getInstance().getUsername(map.getKey()) + "의 권한 :" + map.getValue());
         }
     }
 

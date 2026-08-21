@@ -1,5 +1,6 @@
-import com.sprint.mission.discodeit.entity.NitroLevel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
+import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.Scanner;
@@ -16,11 +17,14 @@ public class Manager {
     }
 
 
-    String id;
-    String email,password,name,nitro;
+
 
     Scanner sc = new Scanner(System.in);
     public void userManager(){
+
+        String id;
+        String email,password,name,nitro;
+
         System.out.println("메뉴를 선택하세요 \n" +
                 "1.유저 생성\n" +
                 "2.유저 목록 출력\n" +
@@ -123,13 +127,343 @@ public class Manager {
 
     public void channelManager(){
 
+        String id, messageId, userId;
+        String name;
+        ChannelRole channelRole;
+
+
+        System.out.println("메뉴를 선택하세요 \n" +
+                "1.채널 생성\n" +
+                "2.채널 목록 출력\n" +
+                "3.채널 정보 수정\n" +
+                "4.유저 등록/수정\n" +
+                "5.유저 목록\n" +
+                "6.유저 강퇴\n" +
+                "7.채널 삭제");
+
+        switch (sc.nextInt()){
+
+            case 1:
+                System.out.println("이름을 입력하세요");
+                name = sc.next();
+                JCFChannelService.getInstance().create(name);
+                break;
+
+            case 2:
+                JCFChannelService.getInstance().read();
+                break;
+
+            case 3:
+
+                System.out.println("수정할 채널의 ID() : ");
+                id = sc.next();
+
+                System.out.println("이름을 입력하세요");
+                name = sc.next();
+                JCFChannelService.getInstance().update(UUID.fromString(id),name);
+
+                //JCFUserService.getInstance().update(UUID.fromString(id),email,password,name,NitroLevel.valueOf(nitro));
+                break;
+
+
+            case 4://유저 등록 갱신  putUser(UUID channelId, UUID userId, ChannelRole channelRole)
+                System.out.println("등록할 채널의 ID() : ");
+                id = sc.next();
+                System.out.println("등록할 유저의 ID() : ");
+                userId = sc.next();
+
+
+                System.out.println("유저의 역할을 정해주세요 역할은 아래 목록이 있습니다.");
+                for (ChannelRole role : ChannelRole.values()){
+                    System.out.println(role);
+                }
+                channelRole = ChannelRole.valueOf(sc.next());
+
+                JCFChannelService.getInstance().putUser(UUID.fromString(id),UUID.fromString(userId),channelRole);
+
+                break;
+
+            case 5:
+                System.out.println("확인할 채널의 ID() : ");
+                id = sc.next();
+                JCFChannelService.getInstance().printUsers(UUID.fromString(id));
+                break;
+
+            case 6://유저 강퇴removeUser(UUID channelId, UUID userId)
+
+                System.out.println("강퇴할 채널의 ID() : ");
+                id = sc.next();
+                System.out.println("강퇴할 유저의 ID() : ");
+                userId = sc.next();
+
+                JCFChannelService.getInstance().removeUser(UUID.fromString(id),UUID.fromString(userId));
+
+                break;
+
+            case 7:
+                System.out.println("삭제할 채널의 ID() : ");
+                id = sc.next();
+
+                JCFChannelService.getInstance().delete(UUID.fromString(id));
+
+        }
+
+
     }
 
 
 
     public void messageManager(){
+        String id, channelId, userId;
+        String text;
+        Reaction reaction;
 
 
+        System.out.println("메뉴를 선택하세요 \n" +
+                "1.메세지 생성\n" +
+                "2.메세지 목록 출력\n" +
+                "3.메세지 수정\n" +
+                "4.리액션(좋/싫)하기\n" +
+                "5.리액션 출력\n" +
+                "6.메세지 삭제");
+
+        switch (sc.nextInt()){
+
+            case 1:
+                System.out.println("보낼 채널의 ID를 입력하세요 : ");
+                channelId = sc.next();
+
+                System.out.println("보낼 유저의 ID를 입력하세요 : ");
+                userId = sc.next();
+
+                System.out.println("메세지 내용을 입력하세요 : ");
+                text = sc.next();
+
+                JCFMessageService.getInstance().create(UUID.fromString(channelId),UUID.fromString(userId),text);
+                break;
+
+            case 2:
+                JCFMessageService.getInstance().read();
+                break;
+
+            case 3:
+
+                System.out.println("수정할 메세지 ID() : ");
+                id = sc.next();
+
+                System.out.println("메세지 내용을 입력하세요");
+                text = sc.next();
+                JCFMessageService.getInstance().update(UUID.fromString(id),text);
+                break;
+
+
+            case 4://toggleReaction(UUID messageId, UUID userId, Reaction reaction)
+                System.out.println("반응할 메세지 ID() : ");
+                id = sc.next();
+
+                System.out.println("반응할 유저 ID() : ");
+                userId = sc.next();
+
+                System.out.println("반응을 정해주세요 반응은 아래 목록이 있으며 다시 토글하면 취소합니다.");
+                for (Reaction re : Reaction.values()){
+                    System.out.println(re);
+                }
+                reaction = Reaction.valueOf(sc.next());
+
+                JCFMessageService.getInstance().toggleReaction(UUID.fromString(id),UUID.fromString(userId),reaction);
+
+
+
+                break;
+
+            case 5://printReactionCount(UUID messageid)
+                System.out.println("출력할 메세지 ID() : ");
+                id = sc.next();
+
+                JCFMessageService.getInstance().printReactionCount(UUID.fromString(id));
+
+                break;
+
+            case 6:
+                System.out.println("삭제할 메세지의 ID() : ");
+                id = sc.next();
+
+                JCFMessageService.getInstance().delete(UUID.fromString(id));
+
+        }
+
+
+    }
+
+
+    public void createTestUnit() {
+
+        JCFUserService userService = JCFUserService.getInstance();
+        JCFChannelService channelService = JCFChannelService.getInstance();
+        JCFMessageService messageService = JCFMessageService.getInstance();
+
+        // =========================
+        // 유저 3명 생성
+        // =========================
+
+        userService.create(
+                "test1@test.com",
+                "1234",
+                "유저1",
+                NitroLevel.CLASSIC
+        );
+        UUID user1 = userService.getTestUser().getId();
+
+        userService.create(
+                "test2@test.com",
+                "1234",
+                "유저2",
+                NitroLevel.CLASSIC
+        );
+        UUID user2 = userService.getTestUser().getId();
+
+        userService.create(
+                "test3@test.com",
+                "1234",
+                "유저3",
+                NitroLevel.CLASSIC
+        );
+        UUID user3 = userService.getTestUser().getId();
+
+
+        // =========================
+        // 채널 3개 생성
+        // =========================
+
+        channelService.create("테스트채널1");
+        UUID channel1 = channelService.getTestChannel().getId();
+
+        channelService.create("테스트채널2");
+        UUID channel2 = channelService.getTestChannel().getId();
+
+        channelService.create("테스트채널3");
+        UUID channel3 = channelService.getTestChannel().getId();
+
+
+        UUID[] userIds = {
+                user1,
+                user2,
+                user3
+        };
+
+        UUID[] channelIds = {
+                channel1,
+                channel2,
+                channel3
+        };
+
+
+        // =========================
+        // 모든 유저를 모든 채널에 등록
+        // =========================
+
+        for (UUID channelId : channelIds) {
+            for (UUID userId : userIds) {
+                channelService.putUser(
+                        channelId,
+                        userId,
+                        ChannelRole.MEMBER
+                );
+            }
+        }
+
+
+        // =========================
+        // 메시지 9개 생성
+        // =========================
+
+        UUID[][] messageIds = new UUID[3][3];
+
+        for (int userIndex = 0; userIndex < userIds.length; userIndex++) {
+
+            for (int channelIndex = 0;
+                 channelIndex < channelIds.length;
+                 channelIndex++) {
+
+                messageService.create(
+                        channelIds[channelIndex],
+                        userIds[userIndex],
+                        "유저" + (userIndex + 1)
+                                + "-채널" + (channelIndex + 1)
+                                + " 메시지"
+                );
+
+                messageIds[userIndex][channelIndex] =
+                        messageService.getTestMessage().getId();
+            }
+        }
+
+
+        // =========================
+        // testUnitID.txt 작성
+        // =========================
+
+        StringBuilder text = new StringBuilder();
+
+        for (int i = 0; i < userIds.length; i++) {
+            text.append("유저")
+                    .append(i + 1)
+                    .append(" : ")
+                    .append(userIds[i])
+                    .append(System.lineSeparator());
+        }
+
+        text.append(System.lineSeparator());
+
+        for (int i = 0; i < channelIds.length; i++) {
+            text.append("채널")
+                    .append(i + 1)
+                    .append(" : ")
+                    .append(channelIds[i])
+                    .append(System.lineSeparator());
+        }
+
+        text.append(System.lineSeparator());
+
+        for (int userIndex = 0; userIndex < messageIds.length; userIndex++) {
+
+            for (int channelIndex = 0;
+                 channelIndex < messageIds[userIndex].length;
+                 channelIndex++) {
+
+                text.append("유저")
+                        .append(userIndex + 1)
+                        .append("-채널")
+                        .append(channelIndex + 1)
+                        .append(" 메세지 : ")
+                        .append(messageIds[userIndex][channelIndex])
+                        .append(System.lineSeparator());
+            }
+        }
+
+
+        // =========================
+        // 파일 저장
+        // =========================
+
+        try {
+            java.nio.file.Path path =
+                    java.nio.file.Paths.get(
+                            "src",
+                            "main",
+                            "메모",
+                            "testUnitID.txt"
+                    );
+
+            java.nio.file.Files.writeString(
+                    path,
+                    text.toString(),
+                    java.nio.charset.StandardCharsets.UTF_8
+            );
+
+        } catch (java.io.IOException e) {
+            throw new RuntimeException("testUnitID.txt 생성 실패", e);
+        }
     }
 
 }
