@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
-import java.nio.*;
 import java.nio.file.*;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,17 +13,34 @@ public class FileUserService implements UserService, Serializable {
     private File[] files;
 
     public FileUserService() {
-        path = Paths.get("user");
+        path = Paths.get("data\\user");
 
         try {
             Files.createDirectory(path);
             System.out.println("[초기화 단계] user 데이터 저장을 위한 디렉토리가 생성되었습니다.");
-        } catch (NoSuchFileException e) {
+        } catch (FileAlreadyExistsException ignored) {
+
+        }
+        catch (NoSuchFileException e) {
             System.out.println("폴더 경로가 없음");
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    private void updateSave(User user) {
+        try {
+            FileOutputStream fos = new FileOutputStream("data\\user\\user-" + user.getId() + ".ser");
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+
+            oos.writeObject(user);
+            System.out.println(user.getUser() + " 유저 저장 완료.");
+
+            oos.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -41,14 +57,14 @@ public class FileUserService implements UserService, Serializable {
                 }
             }
 
-            FileOutputStream fos = new FileOutputStream("user\\user-" + user.getId() + ".ser");
+            FileOutputStream fos = new FileOutputStream("data\\user\\user-" + user.getId() + ".ser");
             ObjectOutputStream oos = new ObjectOutputStream(fos);
 
             oos.writeObject(user);
             System.out.println(user.getUser() + " 유저 저장 완료.");
 
-            fos.close();
             oos.close();
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -111,6 +127,21 @@ public class FileUserService implements UserService, Serializable {
             System.out.println("읽을 파일이 없습니다.");
             return;
         }
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                Object obj = ois.readObject();
+                User c = (User) obj;
+                if (c.getUser().equals(data)) {
+                    System.out.println("동일한 이름의 유저가 이미 존재합니다.");
+                    return;
+                }
+
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("파일 역직렬화 실패: " + file.getName());
+            }
+        }
+
         for (File file : files) {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Object obj = ois.readObject();
@@ -118,6 +149,10 @@ public class FileUserService implements UserService, Serializable {
                 if (u.getId().equals(user.getId())) {
                     String temp = u.getUser();
                     u.setUser(data);
+                    u.setUpdatedAt();
+
+                    updateSave(u);
+
                     System.out.println(temp + " -> " + data + " 로 정상적으로 Update 완료.");
                     return;
                 }
@@ -140,10 +175,15 @@ public class FileUserService implements UserService, Serializable {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Object obj = ois.readObject();
                 User u = (User) obj;
+                ois.close(); //인풋 스트림을 열어둔 상태에서 delete는 불가능. 사용하고 있는 프로세서가 있는데 삭제하면 안되는 것 처럼. 닫아주고 삭제해야함.
                 if (u.getId().equals(user.getId())) {
-                    file.delete();
-                    System.out.println(user.getUser() + " User 삭제 성공");
-                    return;
+                    if (file.delete()) {
+                        System.out.println(user.getUser() + " User 삭제 성공");
+                        return;
+                    }
+                    else {
+                        System.out.println("파일을 삭제하지 못했습니다.");
+                    }
                 }
 
             } catch (IOException | ClassNotFoundException e) {

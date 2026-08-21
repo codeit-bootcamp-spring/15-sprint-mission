@@ -1,25 +1,21 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.service.*;
+import com.sprint.mission.discodeit.service.file.*;
+import com.sprint.mission.discodeit.service.jcf.*;
 
 public class JavaApplication {
     public static void main(String[] args) {
         User user;
         User user1;
 
-        JCFUserService users = new JCFUserService();
-        ChannelService channels = new JCFChannelService();
-        MessageService messages = new JCFMessageService(users, channels);
+        UserService users = new FileUserService();
+        ChannelService channels = new FileChannelService();
+        MessageService messages = new FileMessageService();
 
 
-        user = new User("seok0630");
+/*        user = new User("seok0630");
         user1 = new User("shon0430");
 
         users.create(user);
@@ -36,7 +32,7 @@ public class JavaApplication {
 
 
         messages.create(message);
-        messages.create(message1);
+        messages.create(message1);*/
 
 
         System.out.println("↓↓↓↓↓↓↓↓모든 유저 출력↓↓↓↓↓↓↓↓");
@@ -51,11 +47,11 @@ public class JavaApplication {
 
         System.out.println("↓↓↓↓↓↓↓↓모든 메시지 출력↓↓↓↓↓↓↓↓");
         //messages.update(message, "하이요");
-        messages.readAll().stream().forEach(x-> System.out.println(x.getMessage() + " "));
+        messages.readAll().stream().forEach(x-> System.out.println(x.getUser().getUser() + ": " + x.getMessage() + " "));
         System.out.println();
         System.out.println();
 
-        System.out.print("단일 유저 출력: " + users.read(user).getUser());
+        /*System.out.print("단일 유저 출력: " + users.read(user).getUser());
         System.out.println();
         System.out.print("단일 채널 출력: " + channels.read(channel).getChannel());
         System.out.println();
@@ -73,11 +69,24 @@ public class JavaApplication {
         System.out.print("[업데이트 후] 단일 메시지 출력: " + messages.read(message).getMessage());
         System.out.println();
 
-        users.delete(user);
-        channels.delete(channel);
-        messages.delete(message);
 
-        messages.create(message);
+        System.out.println("↓↓↓↓↓↓↓↓모든 유저 출력↓↓↓↓↓↓↓↓");
+        users.readAll().stream().forEach(x-> System.out.print(x.getUser() + " "));
+        System.out.println();
+        System.out.println();
+
+        System.out.println("↓↓↓↓↓↓↓↓모든 채널 출력↓↓↓↓↓↓↓↓");
+        channels.readAll().stream().forEach(x-> System.out.print(x.getChannel() + " "));
+        System.out.println();
+        System.out.println();
+
+        System.out.println("↓↓↓↓↓↓↓↓모든 메시지 출력↓↓↓↓↓↓↓↓");
+        //messages.update(message, "하이요");
+        messages.readAll().stream().forEach(x-> System.out.println(x.getMessage() + " "));
+        System.out.println();
+        System.out.println();*/
+
+        //messages.create(message);
     }
 
     /* 1. 첫 실행시에는 User 객체의 UUID를 가지고 있으니까 자유롭게 delete가 가능한데, 두번째 실행부터는 User user객체를 동일하게
