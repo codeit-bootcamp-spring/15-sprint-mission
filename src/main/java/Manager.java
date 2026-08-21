@@ -222,7 +222,12 @@ public class Manager {
                 for (ChannelRole role : ChannelRole.values()){
                     System.out.println(role);
                 }
-                channelRole = ChannelRole.valueOf(sc.next());
+                try {
+                    channelRole = ChannelRole.valueOf(sc.next());
+                } catch (IllegalArgumentException e) {
+                    throw new IllegalArgumentException("없는 역할입니다.");
+                }
+
 
                 JCFChannelService.getInstance().putUser(UUID.fromString(id),UUID.fromString(userId),channelRole);
 
@@ -316,7 +321,11 @@ public class Manager {
                 for (Reaction re : Reaction.values()){
                     System.out.println(re);
                 }
-                reaction = Reaction.valueOf(sc.next());
+                try{
+                    reaction = Reaction.valueOf(sc.next());
+                }catch (IllegalArgumentException e){
+                    throw new IllegalArgumentException("없는 반응입니다");
+                }
 
                 JCFMessageService.getInstance().toggleReaction(UUID.fromString(id),UUID.fromString(userId),reaction);
 
