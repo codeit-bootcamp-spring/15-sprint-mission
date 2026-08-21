@@ -17,13 +17,14 @@ public class Manager {
     }
 
 
-
+    String uuidPattern = "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$";
 
     Scanner sc = new Scanner(System.in);
     public void userManager(){
 
         String id;
         String email,password,name,nitro;
+        NitroLevel nitroLevel;
 
         System.out.println("메뉴를 선택하세요 \n" +
                 "1.유저 생성\n" +
@@ -31,9 +32,9 @@ public class Manager {
                 "3.유저 정보 수정\n" +
                 "4.유저 삭제");
 
-        switch (sc.nextInt()){
+        switch (sc.next()){
 
-            case 1:
+            case "1":
                 System.out.println();
                 System.out.println("E-mail을 입력하세요");
                 email = sc.next();
@@ -45,29 +46,51 @@ public class Manager {
                 for(NitroLevel level : NitroLevel.values()){
                     System.out.println(level);
                 }
-                System.out.println("니트로 레벨을 입력하세요");
-                nitro = sc.next();
+                //////////////////////////
+                while (true) {
+
+                    System.out.println("니트로 레벨을 입력하세요.");
+
+                    nitro = sc.next();
+
+                    try {
+                        nitroLevel = NitroLevel.valueOf(nitro);
+                        break;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("잘못된 니트로 레벨입니다. 다시 입력해주세요.");
+                    }
+                }
+                ///////////////////////////
 
 
                 JCFUserService.getInstance().create(email, password, name,
-                        NitroLevel.valueOf(nitro));
+                        nitroLevel);
                 break;
 
-            case 2:
+            case "2":
                 JCFUserService.getInstance().read();
                 break;
 
-            case 3:
+            case "3":
                 System.out.println("XXX 입력 시 해당 항목을 수정하지 않습니다.");
-                System.out.println("수정할 유저의 ID() : ");
-                id = sc.next();
+
+                while (true) {
+                    System.out.println("수정할 유저의 ID() : ");
+                    id = sc.next();
+                    if (id.matches(uuidPattern)) {
+                        break;
+                    } else {
+                        System.out.println("UUID 형식이 아닙니다.");
+                    }
+                }
+
 
                 System.out.println("E-mail을 입력하세요");
                 email = sc.next();
                 if(email.equals("XXX")){
                     for(User user : JCFUserService.getInstance().getUsers()){
                         if(user.getId().equals(UUID.fromString(id))){
-                            email=user.getEmail().toString();
+                            email=user.getEmail();
                         }
                     }
                 }
@@ -77,7 +100,7 @@ public class Manager {
                 if(password.equals("XXX")){
                     for(User user : JCFUserService.getInstance().getUsers()){
                         if(user.getId().equals(UUID.fromString(id))){
-                            password=user.getPassword().toString();
+                            password=user.getPassword();
                         }
                     }
                 }
@@ -88,7 +111,7 @@ public class Manager {
                 if (name.equals("XXX")){
                     for(User user : JCFUserService.getInstance().getUsers()){
                         if(user.getId().equals(UUID.fromString(id))){
-                            name=user.getName().toString();
+                            name=user.getName();
                         }
                     }
                 }
@@ -98,25 +121,47 @@ public class Manager {
                 for(NitroLevel level : NitroLevel.values()){
                     System.out.println(level);
                 }
-                System.out.println("니트로 레벨을 입력하세요");
-                nitro = sc.next();
-                if (nitro.equals("XXX")){
-                    for(User user : JCFUserService.getInstance().getUsers()){
-                        if(user.getId().equals(UUID.fromString(id))){
-                            nitro=user.getNitroLevel().toString();
+                while (true) {
+
+                    System.out.println("니트로 레벨을 입력하세요.");
+
+                    nitro = sc.next();
+
+                    if (nitro.equals("XXX")){
+                        for(User user : JCFUserService.getInstance().getUsers()){
+                            if(user.getId().equals(UUID.fromString(id))){
+                                nitro=user.getNitroLevel().toString();
+                            }
+
                         }
+                        if (nitro.equals("XXX")){
+                            //nitro=NitroLevel.values()[0].toString();
+                            throw new IllegalArgumentException("없는 id입니다. 니트로레벨을 읽어올 수 없습니다.");
+                        }
+                    }
+
+
+                    try {
+                        nitroLevel = NitroLevel.valueOf(nitro);
+                        break;
+                    } catch (IllegalArgumentException e) {
+                        System.out.println("잘못된 니트로 레벨입니다. 다시 입력해주세요.");
                     }
                 }
 
-
-                JCFUserService.getInstance().update(UUID.fromString(id),email,password,name,NitroLevel.valueOf(nitro));
+                JCFUserService.getInstance().update(UUID.fromString(id),email,password,name,nitroLevel);
                 break;
 
-            case 4:
+            case "4":
                 System.out.println("삭제할 유저의 ID() : ");
                 id = sc.next();
 
                 JCFUserService.getInstance().delete(UUID.fromString(id));
+                break;
+
+            default:
+                System.out.println("잘못된 입력입니다.");
+                break;
 
         }
 
@@ -141,19 +186,19 @@ public class Manager {
                 "6.유저 강퇴\n" +
                 "7.채널 삭제");
 
-        switch (sc.nextInt()){
+        switch (sc.next()){
 
-            case 1:
+            case "1":
                 System.out.println("이름을 입력하세요");
                 name = sc.next();
                 JCFChannelService.getInstance().create(name);
                 break;
 
-            case 2:
+            case "2":
                 JCFChannelService.getInstance().read();
                 break;
 
-            case 3:
+            case "3":
 
                 System.out.println("수정할 채널의 ID() : ");
                 id = sc.next();
@@ -166,7 +211,7 @@ public class Manager {
                 break;
 
 
-            case 4://유저 등록 갱신  putUser(UUID channelId, UUID userId, ChannelRole channelRole)
+            case "4"://유저 등록 갱신  putUser(UUID channelId, UUID userId, ChannelRole channelRole)
                 System.out.println("등록할 채널의 ID() : ");
                 id = sc.next();
                 System.out.println("등록할 유저의 ID() : ");
@@ -183,13 +228,13 @@ public class Manager {
 
                 break;
 
-            case 5:
+            case "5":
                 System.out.println("확인할 채널의 ID() : ");
                 id = sc.next();
                 JCFChannelService.getInstance().printUsers(UUID.fromString(id));
                 break;
 
-            case 6://유저 강퇴removeUser(UUID channelId, UUID userId)
+            case "6"://유저 강퇴removeUser(UUID channelId, UUID userId)
 
                 System.out.println("강퇴할 채널의 ID() : ");
                 id = sc.next();
@@ -200,17 +245,20 @@ public class Manager {
 
                 break;
 
-            case 7:
+            case "7":
                 System.out.println("삭제할 채널의 ID() : ");
                 id = sc.next();
 
                 JCFChannelService.getInstance().delete(UUID.fromString(id));
+                break;
 
+            default:
+                System.out.println("잘못된 입력입니다.");
+                break;
         }
 
 
     }
-
 
 
     public void messageManager(){
@@ -227,9 +275,9 @@ public class Manager {
                 "5.리액션 출력\n" +
                 "6.메세지 삭제");
 
-        switch (sc.nextInt()){
+        switch (sc.next()){
 
-            case 1:
+            case "1":
                 System.out.println("보낼 채널의 ID를 입력하세요 : ");
                 channelId = sc.next();
 
@@ -242,11 +290,11 @@ public class Manager {
                 JCFMessageService.getInstance().create(UUID.fromString(channelId),UUID.fromString(userId),text);
                 break;
 
-            case 2:
+            case "2":
                 JCFMessageService.getInstance().read();
                 break;
 
-            case 3:
+            case "3":
 
                 System.out.println("수정할 메세지 ID() : ");
                 id = sc.next();
@@ -257,7 +305,7 @@ public class Manager {
                 break;
 
 
-            case 4://toggleReaction(UUID messageId, UUID userId, Reaction reaction)
+            case "4"://toggleReaction(UUID messageId, UUID userId, Reaction reaction)
                 System.out.println("반응할 메세지 ID() : ");
                 id = sc.next();
 
@@ -276,7 +324,7 @@ public class Manager {
 
                 break;
 
-            case 5://printReactionCount(UUID messageid)
+            case "5"://printReactionCount(UUID messageid)
                 System.out.println("출력할 메세지 ID() : ");
                 id = sc.next();
 
@@ -284,7 +332,7 @@ public class Manager {
 
                 break;
 
-            case 6:
+            case "6":
                 System.out.println("삭제할 메세지의 ID() : ");
                 id = sc.next();
 

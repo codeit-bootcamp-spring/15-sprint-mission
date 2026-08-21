@@ -11,18 +11,18 @@ public class ManagerTest {
 
         Manager.getInstance().userManager();
 
-        Manager.getInstance().channelManager();
-        Manager.getInstance().channelManager();
-        Manager.getInstance().channelManager();
-        Manager.getInstance().channelManager();
+    //    Manager.getInstance().channelManager();
+    //    Manager.getInstance().channelManager();
+    //    Manager.getInstance().channelManager();
+    //    Manager.getInstance().channelManager();
 
-        /*Manager.getInstance().userManager();
+        Manager.getInstance().userManager();
 
         Manager.getInstance().userManager();
 
 
         Manager.getInstance().userManager();
 
-        Manager.getInstance().userManager();*/
+        Manager.getInstance().userManager();
     }
 }

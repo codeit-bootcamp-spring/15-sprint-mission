@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class JavaApplication {
     public static void main(String[] args) {
 
-        int choose;
+        String choose;
         boolean loop = true;
 
         Manager.getInstance().createTestUnit();
@@ -17,22 +17,22 @@ public class JavaApplication {
                     "2. 채널\n" +
                     "3. 메세지\n" +
                     "4. 종료");
-            choose=sc.nextInt();
+            choose=sc.next();
             switch (choose){
-                case 1:
+                case "1":
                     Manager.getInstance().userManager();
                     break;
 
-                case 2:
+                case "2":
                     Manager.getInstance().channelManager();
                     break;
 
 
-                case 3:
+                case "3":
                     Manager.getInstance().messageManager();
                     break;
 
-                case 4:
+                case "4":
                     loop=false;
                     break;
 
