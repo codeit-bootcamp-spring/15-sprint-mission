@@ -8,22 +8,23 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> data = new HashMap<>();
+    private final Map<UUID, Message> data;
     private final UserService userService;
     private final ChannelService channelService;
 
     public JCFMessageService(UserService userService, ChannelService channelService){
+        this.data = new HashMap<>();
         this.userService =userService;
         this.channelService = channelService;
     }
     @Override
-    public Message create(UUID userId, UUID channelID, String Message){
+    public Message create(UUID userId, UUID channelID, String content){
         User user = userService.read(userId);
         Channel channel = channelService.read(channelID);
         if (user ==null || channel == null){
             throw new IllegalArgumentException("user나 channel 이 존재하지 않습니다");
         }
-        Message message = new Message(Message,channelID,userId);
+        Message message = new Message(content,channelID,userId);
         data.put(message.getMessageId(), message);
         return message;
     }
@@ -36,12 +37,12 @@ public class JCFMessageService implements MessageService {
         return new ArrayList<>(data.values());
     }
     @Override
-    public Message update(UUID id, String Message){
-        Message contents = data.get(id);
-        if (contents != null){
-            contents.update(Message);
+    public Message update(UUID id, String content){
+        Message message = data.get(id);
+        if (message != null){
+            message.update(content);
         }
-        return contents;
+        return message;
     }
     @Override
     public Message delete(UUID id){

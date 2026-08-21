@@ -22,6 +22,9 @@ public class Channel {
     public long getUpdatedAt() {
         return updatedAt;
     }
+    public String getChannelName() {
+        return channelName;
+    }
     public void update(String channelName){
         this.channelName = channelName;
         this.updatedAt = System.currentTimeMillis();

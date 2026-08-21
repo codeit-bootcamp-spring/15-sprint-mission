@@ -3,17 +3,17 @@ import java.util.UUID;
 
 
 public class Message {
-    private final UUID channelId;
-    private final UUID UserId;
     private final UUID messageId;
+    private final UUID userId;
+    private final UUID channelId;
     private final long createdAt;
     private long updatedAt;
-    private String message;
-    public Message(String contents, UUID channelId,UUID userId){
-        this.channelId = channelId;
-        this.UserId = userId;
+    private String content;
+    public Message(String content, UUID channelId,UUID userId){
+        this.userId = userId;
         this.messageId = UUID.randomUUID();
-        this.message = contents;
+        this.content = content;
+        this.channelId = channelId;
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = createdAt;
     }
@@ -24,8 +24,17 @@ public class Message {
     public long getCreatedAt() {
         return createdAt;
     }
-    public void update(String message){
-        this.message = message;
+    public String getContent() {
+        return content;
+    }
+    public UUID getUserId() {
+        return userId;
+    }
+    public UUID getChannelId() {
+        return channelId;
+    }
+    public void update(String content){
+        this.content = content;
         this.updatedAt = System.currentTimeMillis();
     }
 }

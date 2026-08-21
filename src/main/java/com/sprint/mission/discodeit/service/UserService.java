@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(String User);
+    User create(String username);
     User read(UUID id);
     List<User> readAll();
     User update(UUID id, String username);

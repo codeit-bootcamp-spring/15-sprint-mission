@@ -21,6 +21,9 @@ public class User {
     public long getUpdatedAt(){
         return updatedAt;
     }
+    public String getUsername() {
+        return username;
+    }
     public void update(String username) {
         this.username = username;
         this.updatedAt = System.currentTimeMillis();
