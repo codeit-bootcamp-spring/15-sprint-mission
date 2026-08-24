@@ -1,8 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.util.UUID;
+import java.io.Serializable;
 
-public class User {
+public class User implements Serializable {
 
     //필드
     private UUID id;
@@ -22,13 +23,11 @@ public class User {
     }
 
     //메서드
-
-
     public UUID getId() { return id; }
 
     public long getCreatedAt() { return createdAt; }
 
-    public long getUpdatdAt() { return  updatedAt; }
+    public long getUpdatedAt() { return  updatedAt; }
 
     public  String getName() { return name; }
 

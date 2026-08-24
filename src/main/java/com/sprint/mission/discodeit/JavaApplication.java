@@ -3,6 +3,15 @@ package com.sprint.mission.discodeit;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileMessageService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCF_ChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCF_MessageService;
 import com.sprint.mission.discodeit.service.jcf.JCF_UserService;
@@ -21,29 +30,13 @@ public class JavaApplication {
 // 여기서 서비스 객체 생성 및 테스트 코드 작성
         boolean running = true;
         Scanner sc = new Scanner(System.in);
-        JCF_UserService userService = new JCF_UserService();
-        JCF_ChannelService channelService = new JCF_ChannelService();
-        JCF_MessageService messageService = new JCF_MessageService();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
 
-        //테스트 메시지(테스트후에 주석처리하세요.)
-        Channel testChannel = channelService.readAll().get(0);
-        User testUser = userService.readAll().get(0);
-        messageService.create(
-                testChannel.getId(),
-                testUser.getId(),
-                "테스트 메시지입니다."
-        );
-        messageService.create(
-                testChannel.getId(),
-                testUser.getId(),
-                "두번째 테스트 메시지입니다. ##"
-        );
-        messageService.create(
-                testChannel.getId(),
-                testUser.getId(),
-                "세번째 테스트 메시지입니다. 오늘은 날씨가 흐립니다."
-        );
-
+        FileUserService userService = new FileUserService(userRepository);
+        FileChannelService channelService = new FileChannelService(channelRepository);
+        FileMessageService messageService = new FileMessageService(messageRepository);
 
         while (running) {
             try {

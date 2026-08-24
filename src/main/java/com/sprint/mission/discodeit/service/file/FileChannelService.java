@@ -1,54 +1,61 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-public class JCF_ChannelService implements ChannelService {
+public class FileChannelService implements ChannelService {
 
-    private final Map<UUID, Channel> data;
+    private final ChannelRepository channelRepository;
 
-    public JCF_ChannelService() {
-        this.data = new HashMap<>();
-
-    //테스트용 채널입니다.(사용후 주석처리하세요)
-    Channel testChannel = new Channel("testChannel");
-    data.put(testChannel.getId(), testChannel);
+    public FileChannelService(ChannelRepository channelRepository) {
+        this.channelRepository = channelRepository;
     }
 
     @Override
     public Channel create(String channelName) {
+
         Channel channel = new Channel(channelName);
-        data.put(channel.getId(), channel);
+
+        channelRepository.save(channel);
+
         return channel;
     }
 
     @Override
     public Channel read(UUID id) {
-        return data.get(id);
+
+        return channelRepository.findById(id);
     }
 
     @Override
     public List<Channel> readAll() {
-        return List.copyOf(data.values());
+
+        return channelRepository.findAll();
     }
 
     @Override
     public Channel update(UUID id, String channelName) {
-        Channel channel = data.get(id);
+
+        Channel channel = channelRepository.findById(id);
+
         if (channel == null) {
             return null;
         }
+
         channel.setChannelName(channelName);
+
+        channelRepository.save(channel);
+
         return channel;
     }
 
     @Override
     public void delete(UUID id) {
-        data.remove(id);
+
+        channelRepository.deleteById(id);
     }
 }
