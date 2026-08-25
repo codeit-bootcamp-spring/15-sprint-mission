@@ -1,0 +1,23 @@
+package com.sprint.mission.discodeit.FileIO;
+
+import com.sprint.mission.discodeit.entity.User;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+import java.util.UUID;
+
+public class UserData {
+    /*
+    final Map<UUID, User> userMap = new HashMap<>();
+     */
+    private Map<UUID, User> userMap;
+
+    public UserData(Map<UUID, User> userMap) {
+        this.userMap = userMap;
+    }
+
+    public Map<UUID, User> getUserMap() {
+        return new HashMap<>(userMap);
+    }
+}

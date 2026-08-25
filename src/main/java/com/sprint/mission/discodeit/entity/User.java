@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 
 import java.time.Instant;
+import java.util.UUID;
 
 //계정,비번,닉,등급?
 public class User extends BaseClass{
@@ -16,6 +17,14 @@ public class User extends BaseClass{
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
             throw new IllegalArgumentException("메일 형식이 아님.");
         }
+        this.email=email;
+        this.password=password;
+        this.name=name;
+        this.nitroLevel=nitroLevel;
+    }
+
+    public User(UUID id, Long createdAt, Long updatedAt, String email, String password, String name, NitroLevel nitroLevel) {
+        super(id, createdAt, updatedAt);
         this.email=email;
         this.password=password;
         this.name=name;
@@ -71,8 +80,21 @@ public class User extends BaseClass{
         return name;
     }
 
+
     public NitroLevel getNitroLevel() {
         return nitroLevel;
+    }
+
+    public String ToString(){
+        return "User{" +
+                "id=" + super.getId() +
+                ", createdAt=" + super.getCreatedAt() +
+                ", updatedAt=" + super.getUpdatedAt() +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                ", name='" + name + '\'' +
+                ", nitroLevel=" + nitroLevel +
+                '}';
     }
 }
 

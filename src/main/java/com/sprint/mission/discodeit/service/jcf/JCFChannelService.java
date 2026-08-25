@@ -18,7 +18,13 @@ public class JCFChannelService implements ChannelService{
 
     ////////////////////테스트용 나중에 삭제
     public Map<UUID, List<UUID>> getMessagesListMap() {
-        return messagesListMap;
+        return new HashMap<>(messagesListMap);
+    }
+    public Map<UUID, Map<UUID, ChannelRole>> getUserRoleMap() {
+        return new HashMap<>(userRoleMap);
+    }
+    public Set<Channel> getChannelSet() {
+        return new HashSet<>(channelSet);
     }
 
     ////////////////////////////

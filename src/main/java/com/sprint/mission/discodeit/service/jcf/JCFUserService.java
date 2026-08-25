@@ -20,6 +20,9 @@ public class JCFUserService implements UserService{
         return instance;
     }
 
+    public Map<UUID, User> getUserMap() {
+        return new HashMap<>(userMap);
+    }
 
 
     public Set<User> getUsers(){

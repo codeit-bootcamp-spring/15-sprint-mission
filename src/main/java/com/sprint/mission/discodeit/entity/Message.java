@@ -32,6 +32,17 @@ public class Message extends BaseClass  {
         setUpdatedAt();
     }
 
+    public String ToString(){
+        return "User{" +
+                "id=" + super.getId() +
+                ", createdAt=" + super.getCreatedAt() +
+                ", updatedAt=" + super.getUpdatedAt() +
+                ", userID='" + getUserId() + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
+
+
     /*public void setMessage(String messageString) {
         this.message = messageString;
     }*/

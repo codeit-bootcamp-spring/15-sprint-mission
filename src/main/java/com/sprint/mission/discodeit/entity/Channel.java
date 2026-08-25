@@ -28,6 +28,11 @@ public class Channel extends BaseClass{
         return name;
     }
 
+    @Override
+    public String ToString() {
+        return "";
+    }
+
     /*public void setName(String name) {
         this.name = name;
     }

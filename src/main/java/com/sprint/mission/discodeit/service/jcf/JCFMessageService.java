@@ -72,6 +72,10 @@ public class JCFMessageService implements MessageService{
         return new HashMap<>(messageMap);
     }
 
+    public Map<UUID, Map<Reaction, Set<UUID>>> getReactionMap() {
+        return new HashMap<>(reactionMap);
+    }
+
     ////////////////////////////////////////
     public void toggleReaction(UUID messageId, UUID userId, Reaction reaction) {
         if(!messageMap.containsKey(messageId)){
