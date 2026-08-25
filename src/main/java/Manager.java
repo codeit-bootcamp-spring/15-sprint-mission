@@ -181,10 +181,11 @@ public class Manager {
                 "1.채널 생성\n" +
                 "2.채널 목록 출력\n" +
                 "3.채널 정보 수정\n" +
-                "4.유저 등록/수정\n" +
-                "5.유저 목록\n" +
-                "6.유저 강퇴\n" +
-                "7.채널 삭제");
+                "4.채널내 메세지 출력\n" +
+                "5.유저 등록/수정\n" +
+                "6.유저 목록\n" +
+                "7.유저 강퇴\n" +
+                "8.채널 삭제");
 
         switch (sc.next()){
 
@@ -210,8 +211,14 @@ public class Manager {
                 //JCFUserService.getInstance().update(UUID.fromString(id),email,password,name,NitroLevel.valueOf(nitro));
                 break;
 
+                case "4":
+                    System.out.println("출력할 채널의 ID() : ");
+                    id = sc.next();
+                    JCFChannelService.getInstance().printMessageList(UUID.fromString(id));
+                    break;
 
-            case "4"://유저 등록 갱신  putUser(UUID channelId, UUID userId, ChannelRole channelRole)
+
+            case "5"://유저 등록 갱신  putUser(UUID channelId, UUID userId, ChannelRole channelRole)
                 System.out.println("등록할 채널의 ID() : ");
                 id = sc.next();
                 System.out.println("등록할 유저의 ID() : ");
@@ -233,13 +240,13 @@ public class Manager {
 
                 break;
 
-            case "5":
+            case "6":
                 System.out.println("확인할 채널의 ID() : ");
                 id = sc.next();
                 JCFChannelService.getInstance().printUsers(UUID.fromString(id));
                 break;
 
-            case "6"://유저 강퇴removeUser(UUID channelId, UUID userId)
+            case "7"://유저 강퇴removeUser(UUID channelId, UUID userId)
 
                 System.out.println("강퇴할 채널의 ID() : ");
                 id = sc.next();
@@ -250,7 +257,7 @@ public class Manager {
 
                 break;
 
-            case "7":
+            case "8":
                 System.out.println("삭제할 채널의 ID() : ");
                 id = sc.next();
 

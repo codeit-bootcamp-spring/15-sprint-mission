@@ -139,6 +139,20 @@ public class JCFChannelService implements ChannelService{
         }*/
     }
 
+
+    public void printMessageList(UUID channelId){
+        if(messagesListMap.containsKey(channelId)){
+            for(UUID messageId : messagesListMap.get(channelId)){
+                for(User user : JCFUserService.getInstance().getUsers()) {
+                    if (user.getId().equals(JCFMessageService.getInstance().getMessageMap().get(messageId).getUserId())) {
+                        System.out.println(user.getName());
+                    }
+                }
+                System.out.println(JCFMessageService.getInstance().getMessageMap().get(messageId).getMessage());
+            }
+        }
+    }
+
    /* public void removeMessage(UUID channelId, UUID messageId) {
         if(userRoleMap.containsKey(channelId)){
             if(userRoleMap.get(channelId).containsKey(messageId)){
