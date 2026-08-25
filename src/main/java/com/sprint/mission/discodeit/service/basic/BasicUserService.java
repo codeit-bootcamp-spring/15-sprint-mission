@@ -49,6 +49,7 @@ public class BasicUserService implements UserService {
         user.setName(name);
         user.setEmail(email);
         user.setPassword(password);
+        user.setUpdatedAt();
 
         userRepository.save(user);
 

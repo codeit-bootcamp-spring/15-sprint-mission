@@ -35,7 +35,7 @@ public class User implements Serializable {
 
     public String getPassword() { return password; }
 
-    public void setUpdatedAt() { return; }
+    public void setUpdatedAt() { this.updatedAt = System.currentTimeMillis(); }
 
     public void setPassword(String password) { this.password = password; }
 

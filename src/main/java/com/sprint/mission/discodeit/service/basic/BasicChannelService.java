@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
             return null;
         }
 
-        channel.setChannelName(channelName);
+        channel.update(channelName);
 
         channelRepository.save(channel);
 
