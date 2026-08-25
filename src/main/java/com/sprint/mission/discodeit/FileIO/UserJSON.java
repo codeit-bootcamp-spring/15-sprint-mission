@@ -23,15 +23,20 @@ public class UserJSON {
         }
     }
 
-    public static UserData LoadUser() {
+    public static void LoadUser() {
+        UserData userData;
         try {
-            return mapper.readValue(new File("user.json"),
+            userData = mapper.readValue(new File("user.json"),
                     new TypeReference<UserData>() {});
 
         }catch (IOException e) {
             e.printStackTrace();
-            return null;
+            userData=null;
+
+        }finally {
+
         }
+        JCFUserService.getInstance().setUserMap(userData.getUserMap());
 
     }
 

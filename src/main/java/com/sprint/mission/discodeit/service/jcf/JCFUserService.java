@@ -24,6 +24,11 @@ public class JCFUserService implements UserService{
         return new HashMap<>(userMap);
     }
 
+    public void setUserMap(Map<UUID, User> userMap) {
+        this.userMap.clear();
+        this.userMap.putAll(userMap);
+    }
+
 
     public Set<User> getUsers(){
         return new HashSet<>(userMap.values());

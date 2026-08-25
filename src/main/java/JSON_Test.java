@@ -2,6 +2,7 @@ import com.sprint.mission.discodeit.FileIO.ChannelJSON;
 import com.sprint.mission.discodeit.FileIO.MessageJSON;
 import com.sprint.mission.discodeit.FileIO.UserData;
 import com.sprint.mission.discodeit.FileIO.UserJSON;
+import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 public class JSON_Test {
 
@@ -10,7 +11,11 @@ public class JSON_Test {
     //    UserJSON.SaveUser();
     //    MessageJSON.SaveMessage();
     //    ChannelJSON.SaveChannel();
-        UserData userData = UserJSON.LoadUser();
-        System.out.println(userData);
+     //   UserData userData = UserJSON.LoadUser();
+     //   System.out.println(userData);
+        UserJSON.LoadUser();
+        System.out.println("asdf");
+        Manager.getInstance().userManager();
+        System.out.println("asdf");
     }
 }
