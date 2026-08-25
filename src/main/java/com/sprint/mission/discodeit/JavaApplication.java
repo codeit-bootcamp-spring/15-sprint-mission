@@ -19,10 +19,6 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
-
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -139,12 +135,12 @@ public class JavaApplication {
                                             int channelNumber1 = sc.nextInt();
                                             sc.nextLine();
 
-                                            Channel selectedChannel1 =
-                                                    channels1.get(channelNumber1 - 1);
-
                                             if (channelNumber1 == 0) {
                                                 break;
                                             }
+
+                                            Channel selectedChannel1 =
+                                                    channels1.get(channelNumber1 - 1);
 
                                             System.out.print("새 채널명 > ");
                                             System.out.println("만약 채널을 잘못 선택 했다면\"0\"을 입력하세요.");
@@ -173,12 +169,12 @@ public class JavaApplication {
                                             System.out.println("만약 선택할 채널이 없다면\"0\"을 입력하세요.");
                                             int channelNumber = sc.nextInt();
 
-                                            sc.nextLine();
-                                            Channel selectedChannel = channels.get(channelNumber - 1);
-
                                             if (channelNumber == 0) {
                                                 break;
                                             }
+
+                                            sc.nextLine();
+                                            Channel selectedChannel = channels.get(channelNumber - 1);
 
                                             UUID channelId = selectedChannel.getId();
 
