@@ -1,20 +1,27 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
+
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
-import com.sprint.mission.discodeit.service.jcf.JCF_ChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCF_MessageService;
-import com.sprint.mission.discodeit.service.jcf.JCF_UserService;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -27,16 +34,24 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-// 여기서 서비스 객체 생성 및 테스트 코드 작성
+
         boolean running = true;
         Scanner sc = new Scanner(System.in);
+
+        // Repository 생성
         UserRepository userRepository = new FileUserRepository();
         ChannelRepository channelRepository = new FileChannelRepository();
         MessageRepository messageRepository = new FileMessageRepository();
 
-        FileUserService userService = new FileUserService(userRepository);
-        FileChannelService channelService = new FileChannelService(channelRepository);
-        FileMessageService messageService = new FileMessageService(messageRepository);
+        // BasicService 생성 + Repository 주입
+        UserService userService =
+                new BasicUserService(userRepository);
+
+        ChannelService channelService =
+                new BasicChannelService(channelRepository);
+
+        MessageService messageService =
+                new BasicMessageService(messageRepository);
 
         while (running) {
             try {
