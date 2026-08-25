@@ -21,6 +21,17 @@ public class UserJSON {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public static UserData LoadUser() {
+        try {
+            return mapper.readValue(new File("user.json"),
+                    new TypeReference<UserData>() {});
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
 
     }
 

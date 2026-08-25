@@ -11,6 +11,7 @@ public class User extends BaseClass{
     private String name;
     private NitroLevel nitroLevel;
 
+    public User() {}
     public User(String email, String password, String name, NitroLevel nitroLevel) {
         super();
 

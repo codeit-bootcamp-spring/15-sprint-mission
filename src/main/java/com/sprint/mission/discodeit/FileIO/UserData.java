@@ -13,11 +13,17 @@ public class UserData {
      */
     private Map<UUID, User> userMap;
 
+    public UserData() { }
+
     public UserData(Map<UUID, User> userMap) {
         this.userMap = userMap;
     }
 
     public Map<UUID, User> getUserMap() {
         return new HashMap<>(userMap);
+    }
+
+    public void setUserMap(Map<UUID, User> userMap) {
+        this.userMap = userMap;
     }
 }
