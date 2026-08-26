@@ -1,6 +1,6 @@
-import com.sprint.mission.discodeit.FileIO.ChannelJSON;
-import com.sprint.mission.discodeit.FileIO.MessageJSON;
-import com.sprint.mission.discodeit.FileIO.UserJSON;
+import com.sprint.mission.discodeit.repository.ChannelJSON;
+import com.sprint.mission.discodeit.repository.MessageJSON;
+import com.sprint.mission.discodeit.repository.UserJSON;
 
 import java.util.Scanner;
 

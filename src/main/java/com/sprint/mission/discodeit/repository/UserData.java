@@ -1,10 +1,9 @@
-package com.sprint.mission.discodeit.FileIO;
+package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.User;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 
 public class UserData {

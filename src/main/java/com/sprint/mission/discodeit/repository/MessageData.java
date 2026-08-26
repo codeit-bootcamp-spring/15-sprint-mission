@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.FileIO;
+package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Reaction;

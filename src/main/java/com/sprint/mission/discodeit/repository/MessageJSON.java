@@ -1,9 +1,8 @@
-package com.sprint.mission.discodeit.FileIO;
+package com.sprint.mission.discodeit.repository;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.io.File;
 import java.io.IOException;
