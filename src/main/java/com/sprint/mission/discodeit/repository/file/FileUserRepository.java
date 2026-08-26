@@ -19,10 +19,10 @@ public class FileUserRepository implements UserRepository {
     @Override
     public void save(User user) {
         data.put(user.getId(), user); // 저장 로직
-        try (FileOutputStream fos = new FileOutputStream("user.ser"); // 저장 로직
-             ObjectOutputStream oos = new ObjectOutputStream(fos);
+        try (FileOutputStream fos = new FileOutputStream("user.ser"); // 저장 로직 (user.ser이라는 실제 파일 아웃픗 만듦)
+             ObjectOutputStream oos = new ObjectOutputStream(fos); // user.ser이라는 아웃풋의 주소값을 변수에 보관한다.
         ) {
-            oos.writeObject(data);
+            oos.writeObject(data); // data 컬렉션 자체를 객체로 직렬화해 user.ser 파일에 기록한다.
         } catch (IOException e) {
             e.printStackTrace();
         }
