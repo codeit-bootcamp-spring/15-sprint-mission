@@ -67,6 +67,16 @@ public class JavaApplication {
 
         System.out.println("전체 메시지 수" + messageService.findAll().size());
 
+        //좋아요 개수 표시하기
+        messageService.create(message);
+
+        messageService.like(message.getId(), user.getId());
+
+        System.out.println(
+                "좋아요 개수: "
+                        + messageService.getlikeUserIds(message.getId()).size()
+        );
+
 
 
 
