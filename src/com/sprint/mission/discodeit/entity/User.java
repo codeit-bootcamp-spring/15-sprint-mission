@@ -33,5 +33,5 @@ public class User extends BaseEntity {
     public String getPassword() {
         return password;
     }
-    //+@ 추가할거
+
 }

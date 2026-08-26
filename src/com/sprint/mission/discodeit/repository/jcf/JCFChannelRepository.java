@@ -33,7 +33,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean existById(UUID id)
+    public boolean existsById(UUID id)
     {
         return data.containsKey(id);
     }
