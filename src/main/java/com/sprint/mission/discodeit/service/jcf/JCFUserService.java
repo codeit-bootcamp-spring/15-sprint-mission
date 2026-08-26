@@ -34,9 +34,9 @@ public class JCFUserService implements UserService{
         return new HashSet<>(userMap.values());
     }
 
-    public String getUsername(UUID uuid){
+    /*public String getUsername(UUID uuid){
         return userMap.get(uuid).getName();
-    }
+    }*/
 
     @Override
     public void create(String email, String password, String name, NitroLevel nitroLevel) {

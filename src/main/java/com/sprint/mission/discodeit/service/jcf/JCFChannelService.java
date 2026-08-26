@@ -137,7 +137,8 @@ public class JCFChannelService implements ChannelService{
         }
         for(Map.Entry<UUID, ChannelRole> map : userRoleMap.get(channelId).entrySet()){
             System.out.println(map.getKey());
-            System.out.println(JCFUserService.getInstance().getUsername(map.getKey()) + "의 권한 :" + map.getValue());
+            //System.out.println(JCFUserService.getInstance().getUsername(map.getKey()) + "의 권한 :" + map.getValue());
+            System.out.println(JCFUserService.getInstance().getUserMap().get(map.getKey()).getName() + "의 권한 :" + map.getValue());
         }
     }
 
