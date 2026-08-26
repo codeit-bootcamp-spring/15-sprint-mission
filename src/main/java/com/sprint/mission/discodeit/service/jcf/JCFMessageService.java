@@ -44,6 +44,7 @@ public class JCFMessageService implements MessageService{
             System.out.println("ID: " + entry.getValue().getId());
             System.out.println("메세지: " + entry.getValue().getMessage());
             System.out.println("보낸사람: " + entry.getValue().getUserId());
+            System.out.println("생성시간: "+ entry.getValue().getCreatedAt());
             System.out.println("수정시간: " + entry.getValue().getUpdatedAt());
         }
 

@@ -89,6 +89,7 @@ public class JCFChannelService implements ChannelService{
         for(Channel channel : channelMap.values()){
             System.out.println("ID: " + channel.getId());
             System.out.println("채널명: " + channel.getName());
+            System.out.println("생성시간: "+ channel.getCreatedAt());
             System.out.println("수정시간: " + channel.getUpdatedAt());
         }
     }
