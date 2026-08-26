@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 public class Message {
@@ -11,18 +13,18 @@ public class Message {
     private Long createdAt;
     private Long updateAt;
 
+    // 좋아요를 누른 사용자 ID
+    private final Set<UUID> likeUserIds = new HashSet<>();
+    public Set<UUID> getLikeUserIds() {
+        return likeUserIds;
+    }
+
     public Message(UUID userid , UUID channelId, String content) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.userid = userid;
         this.ChannelId = channelId;
         this.content = content;
-    }
-
-    public Message(String 안녕하세요_봄의_요정_길춘배) {
-    }
-
-    public Message(UUID id, UUID id1) {
     }
 
     public UUID getId() {

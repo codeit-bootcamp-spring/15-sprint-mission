@@ -9,13 +9,14 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 public class JCFMessageService implements MessageService {
 
     private final List<Message> data;
 
-    private  final UserService userService;
+    private final UserService userService;
     private final ChannelService channelService;
 
     public JCFMessageService(UserService userService, ChannelService channelService) {
@@ -62,10 +63,42 @@ public class JCFMessageService implements MessageService {
     public void delete(UUID id) {
         Message message = findById(id);
 
-        if (message !=null) {
+        if (message != null) {
             data.remove(message);
         }
 
 
     }
+
+    @Override
+    public void like(UUID messageId, UUID userId) {
+        Message message = findById(messageId);
+
+        if (message == null) {
+            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
+
+        }
+        message.getLikeUserIds().add(userId);
+
+    }
+    @Override
+    public Set<UUID> getlikeUserIds(UUID messageId) {
+        Message message = findById(messageId);
+
+        if (message == null) {
+            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
+        }
+
+        return message.getLikeUserIds();
+    }
+    @Override
+    public void unlike(UUID messageId, UUID userId) {
+        Message message = findById(messageId);
+
+        if (message == null) {
+            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
+        }
+        message.getLikeUserIds().remove(userId);
+    }
+
 }

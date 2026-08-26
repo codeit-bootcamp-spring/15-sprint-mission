@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.util.UUID;
+
 public class JavaApplication {
     public static <user> void main(String[] args) {
 
@@ -64,6 +66,8 @@ public class JavaApplication {
         System.out.println("조회" + found.getContent());
 
         System.out.println("전체 메시지 수" + messageService.findAll().size());
+
+
 
 
 
