@@ -1,98 +1,112 @@
 package com.sprint.mission;
 
-import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.service.*;
-import com.sprint.mission.discodeit.service.file.*;
-import com.sprint.mission.discodeit.service.jcf.*;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.ServiceFactory;
+import com.sprint.mission.discodeit.service.UserService;
 
 public class JavaApplication {
-    public static void main(String[] args) {
-        User user;
-        User user1;
-
-        UserService users = new FileUserService();
-        ChannelService channels = new FileChannelService();
-        MessageService messages = new FileMessageService();
-
-
-/*        user = new User("seok0630");
-        user1 = new User("shon0430");
-
-        users.create(user);
-        users.create(user1);
-
-        Channel channel = new Channel("1");
-        Channel channel1 = new Channel("2");
-        channels.create(channel);
-        channels.create(channel1);
-
-
-        Message message = new Message("안녕하세용", user, channel);
-        Message message1 = new Message("안녕하삼", user1, channel);
-
-
-        messages.create(message);
-        messages.create(message1);*/
-
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 유저 출력↓↓↓↓↓↓↓↓");
-        users.readAll().stream().forEach(x-> System.out.print(x.getUser() + " "));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 채널 출력↓↓↓↓↓↓↓↓");
-        channels.readAll().stream().forEach(x-> System.out.print(x.getChannel() + " "));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 메시지 출력↓↓↓↓↓↓↓↓");
-        //messages.update(message, "하이요");
-        messages.readAll().stream().forEach(x-> System.out.println(x.getUser().getUser() + ": " + x.getMessage() + " "));
-        System.out.println();
-        System.out.println();
-
-        /*System.out.print("단일 유저 출력: " + users.read(user).getUser());
-        System.out.println();
-        System.out.print("단일 채널 출력: " + channels.read(channel).getChannel());
-        System.out.println();
-        System.out.print("단일 메시지 출력: " + messages.read(message).getMessage());
-        System.out.println();
-
-        users.update(user, "tjrrb0630");
-        channels.update(channel, "공지 채널");
-        messages.update(message, "HI!");
-
-        System.out.print("[업데이트 후] 단일 유저 출력: " + users.read(user).getUser());
-        System.out.println();
-        System.out.print("[업데이트 후] 단일 채널 출력: " + channels.read(channel).getChannel());
-        System.out.println();
-        System.out.print("[업데이트 후] 단일 메시지 출력: " + messages.read(message).getMessage());
-        System.out.println();
-
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 유저 출력↓↓↓↓↓↓↓↓");
-        users.readAll().stream().forEach(x-> System.out.print(x.getUser() + " "));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 채널 출력↓↓↓↓↓↓↓↓");
-        channels.readAll().stream().forEach(x-> System.out.print(x.getChannel() + " "));
-        System.out.println();
-        System.out.println();
-
-        System.out.println("↓↓↓↓↓↓↓↓모든 메시지 출력↓↓↓↓↓↓↓↓");
-        //messages.update(message, "하이요");
-        messages.readAll().stream().forEach(x-> System.out.println(x.getMessage() + " "));
-        System.out.println();
-        System.out.println();*/
-
-        //messages.create(message);
+    static User setupUser(UserService userService, String name, String email, String id) {
+        User user = userService.read(name);
+        if (user == null) {
+            return userService.create(name, email, id);
+        }
+        else {
+            return user;
+        }
     }
 
-    /* 1. 첫 실행시에는 User 객체의 UUID를 가지고 있으니까 자유롭게 delete가 가능한데, 두번째 실행부터는 User user객체를 동일하게
-    만들더라도, UUID가 달라진다. 그래서 UUID로 객체를 비교하여 사용자가 원하는 객체를 가져오거나(read()) 하는 것이 어렵다.
-    그렇다고 delete나 update와 같은 함수에 UUID가 아니라 각각의 entity 객체가 가지는 멤버 변수로 비교하여 원하는 값을 가져오게 한다면
-    기능 구현이 가능할 것 같지만 UUID 자체가 객체를 식별하기 위한 필드 아니었나? 의미가 사라지는 느낌이다.
-     */
+    static Channel setupChannel(ChannelService channelService, String channelName) {
+        Channel channel = channelService.read(channelName);
+        if (channel == null) {
+            return channelService.create(ChannelType.PUBLIC, channelName, "채널입니다.");
+        }
+        else {
+            return channel;
+        }
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author, String mes) {
+        if (channel != null && author != null) {
+            Message message = messageService.create(mes, channel, author);
+            if (message != null) {
+                System.out.println("메시지 생성: " + message.getMessage());
+            }
+            else System.out.println("[messageCreate] 생성에 실패했습니다: 채널, 사용자 데이터 없음");
+        }
+        else {
+            System.out.println("[messageCreate] 생성에 실패했습니다: 잘못된 매개변수 입력.");
+        }
+    }
+
+    static void runUserCrud(UserService userService) {
+        User user = setupUser(userService, "woody", "woody@codeit.com", "woody1234");
+        User user1 = setupUser(userService, "박석규", "tjrrb0630@codeit.com", "tjrrb0630");
+
+        userService.readAll();
+
+        User readUser = userService.read("woody");
+
+        userService.update(readUser, "우디", "woody@codeit.com", "woody1234");
+        System.out.println(userService.read("우디").getEmail());
+        userService.delete(readUser);
+        System.out.println();
+        userService.readAll().forEach(x-> System.out.println(x.getUser()));
+        System.out.println();
+    }
+
+    static void runChannelCrud(ChannelService channelService) {
+        Channel channel = setupChannel(channelService, "공지");
+        Channel channel1 = setupChannel(channelService, "일반");
+
+        channelService.readAll();
+
+        Channel readChannel = channelService.read("일반");
+
+        channelService.update(readChannel, ChannelType.PRIVATE, "공지사항", "공지사항 채널입니다.");
+        System.out.println(channelService.read("공지사항").getChannelName());
+        System.out.println();
+        channelService.delete(readChannel);
+        channelService.readAll().forEach(x-> System.out.println(x.getChannelName()));
+        System.out.println();
+    }
+
+    static void runMessageCrud(MessageService messageService, UserService userService, ChannelService channelService) {
+        System.out.println();
+        messageService.readAll().forEach(x-> System.out.println(x.getMessage()));
+        System.out.println();
+        Channel channel = setupChannel(channelService, "공지");
+
+        User user = setupUser(userService, "woody", "woody@codeit.com", "woody1234");
+        User user1 = setupUser(userService, "박석규", "tjrrb0630@codeit.com", "tjrrb0630");
+
+        messageCreateTest(messageService, channel, user, "반가워요.");
+        messageCreateTest(messageService, channel, user1, "안녕하세요.");
+
+        Message readMessage = messageService.read(channel.getId(), user.getId());
+
+        messageService.update(readMessage, "메시지 업데이트 테스트.");
+        System.out.println(messageService.read(channel.getId(), user.getId()).getMessage());
+        System.out.println();
+        messageService.delete(readMessage);
+        messageService.readAll().forEach(x-> System.out.println(x.getMessage()));
+        System.out.println();
+    }
+
+    static void runAll(ServiceFactory serviceFactory) {
+        runUserCrud(serviceFactory.getUserService());
+        runChannelCrud(serviceFactory.getChannelService());
+        runMessageCrud(serviceFactory.getMessageService(), serviceFactory.getUserService(), serviceFactory.getChannelService());
+    }
+
+    public static void main(String[] args) {
+        ServiceFactory serviceFactory = ServiceFactory.getInstance(false);
+
+        runAll(serviceFactory);
+    }
 
 }

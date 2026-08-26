@@ -1,19 +1,39 @@
 package com.sprint.mission.discodeit.entity;
 
 public class Channel extends Common {
-    String channel;
+    ChannelType channelType;
+    String channelName;
+    String channelDescription;
 
 
-    public Channel(String channel) {
+    public Channel(ChannelType channelType, String channelName, String channelDescription) {
         super();
-        this.channel = channel;
+        this.channelType = channelType;
+        this.channelName = channelName;
+        this.channelDescription = channelDescription;
     }
 
-    public String getChannel() {
-        return channel;
+    public ChannelType getChannelType() {
+        return channelType;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setChannelType(ChannelType channelType) {
+        this.channelType = channelType;
+    }
+
+    public String getChannelName() {
+        return channelName;
+    }
+
+    public void setChannelName(String channelName) {
+        this.channelName = channelName;
+    }
+
+    public String getChannelDescription() {
+        return channelDescription;
+    }
+
+    public void setChannelDescription(String channelDescription) {
+        this.channelDescription = channelDescription;
     }
 }

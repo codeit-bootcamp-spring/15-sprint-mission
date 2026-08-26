@@ -18,16 +18,31 @@ public class Common implements Serializable {
         return id;
     }
 
+    public void setId(UUID id) {
+        this.id = id;
+    }
+
     public Long getCreatedAt() {
         return createdAt;
+    }
+
+    public void autoSetCreatedAt() {
+        this.createdAt = System.currentTimeMillis();
     }
 
     public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public void setUpdatedAt() {
+    public void autoSetUpdatedAt() {
         this.updatedAt = System.currentTimeMillis();
     }
 
+    public void setCreatedAt(Long createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public void setUpdatedAt(Long updatedAt) {
+        this.updatedAt = updatedAt;
+    }
 }

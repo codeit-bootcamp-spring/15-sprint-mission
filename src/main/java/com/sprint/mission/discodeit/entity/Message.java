@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.entity;
 
 public class Message extends Common {
     private String message;
-    private User user;
     private Channel channel;
+    private User user;
 
-    public Message(String message, User user, Channel channel) {
+    public Message(String message, Channel channel, User user) {
         super();
         this.message = message;
-        this.user = user;
         this.channel = channel;
+        this.user = user;
     }
 
     public String getMessage() {
@@ -20,23 +20,19 @@ public class Message extends Common {
         this.message = message;
     }
 
-    public User getUser() {
-        return user;
-    }
-
     public Channel getChannel() {
         return channel;
     }
 
-/*    @Override
-    public String toString() {
-        return "Account{" +
-                "id='" + this.getId() + '\'' +
-                ", user='" + this.getUser() + '\'' +
-                ", channel='" + this.getChannel() + '\'' +
-                ", message='" + this.getMessage() + '\'' +
-                ", creadtedAt='" + this.getCreatedAt() + '\'' +
-                ", updatedAt='" + this.getUpdatedAt() + '\'' +
-                '}';
-    }*/
+    public void setChannel(Channel channel) {
+        this.channel = channel;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 }
