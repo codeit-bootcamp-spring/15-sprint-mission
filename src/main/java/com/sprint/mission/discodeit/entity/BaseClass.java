@@ -36,5 +36,5 @@ abstract public class BaseClass {
         return updatedAt;
     }
 
-    public abstract String ToString();
+    //public abstract String ToString();
 }

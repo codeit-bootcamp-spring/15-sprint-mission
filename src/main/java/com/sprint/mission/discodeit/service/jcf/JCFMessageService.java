@@ -72,8 +72,19 @@ public class JCFMessageService implements MessageService{
         return new HashMap<>(messageMap);
     }
 
+    public void setMessageMap(Map<UUID, Message> messageMap) {
+        this.messageMap.clear();
+        this.messageMap.putAll(messageMap);
+    }
+
+
     public Map<UUID, Map<Reaction, Set<UUID>>> getReactionMap() {
         return new HashMap<>(reactionMap);
+    }
+
+    public void setReactionMap(Map<UUID, Map<Reaction, Set<UUID>>> reactionMap) {
+        this.reactionMap.clear();
+        this.reactionMap.putAll(reactionMap);
     }
 
     ////////////////////////////////////////

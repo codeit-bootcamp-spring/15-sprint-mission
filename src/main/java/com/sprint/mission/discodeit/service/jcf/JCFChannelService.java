@@ -16,15 +16,33 @@ public class JCFChannelService implements ChannelService{
     final Set<Channel>  channelSet = new HashSet<>();
     //final Map<UUID, >
 
-    ////////////////////테스트용 나중에 삭제
+
     public Map<UUID, List<UUID>> getMessagesListMap() {
         return new HashMap<>(messagesListMap);
     }
+
+    public void setMessagesListMap(Map<UUID, List<UUID>> messagesListMap) {
+        this.messagesListMap.clear();
+        this.messagesListMap.putAll(messagesListMap);
+    }
+
     public Map<UUID, Map<UUID, ChannelRole>> getUserRoleMap() {
         return new HashMap<>(userRoleMap);
     }
+
+    public void setUserRoleMap(Map<UUID, Map<UUID, ChannelRole>> userRoleMap) {
+        this.userRoleMap.clear();
+        this.userRoleMap.putAll(userRoleMap);
+    }
+
+
     public Set<Channel> getChannelSet() {
         return new HashSet<>(channelSet);
+    }
+
+    public void setChannelSet(Set<Channel> channelSet) {
+        this.channelSet.clear();
+        this.channelSet.addAll(channelSet);
     }
 
     ////////////////////////////

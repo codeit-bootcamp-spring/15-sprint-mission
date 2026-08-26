@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.FileIO;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -26,4 +27,25 @@ public class MessageJSON {
         }
 
     }
+
+
+    public static void LoadMessage() {
+        MessageData messageData;
+        try {
+            messageData = mapper.readValue(new File("message.json"),
+                    new TypeReference<MessageData>() {});
+
+        }catch (IOException e) {
+            e.printStackTrace();
+            messageData=null;
+
+        }finally {
+
+        }
+        JCFMessageService.getInstance().setMessageMap(messageData.getMessageMap());
+        JCFMessageService.getInstance().setReactionMap(messageData.getReactionMap());
+
+    }
+
+
 }

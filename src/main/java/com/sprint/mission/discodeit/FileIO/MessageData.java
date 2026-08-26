@@ -17,8 +17,18 @@ public class MessageData {
     private Map<UUID, Message> messageMap;
     private Map<UUID, Map<Reaction, Set<UUID>>> reactionMap;
 
+    public MessageData() { }
+
     public MessageData(Map<UUID, Message> messageMap, Map<UUID, Map<Reaction, Set<UUID>>> reactionMap) {
         this.messageMap = messageMap;
+        this.reactionMap = reactionMap;
+    }
+
+    public void setMessageMap(Map<UUID, Message> messageMap) {
+        this.messageMap = messageMap;
+    }
+
+    public void setReactionMap(Map<UUID, Map<Reaction, Set<UUID>>> reactionMap) {
         this.reactionMap = reactionMap;
     }
 

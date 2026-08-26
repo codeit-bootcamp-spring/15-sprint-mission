@@ -86,16 +86,6 @@ public class User extends BaseClass{
         return nitroLevel;
     }
 
-    public String ToString(){
-        return "User{" +
-                "id=" + super.getId() +
-                ", createdAt=" + super.getCreatedAt() +
-                ", updatedAt=" + super.getUpdatedAt() +
-                ", email='" + email + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", nitroLevel=" + nitroLevel +
-                '}';
-    }
+
 }
 

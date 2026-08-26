@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.util.*;
 
 //누가,머라고,반응,
@@ -11,6 +14,20 @@ public class Message extends BaseClass  {
     //private final Map<Reaction, Set<User>> reactionMap = new HashMap<>();
     //메세지에 좋아요, 싫어요를 누를 수 있는 기능
     //////////////////////////////////
+
+    @JsonCreator
+    public Message(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("createdAt") Long createdAt,
+            @JsonProperty("updatedAt") Long updatedAt,
+            @JsonProperty("userId") UUID userId,
+            @JsonProperty("message") String message
+    ) {
+        super(id, createdAt, updatedAt);
+
+        this.userId = userId;
+        this.message = message;
+    }
 
     public Message(UUID userId , String message){
         this.userId=userId;
@@ -32,15 +49,7 @@ public class Message extends BaseClass  {
         setUpdatedAt();
     }
 
-    public String ToString(){
-        return "User{" +
-                "id=" + super.getId() +
-                ", createdAt=" + super.getCreatedAt() +
-                ", updatedAt=" + super.getUpdatedAt() +
-                ", userID='" + getUserId() + '\'' +
-                ", message='" + message + '\'' +
-                '}';
-    }
+
 
 
     /*public void setMessage(String messageString) {

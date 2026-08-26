@@ -16,6 +16,8 @@ public class ChannelData {
     private Map<UUID, List<UUID>>  messagesListMap;
     private Set<Channel> channelSet;
 
+    public ChannelData() { }
+
     public ChannelData(Map<UUID, Map<UUID, ChannelRole>> userRoleMap, Map<UUID, List<UUID>>  messagesListMap, Set<Channel> channelSet) {
         this.userRoleMap = userRoleMap;
         this.messagesListMap = messagesListMap;
@@ -32,5 +34,17 @@ public class ChannelData {
 
     public Set<Channel> getChannelSet() {
         return new HashSet<>(channelSet);
+    }
+
+    public void setChannelSet(Set<Channel> channelSet) {
+        this.channelSet = channelSet;
+    }
+
+    public void setMessagesListMap(Map<UUID, List<UUID>> messagesListMap) {
+        this.messagesListMap = messagesListMap;
+    }
+
+    public void setUserRoleMap(Map<UUID, Map<UUID, ChannelRole>> userRoleMap) {
+        this.userRoleMap = userRoleMap;
     }
 }

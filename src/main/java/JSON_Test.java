@@ -7,15 +7,19 @@ import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 public class JSON_Test {
 
     public static void main(String[] args) {
-        Manager.getInstance().createTestUnit();
+    //    Manager.getInstance().createTestUnit();
     //    UserJSON.SaveUser();
     //    MessageJSON.SaveMessage();
     //    ChannelJSON.SaveChannel();
      //   UserData userData = UserJSON.LoadUser();
      //   System.out.println(userData);
         UserJSON.LoadUser();
-        System.out.println("asdf");
+        MessageJSON.LoadMessage();
+        ChannelJSON.LoadChannel();
+        //System.out.println("asdf");
         Manager.getInstance().userManager();
-        System.out.println("asdf");
+        Manager.getInstance().messageManager();
+        Manager.getInstance().channelManager();
+
     }
 }

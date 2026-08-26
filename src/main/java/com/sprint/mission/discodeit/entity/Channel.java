@@ -14,6 +14,9 @@ public class Channel extends BaseClass{
     //채널에 대화한 메세지를 list로 기록
     private String name;
     ///////////////////////////////////////////
+
+    public Channel() {}
+
     public Channel(String name) {
         super();
         this.name = name;
@@ -28,10 +31,7 @@ public class Channel extends BaseClass{
         return name;
     }
 
-    @Override
-    public String ToString() {
-        return "";
-    }
+
 
     /*public void setName(String name) {
         this.name = name;
