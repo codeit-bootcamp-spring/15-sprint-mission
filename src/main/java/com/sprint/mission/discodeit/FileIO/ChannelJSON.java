@@ -17,7 +17,7 @@ public class ChannelJSON {
                     .writeValue(new File("channel.json"), new ChannelData(
                             JCFChannelService.getInstance().getUserRoleMap()
                     ,JCFChannelService.getInstance().getMessagesListMap()
-                    ,JCFChannelService.getInstance().getChannelSet()));
+                    ,JCFChannelService.getInstance().getChanelMap()));
 
             System.out.println("채널 저장 완료");
 
@@ -42,7 +42,7 @@ public class ChannelJSON {
         }
         JCFChannelService.getInstance().setUserRoleMap(channelData.getUserRoleMap());
         JCFChannelService.getInstance().setMessagesListMap(channelData.getMessagesListMap());
-        JCFChannelService.getInstance().setChannelSet(channelData.getChannelSet());
+        JCFChannelService.getInstance().setChanelMap(channelData.getChannelMap());
 
     }
 }

@@ -1,27 +1,27 @@
 {
   "userMap" : {
-    "78736111-7474-40e3-b345-dc1f2b70f9dc" : {
-      "id" : "78736111-7474-40e3-b345-dc1f2b70f9dc",
-      "createdAt" : 1787644683413,
-      "updatedAt" : 1787644683413,
-      "email" : "test2@test.com",
-      "password" : "1234",
-      "name" : "유저2",
-      "nitroLevel" : "CLASSIC"
-    },
-    "175998ea-07ef-43a3-a932-e9e37998b12a" : {
-      "id" : "175998ea-07ef-43a3-a932-e9e37998b12a",
-      "createdAt" : 1787644683412,
-      "updatedAt" : 1787644683412,
+    "8eaffb9d-6cd5-4011-ad1c-8fb79ec6673b" : {
+      "id" : "8eaffb9d-6cd5-4011-ad1c-8fb79ec6673b",
+      "createdAt" : 1787721067878,
+      "updatedAt" : 1787721067878,
       "email" : "test1@test.com",
       "password" : "1234",
       "name" : "유저1",
       "nitroLevel" : "CLASSIC"
     },
-    "54eb8d87-11b7-46d7-8e91-ff52e3bd6c2f" : {
-      "id" : "54eb8d87-11b7-46d7-8e91-ff52e3bd6c2f",
-      "createdAt" : 1787644683413,
-      "updatedAt" : 1787644683413,
+    "0ea5422e-b446-4a74-abfa-76f2be00bd6d" : {
+      "id" : "0ea5422e-b446-4a74-abfa-76f2be00bd6d",
+      "createdAt" : 1787721067880,
+      "updatedAt" : 1787721067880,
+      "email" : "test2@test.com",
+      "password" : "1234",
+      "name" : "유저2",
+      "nitroLevel" : "CLASSIC"
+    },
+    "cd613816-27fe-43f4-ac6c-186391782c0d" : {
+      "id" : "cd613816-27fe-43f4-ac6c-186391782c0d",
+      "createdAt" : 1787721067880,
+      "updatedAt" : 1787721067880,
       "email" : "test3@test.com",
       "password" : "1234",
       "name" : "유저3",

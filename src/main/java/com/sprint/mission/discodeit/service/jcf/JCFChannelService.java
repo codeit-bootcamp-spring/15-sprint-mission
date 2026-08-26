@@ -13,7 +13,7 @@ public class JCFChannelService implements ChannelService{
 
     final Map<UUID, Map<UUID, ChannelRole>> userRoleMap = new HashMap<>();//key channel, value-value user
     final Map<UUID, List<UUID>>  messagesListMap = new HashMap<>();//key channel, value message
-    final Set<Channel>  channelSet = new HashSet<>();
+    final Map<UUID, Channel>  channelMap = new HashMap<>();
     //final Map<UUID, >
 
 
@@ -35,15 +35,23 @@ public class JCFChannelService implements ChannelService{
         this.userRoleMap.putAll(userRoleMap);
     }
 
+    public Map<UUID, Channel> getChanelMap() {
+        return new HashMap<>(channelMap);
+    }
 
-    public Set<Channel> getChannelSet() {
+    public void setChanelMap(Map<UUID, Channel> chanelMap) {
+        this.channelMap.clear();
+        this.channelMap.putAll(chanelMap);
+    }
+
+    /*public Set<Channel> getChannelSet() {
         return new HashSet<>(channelSet);
     }
 
     public void setChannelSet(Set<Channel> channelSet) {
         this.channelSet.clear();
         this.channelSet.addAll(channelSet);
-    }
+    }*/
 
     ////////////////////////////
     Channel testChannel;
@@ -63,8 +71,8 @@ public class JCFChannelService implements ChannelService{
 
     @Override
     public void create(String name) {
-        for (Channel channel : channelSet) {
-            if (channel.getName().equals(name)) {
+        for (UUID channelID : channelMap.keySet()) {
+            if (channelMap.get(channelID).getName().equals(name)) {
                 throw new IllegalArgumentException("이미 존재하는 채널명");
             }
         }
@@ -72,13 +80,13 @@ public class JCFChannelService implements ChannelService{
         Channel channelCreate = new Channel(name);
         userRoleMap.put(channelCreate.getId(),new HashMap<>());
         messagesListMap.put(channelCreate.getId(),new ArrayList<>());
-        channelSet.add(channelCreate);
+        channelMap.put(channelCreate.getId(), channelCreate);
         testChannel = channelCreate;
     }
 
     @Override
     public void read() {
-        for(Channel channel : channelSet){
+        for(Channel channel : channelMap.values()){
             System.out.println("ID: " + channel.getId());
             System.out.println("채널명: " + channel.getName());
             System.out.println("수정시간: " + channel.getUpdatedAt());
@@ -89,22 +97,18 @@ public class JCFChannelService implements ChannelService{
     public void update(UUID id, String name) {
         boolean cheekID=false;
 
-        for (Channel channel : channelSet) {
-
-            if (channel.getName().equals(name)) {
+        for (UUID channelID : channelMap.keySet()) {
+            if (channelMap.get(channelID).getName().equals(name)) {
                 throw new IllegalArgumentException("이미 존재하는 채널명");
             }
         }
-
-        for(Channel channel : channelSet){
-            if(channel.getId().equals(id)){
-                channel.update(name);
-                cheekID=true;
-            }
-        }
-        if(!cheekID){
+        if(!channelMap.containsKey(id)){
             throw new IllegalArgumentException("해당 id가 없습니다.");
         }
+
+
+        channelMap.get(id).update(name);
+
 
     }
 
@@ -117,7 +121,8 @@ public class JCFChannelService implements ChannelService{
 
         userRoleMap.remove(id);
         messagesListMap.remove(id);
-        channelSet.removeIf(channel -> channel.getId().equals(id));
+        channelMap.remove(id);
+        //channelSet.removeIf(channel -> channel.getId().equals(id));
     }
 
     /////////////////////////////////////////////////

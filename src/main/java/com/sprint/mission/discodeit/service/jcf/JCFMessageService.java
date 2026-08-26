@@ -43,7 +43,7 @@ public class JCFMessageService implements MessageService{
         for (Map.Entry<UUID, Message> entry : messageMap.entrySet()) {
             System.out.println("ID: " + entry.getValue().getId());
             System.out.println("메세지: " + entry.getValue().getMessage());
-            System.out.println("보낸사람: " + entry.getValue().getId());
+            System.out.println("보낸사람: " + entry.getValue().getUserId());
             System.out.println("수정시간: " + entry.getValue().getUpdatedAt());
         }
 
