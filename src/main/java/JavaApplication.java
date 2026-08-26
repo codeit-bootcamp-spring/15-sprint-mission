@@ -1,3 +1,7 @@
+import com.sprint.mission.discodeit.FileIO.ChannelJSON;
+import com.sprint.mission.discodeit.FileIO.MessageJSON;
+import com.sprint.mission.discodeit.FileIO.UserJSON;
+
 import java.util.Scanner;
 
 public class JavaApplication {
@@ -6,7 +10,7 @@ public class JavaApplication {
         String choose;
         boolean loop = true;
 
-        Manager.getInstance().createTestUnit();
+
 
 
 
@@ -17,7 +21,10 @@ public class JavaApplication {
                         "1. 유저\n" +
                         "2. 채널\n" +
                         "3. 메세지\n" +
-                        "4. 종료");
+                        "4. 저장\n" +
+                        "5. 불러오기\n" +
+                        "6. 종료\n" +
+                        "0. 테스트유닛생성");
                 choose=sc.next();
                 switch (choose){
                     case "1":
@@ -34,7 +41,24 @@ public class JavaApplication {
                         break;
 
                     case "4":
+                        UserJSON.SaveUser();
+                        MessageJSON.SaveMessage();
+                        ChannelJSON.SaveChannel();
+                        break;
+
+
+                    case "5":
+                        UserJSON.LoadUser();
+                        MessageJSON.LoadMessage();
+                        ChannelJSON.LoadChannel();
+                        break;
+
+                    case "6":
                         loop=false;
+                        break;
+
+                    case "0":
+                        Manager.getInstance().createTestUnit();
                         break;
 
                     default:

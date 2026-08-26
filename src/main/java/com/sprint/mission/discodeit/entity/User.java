@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -11,7 +14,23 @@ public class User extends BaseClass{
     private String name;
     private NitroLevel nitroLevel;
 
-    public User() {}
+    @JsonCreator
+    public User(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("createdAt") Long createdAt,
+            @JsonProperty("updatedAt") Long updatedAt,
+            @JsonProperty("email") String email,
+            @JsonProperty("password") String password,
+            @JsonProperty("name") String name,
+            @JsonProperty("nitroLevel") NitroLevel nitroLevel
+
+    ) {
+        super(id, createdAt, updatedAt);
+        this.email=email;
+        this.password=password;
+        this.name=name;
+        this.nitroLevel=nitroLevel;
+    }
     public User(String email, String password, String name, NitroLevel nitroLevel) {
         super();
 
@@ -24,13 +43,13 @@ public class User extends BaseClass{
         this.nitroLevel=nitroLevel;
     }
 
-    public User(UUID id, Long createdAt, Long updatedAt, String email, String password, String name, NitroLevel nitroLevel) {
+    /*public User(UUID id, Long createdAt, Long updatedAt, String email, String password, String name, NitroLevel nitroLevel) {
         super(id, createdAt, updatedAt);
         this.email=email;
         this.password=password;
         this.name=name;
         this.nitroLevel=nitroLevel;
-    }
+    }*/
 
 
 

@@ -169,7 +169,7 @@ public class JCFChannelService implements ChannelService{
             for(UUID messageId : messagesListMap.get(channelId)){
                 for(User user : JCFUserService.getInstance().getUsers()) {
                     if (user.getId().equals(JCFMessageService.getInstance().getMessageMap().get(messageId).getUserId())) {
-                        System.out.println(user.getName());
+                        System.out.print(user.getName() + " : ");
                     }
                 }
                 System.out.println(JCFMessageService.getInstance().getMessageMap().get(messageId).getMessage());

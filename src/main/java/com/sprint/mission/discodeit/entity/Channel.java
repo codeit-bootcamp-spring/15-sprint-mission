@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import java.util.*;
 
 //멤버(권한), 메세지
 public class Channel extends BaseClass{
@@ -15,7 +15,16 @@ public class Channel extends BaseClass{
     private String name;
     ///////////////////////////////////////////
 
-    public Channel() {}
+    @JsonCreator
+    public Channel(
+            @JsonProperty("id") UUID id,
+            @JsonProperty("createdAt") Long createdAt,
+            @JsonProperty("updatedAt") Long updatedAt,
+            @JsonProperty("name") String name
+    ) {
+        super(id, createdAt, updatedAt);
+        this.name = name;
+    }
 
     public Channel(String name) {
         super();
