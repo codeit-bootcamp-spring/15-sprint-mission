@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.*;
 
 //멤버(권한), 메세지
-public class Channel extends BaseClass implements Serializable {
+public class Channel extends BaseClass {
     ///////////////////////////////////////////
 
     private String name;

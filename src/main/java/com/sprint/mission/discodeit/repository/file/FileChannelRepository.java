@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 
@@ -19,7 +20,7 @@ public class FileChannelRepository implements ChannelRepository {
 
     private final static FileChannelRepository instance = new FileChannelRepository();
     private FileChannelRepository() {
-        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "saveData", User.class.getSimpleName());
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), "saveData", Channel.class.getSimpleName());//<<이줄 수정함
         if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);

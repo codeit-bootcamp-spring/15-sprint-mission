@@ -7,7 +7,7 @@ import java.io.Serializable;
 import java.util.*;
 
 //누가,머라고,반응,
-public class Message extends BaseClass implements Serializable {
+public class Message extends BaseClass  {
     private final UUID channelId;
     private final UUID userId;
     private String message;

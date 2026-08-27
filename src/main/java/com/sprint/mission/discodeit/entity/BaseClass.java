@@ -1,9 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-abstract public class BaseClass {
+abstract public class BaseClass implements Serializable {
     private final UUID id;
     private final Long createdAt;
     protected Long updatedAt;

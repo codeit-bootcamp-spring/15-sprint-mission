@@ -9,7 +9,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 //계정,비번,닉,등급?
-public class User extends BaseClass implements Serializable {
+public class User extends BaseClass {
     private String email;
     private String password;
     private String name;

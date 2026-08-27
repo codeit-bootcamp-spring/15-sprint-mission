@@ -46,7 +46,9 @@ public class BasicUserService implements UserService {
     public User update(UUID id, String email, String password, String name, NitroLevel nitroLevel) {
         User user;
         try{
+            //System.out.println("1. findById 전");
             user = userRepository.findById(id).get();
+            //System.out.println("2. findById 후");
         }catch (NoSuchElementException e) {
             throw new NoSuchElementException("id 없음");
         }
@@ -54,6 +56,7 @@ public class BasicUserService implements UserService {
 
         }
         user.update(email,password,name,nitroLevel);
+        //System.out.println("3. user.update 후");
         return userRepository.save(user);
     }
 
