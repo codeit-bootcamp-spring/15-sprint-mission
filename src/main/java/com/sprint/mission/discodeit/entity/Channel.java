@@ -3,10 +3,11 @@ package com.sprint.mission.discodeit.entity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.util.*;
 
 //멤버(권한), 메세지
-public class Channel extends BaseClass{
+public class Channel extends BaseClass implements Serializable {
     ///////////////////////////////////////////
 
     private String name;

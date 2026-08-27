@@ -6,7 +6,7 @@ import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService {
+public class JCFUserService {
 
     final Map<UUID, User> userMap = new HashMap<>();//UUID = user
     User testUser;//테스트
@@ -39,7 +39,7 @@ public class JCFUserService implements UserService {
         return userMap.get(uuid).getName();
     }*/
 
-    @Override
+
     public void create(String email, String password, String name, NitroLevel nitroLevel) {
         User userCreate = new User(email,password,name,nitroLevel);//이메일,비번,닉넴,니트로
         userMap.put(userCreate.getId(),userCreate);
@@ -49,8 +49,8 @@ public class JCFUserService implements UserService {
 
 
 
-    @Override
-    public void read() {//테스트용 임시코드
+
+    public void readAll() {//테스트용 임시코드
         for (Map.Entry<UUID, User> entry : userMap.entrySet()) {
             System.out.println("ID: " + entry.getKey());
             System.out.println("이름: " + entry.getValue().getName());
@@ -65,7 +65,7 @@ public class JCFUserService implements UserService {
 
 
 
-    @Override
+
     public void update(UUID id, String email, String password, String name, NitroLevel nitroLevel) {
         if(!userMap.containsKey(id)){
             throw new IllegalArgumentException("해당 id가 없습니다.");
@@ -74,7 +74,7 @@ public class JCFUserService implements UserService {
 
     }
 
-    @Override
+
     public void delete(UUID id) {
         userMap.remove(id);
         JCFMessageService.getInstance().delete_UserToMessage(id);

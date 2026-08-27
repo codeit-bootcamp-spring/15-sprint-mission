@@ -4,11 +4,12 @@ package com.sprint.mission.discodeit.entity;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 //계정,비번,닉,등급?
-public class User extends BaseClass{
+public class User extends BaseClass implements Serializable {
     private String email;
     private String password;
     private String name;

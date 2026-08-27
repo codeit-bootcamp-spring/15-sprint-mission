@@ -70,7 +70,7 @@ public class Manager {
                 break;
 
             case "2":
-                JCFUserService.getInstance().read();
+                JCFUserService.getInstance().readAll();
                 break;
 
             case "3":
@@ -198,7 +198,7 @@ public class Manager {
                 break;
 
             case "2":
-                JCFChannelService.getInstance().read();
+                JCFChannelService.getInstance().readAll();
                 break;
 
             case "3":
@@ -305,7 +305,7 @@ public class Manager {
                 break;
 
             case "2":
-                JCFMessageService.getInstance().read();
+                JCFMessageService.getInstance().readAll();
                 break;
 
             case "3":

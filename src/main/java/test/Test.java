@@ -26,7 +26,7 @@ public class Test {
         );
 
         System.out.println("===== User =====");
-        userService.read();
+        userService.readAll();
 
 
         // ========================================
@@ -38,7 +38,7 @@ public class Test {
         Channel channel = channelService.getTestChannel();
 
         System.out.println("\n===== Channel 생성 =====");
-        channelService.read();
+        channelService.readAll();
 
 
         // ========================================
@@ -48,10 +48,10 @@ public class Test {
         User user = null;
 
         // 현재 UserService의 create()가 void이므로
-        // 일단 read()로 UUID를 확인한 뒤 직접 넣어야 함.
+        // 일단 readAll()로 UUID를 확인한 뒤 직접 넣어야 함.
         //
         // 테스트 편의를 위해 아래 UUID에
-        // read()에서 확인한 User UUID를 입력
+        // readAll()에서 확인한 User UUID를 입력
 
         String userIdString = userService.getTestUser().getId().toString();
 
@@ -91,7 +91,7 @@ public class Test {
 
 
             System.out.println("\n===== Message 생성 =====");
-            messageService.read();
+            messageService.readAll();
 
 
             // ========================================
@@ -129,12 +129,12 @@ public class Test {
             // ========================================
 
             System.out.println("\n===== Message 삭제 전 =====");
-            messageService.read();
+            messageService.readAll();
 
             messageService.delete(message1.getId());
 
             System.out.println("\n===== Message 삭제 후 =====");
-            messageService.read();
+            messageService.readAll();
 
             System.out.println("\n===== Channel Message 목록 =====");
 
@@ -155,10 +155,10 @@ public class Test {
 
             System.out.println("\nChannel 삭제 후:");
 
-            channelService.read();
+            channelService.readAll();
 
             System.out.println("\nMessage 목록:");
-            messageService.read();
+            messageService.readAll();
 
 
         } catch (IllegalArgumentException e) {

@@ -3,13 +3,12 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelRole;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
 //메세지 리스트
 //(멤버,권한) 맵
-public class JCFChannelService implements ChannelService {
+public class JCFChannelService  {
 
     final Map<UUID, Map<UUID, ChannelRole>> userRoleMap = new HashMap<>();//key channel, value-value user
     final Map<UUID, List<UUID>>  messagesListMap = new HashMap<>();//key channel, value message
@@ -69,7 +68,7 @@ public class JCFChannelService implements ChannelService {
 
 
 
-    @Override
+
     public void create(String name) {
         for (UUID channelID : channelMap.keySet()) {
             if (channelMap.get(channelID).getName().equals(name)) {
@@ -84,8 +83,8 @@ public class JCFChannelService implements ChannelService {
         testChannel = channelCreate;
     }
 
-    @Override
-    public void read() {
+
+    public void readAll() {
         for(Channel channel : channelMap.values()){
             System.out.println("ID: " + channel.getId());
             System.out.println("채널명: " + channel.getName());
@@ -94,7 +93,7 @@ public class JCFChannelService implements ChannelService {
         }
     }
 
-    @Override
+
     public void update(UUID id, String name) {
         boolean cheekID=false;
 
@@ -113,7 +112,7 @@ public class JCFChannelService implements ChannelService {
 
     }
 
-    @Override
+
     public void delete(UUID id) {
 
         if(userRoleMap.containsKey(id)){

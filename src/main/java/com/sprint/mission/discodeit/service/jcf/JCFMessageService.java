@@ -2,12 +2,11 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Reaction;
-import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 //반응 숫자 맵
-public class JCFMessageService implements MessageService {
+public class JCFMessageService {
     final Map<UUID, Message>  messageMap = new HashMap<>();//UUID=message
     final Map<UUID ,Map<Reaction, Set<UUID>>> reactionMap = new HashMap<>();//key 메세지, value-value 유저
     //2nf?
@@ -25,9 +24,9 @@ public class JCFMessageService implements MessageService {
 
 
 
-    @Override
+
     public void create(UUID channelId,UUID userId, String message) {
-        Message messageCreate = new Message(userId,message);
+        Message messageCreate = new Message(channelId,userId,message);
 
         JCFChannelService.getInstance()
                 .addMessage(channelId, userId, messageCreate.getId());
@@ -38,8 +37,8 @@ public class JCFMessageService implements MessageService {
 
     }
 
-    @Override
-    public void read() {
+
+    public void readAll() {
         for (Map.Entry<UUID, Message> entry : messageMap.entrySet()) {
             System.out.println("ID: " + entry.getValue().getId());
             System.out.println("메세지: " + entry.getValue().getMessage());
@@ -50,7 +49,7 @@ public class JCFMessageService implements MessageService {
 
     }
 
-    @Override
+
     public void update(UUID id , String message) {
         if(!messageMap.containsKey(id)){
             throw new IllegalArgumentException("해당 id가 없습니다.");
@@ -59,7 +58,7 @@ public class JCFMessageService implements MessageService {
 
     }
 
-    @Override
+
     public void delete(UUID id) {
         messageMap.remove(id);
         reactionMap.remove(id);
