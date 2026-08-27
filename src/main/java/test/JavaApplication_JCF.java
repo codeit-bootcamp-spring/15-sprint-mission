@@ -1,10 +1,12 @@
-import com.sprint.mission.discodeit.repository.ChannelJSON;
-import com.sprint.mission.discodeit.repository.MessageJSON;
-import com.sprint.mission.discodeit.repository.UserJSON;
+package test;
+
+import com.sprint.mission.discodeit.service.jcf.JSON.ChannelJSON;
+import com.sprint.mission.discodeit.service.jcf.JSON.MessageJSON;
+import com.sprint.mission.discodeit.service.jcf.JSON.UserJSON;
 
 import java.util.Scanner;
 
-public class JavaApplication {
+public class JavaApplication_JCF {
     public static void main(String[] args) {
 
         String choose;

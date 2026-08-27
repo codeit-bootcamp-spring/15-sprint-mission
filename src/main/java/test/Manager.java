@@ -1,3 +1,5 @@
+package test;
+
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;

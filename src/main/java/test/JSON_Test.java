@@ -1,6 +1,8 @@
-import com.sprint.mission.discodeit.repository.ChannelJSON;
-import com.sprint.mission.discodeit.repository.MessageJSON;
-import com.sprint.mission.discodeit.repository.UserJSON;
+package test;
+
+import com.sprint.mission.discodeit.service.jcf.JSON.ChannelJSON;
+import com.sprint.mission.discodeit.service.jcf.JSON.MessageJSON;
+import com.sprint.mission.discodeit.service.jcf.JSON.UserJSON;
 
 public class JSON_Test {
 

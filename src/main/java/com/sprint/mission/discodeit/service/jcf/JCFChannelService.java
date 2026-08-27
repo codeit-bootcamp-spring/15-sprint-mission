@@ -2,14 +2,14 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelRole;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
 
 //메세지 리스트
 //(멤버,권한) 맵
-public class JCFChannelService implements ChannelService{
+public class JCFChannelService implements ChannelService {
 
     final Map<UUID, Map<UUID, ChannelRole>> userRoleMap = new HashMap<>();//key channel, value-value user
     final Map<UUID, List<UUID>>  messagesListMap = new HashMap<>();//key channel, value message

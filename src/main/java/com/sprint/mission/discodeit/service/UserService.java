@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
+package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.NitroLevel;
 

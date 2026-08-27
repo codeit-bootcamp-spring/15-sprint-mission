@@ -2,10 +2,11 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.NitroLevel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.*;
 
-public class JCFUserService implements UserService{
+public class JCFUserService implements UserService {
 
     final Map<UUID, User> userMap = new HashMap<>();//UUID = user
     User testUser;//테스트

@@ -1,8 +1,4 @@
-package com.sprint.mission.discodeit.service.jcf;
-
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.NitroLevel;
-import com.sprint.mission.discodeit.entity.User;
+package com.sprint.mission.discodeit.service;
 
 import java.util.UUID;
 

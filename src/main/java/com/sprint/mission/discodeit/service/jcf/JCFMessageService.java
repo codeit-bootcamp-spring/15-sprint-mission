@@ -2,12 +2,12 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.Reaction;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 //반응 숫자 맵
-public class JCFMessageService implements MessageService{
+public class JCFMessageService implements MessageService {
     final Map<UUID, Message>  messageMap = new HashMap<>();//UUID=message
     final Map<UUID ,Map<Reaction, Set<UUID>>> reactionMap = new HashMap<>();//key 메세지, value-value 유저
     //2nf?

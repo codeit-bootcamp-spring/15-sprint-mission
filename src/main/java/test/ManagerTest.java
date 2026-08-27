@@ -1,8 +1,6 @@
-import com.sprint.mission.discodeit.entity.NitroLevel;
+package test;
+
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
-import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
-import com.sprint.mission.discodeit.service.jcf.UserService;
 
 import java.util.Scanner;
 import java.util.UUID;
@@ -17,10 +15,10 @@ public class ManagerTest {
 
         Manager.getInstance().userManager();
 
-    //    Manager.getInstance().channelManager();
-    //    Manager.getInstance().channelManager();
-    //    Manager.getInstance().channelManager();
-    //    Manager.getInstance().channelManager();
+    //    test.Manager.getInstance().channelManager();
+    //    test.Manager.getInstance().channelManager();
+    //    test.Manager.getInstance().channelManager();
+    //    test.Manager.getInstance().channelManager();
 
         Manager.getInstance().userManager();
 
