@@ -7,20 +7,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 import com.sprint.mission.discodeit.repository.file.FileUserRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
-import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
-import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 
 
 import java.util.List;
-import java.util.UUID;
 
 public class JavaApplication {
     static User setupUser() {
@@ -54,18 +46,18 @@ public class JavaApplication {
         Channel channel = setupChannel();
         // 테스트
         messageCreateTest(channel, user);
+        Message testMessage1 = BasicMessageService.getInstance().create(channel.getId(),user.getId(),"실험용1");
+        List<Message> messageList = BasicMessageService.getInstance().readAll();
+        Message testMessage2 = BasicMessageService.getInstance().read(testMessage1.getId());
 
-        List<User> userList = BasicUserService.getInstance().readAll();
-        User testuser = BasicUserService.getInstance().read(user.getId());
+        System.out.println("user     : " + testMessage1.getId());
+        System.out.println("testuser : " + testMessage2.getId());
+        System.out.println("같음? : " + testMessage1.getId().equals(testMessage2.getId()));
 
-        System.out.println("user     : " + user.getId());
-        System.out.println("testuser : " + testuser.getId());
-        System.out.println("같음? : " + user.getId().equals(testuser.getId()));
-
-        BasicUserService.getInstance().update(user.getId(),"WER@asdf.sd","asdf","asdf",NitroLevel.CLASSIC);
-        userList = BasicUserService.getInstance().readAll();
-        BasicUserService.getInstance().delete(user.getId());
-        userList = BasicUserService.getInstance().readAll();
+        BasicMessageService.getInstance().update(testMessage1.getId(),"WER@asdf.sd");
+        messageList = BasicMessageService.getInstance().readAll();
+        BasicMessageService.getInstance().delete(testMessage2.getId());
+        messageList = BasicMessageService.getInstance().readAll();
 
         System.out.println("끝");
 
