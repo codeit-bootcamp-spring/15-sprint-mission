@@ -15,20 +15,6 @@ import com.sprint.mission.discodeit.service.file.FileUserService;
 
 public class JavaApplication {
 
-    static User setupUser(UserService userService) {
-        User user = userService.createUser("woody");
-        return user;
-    }
-
-    static Channel setupChannel(ChannelService channelService) {
-        Channel channel = channelService.createChannel( "공지");
-        return channel;
-    }
-
-    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-        Message message = messageService.createMessage("안녕하세요.");
-        System.out.println("메시지 생성: " + message.getId());}
-
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         // 각 도메인별 CRUD기능 사용을 위한 인스턴스 선언
@@ -41,13 +27,10 @@ public class JavaApplication {
         ChannelService channelService = new FileChannelService();
         MessageService messageService = new FileMessageService();
 
-
 //        User user = setupUser(userService);
 //        Channel channel = setupChannel(channelService);
 //        // 테스트
 //        messageCreateTest(messageService, channel, user);
-
-
 
         int count = 0;
         boolean running = true;
@@ -70,8 +53,6 @@ public class JavaApplication {
                 sc.nextLine();  // 입려된 문자(버퍼) 안 비우면 무한루프 걸림
                 continue;   // 메뉴 처음으로
             }
-
-
             switch (choice) {
                 case 1:
                     System.out.println("1. User 등록   2. Channer 등록   3. Message 등록  0. 뒤로가기");
@@ -84,11 +65,10 @@ public class JavaApplication {
                                 System.out.print("유저 이름을 입력하세요: ");
                                 String userName = sc.nextLine();
 
-                                // userService가 JCF를 쓰니까 JCF안에 Map에 String userName이 저장이 되겠네
+                                // userService가 JCF를 쓰니까 JCF안에 Map에 String userName이 저장
                                 userService.createUser(userName);
                                 System.out.println("유저 등록이 완료되었습니다.");
                                 System.out.println();
-                                //System.out.println(map.values()); //map에 잘 들어갔는지 확인용 / [userName]출력
                                 break;
                             case 2:
                                 // Channel 등록
@@ -102,7 +82,7 @@ public class JavaApplication {
                                 // Message 등록
                                 System.out.print("메시지를 입력하세요: ");
                                 String content = sc.nextLine();
-                                messageService.createMessage(content);      // 얘는 또 뭐야
+                                messageService.createMessage(content);
                                 System.out.println("메시지 등록이 완료되었습니다.");
                                 break;
                             default:
@@ -182,10 +162,10 @@ public class JavaApplication {
                                     System.out.println("잘못된 형식입니다.");
                                 }
 
-                                ///왜 Map.put을 다시 안 해도 되나요?
+                                ///왜 Map.put을 다시 안 할까?
                                 /// userMap.get(id)로 꺼내온 user 변수는 Map 속에 들어있는 '진짜 유저 객체'의 주소를 가리키고 있음.
                                 ///따라서 user.updateUserName(...)을 실행하는 순간
-                                ///Map이 가리키고 있던 실제 객체의 데이터가 바로 변하게 됩니다.
+                                ///Map이 가리키고 있던 실제 객체의 데이터가 바로 변한다~
                                 break;  // case 1 종료
                             case 2:
                                 System.out.println("------Channel 수정------");
@@ -250,8 +230,6 @@ public class JavaApplication {
                                 } catch (IllegalArgumentException e) {
                                     System.out.println("잘못된 형식입니다.");
                                 }
-
-
                                 break;  // delete_case 1: 종료
                             case 2:
                                 System.out.println("------Channel 삭제------");
@@ -268,8 +246,6 @@ public class JavaApplication {
                                 } catch (IllegalArgumentException e) {
                                     System.out.println("잘못된 형식입니다.");
                                 }
-
-
                                 break;  // delete_case 2: 종료
                             case 3:
                                 System.out.println("------Message 삭제------");
@@ -302,4 +278,4 @@ public class JavaApplication {
         }
     }
 }
-/// 중복되는 코드가 많아 클래스로 묶어서 사용해도 되는거 아닌가 하는 의문이 듦. -> 내부 클래스 정의?
+/// 중복되는 코드가 많아 클래스로 묶어서 사용해도 되는거 아닌가 하는 의문이 듦.
