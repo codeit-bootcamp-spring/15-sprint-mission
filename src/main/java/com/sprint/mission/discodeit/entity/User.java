@@ -1,29 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
-
-public class User {
-    private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+public class User extends Common {
     private String userName;
     private String email;
     private String password;
 
-    public User(String username, String email, String password) {
-        this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+    public User(String userName, String email, String password) {
         this.userName = userName;
         this.email = email;
         this.password = password;
     }
 
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return updatedAt;
+    public String getUserName() {
+        return userName;
     }
 
     public String getEmail() {
@@ -34,10 +23,11 @@ public class User {
         return password;
     }
 
-    public void update(String username, String email, String password) {
+    public void update(String userName, String email, String password) {
         this.userName = userName;
         this.email = email;
         this.password = password;
-        this.updatedAt = System.currentTimeMillis();
+
+        updateUpdatedAt();
     }
 }
