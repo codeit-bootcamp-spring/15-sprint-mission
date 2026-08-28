@@ -35,7 +35,9 @@ public class Channel implements Serializable {
         return "Channel{" +
                 "id=" + id +
                 ", channelName='" + channelName + '\'' +
-                '}';
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}' + "\n";
     }
 
 }

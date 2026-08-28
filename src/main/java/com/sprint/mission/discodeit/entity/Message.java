@@ -10,29 +10,48 @@ public class Message implements Serializable {
     private String content;
 
     /// Jackson 복원용 기본 생성자
-    public Message() {}
+    public Message() {
+    }
 
-    public Message(String content){
+    public Message(String content) {
         this.id = UUID.randomUUID();
         this.createdAt = System.currentTimeMillis();
         this.updatedAt = System.currentTimeMillis();
         this.content = content;
     }
 
-    public UUID getId() { return id; }
-    public Long getCreatedAt() { return createdAt; }
-    public Long getUpdatedAt() { return updatedAt; }
-    public String getContent() { return content; }
+    public UUID getId() {
+        return id;
+    }
+
+    public Long getCreatedAt() {
+        return createdAt;
+    }
+
+    public Long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getContent() {
+        return content;
+    }
 
 
-    public Long updateUpdatedAt(Long updatedAt) { return this.updatedAt = updatedAt; }
-    public String updateContent(String content) { return this.content = content; }
+    public Long updateUpdatedAt(Long updatedAt) {
+        return this.updatedAt = updatedAt;
+    }
+
+    public String updateContent(String content) {
+        return this.content = content;
+    }
 
     @Override
     public String toString() {
         return "Message{" +
                 "id=" + id +
                 ", content='" + content + '\'' +
-                '}';
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                '}' + "\n";
     }
 }
