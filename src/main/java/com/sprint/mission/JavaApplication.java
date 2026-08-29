@@ -5,13 +5,19 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-import com.sprint.mission.discodeit.service.file.FileChannelService;
-import com.sprint.mission.discodeit.service.file.FileMessageService;
-import com.sprint.mission.discodeit.service.file.FileUserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 public class JavaApplication {
 
@@ -23,9 +29,13 @@ public class JavaApplication {
 //        MessageService messageService = new JCFMessageService();    //
 
         /// FileIO
-        UserService userService = new FileUserService();
-        ChannelService channelService = new FileChannelService();
-        MessageService messageService = new FileMessageService();
+        UserRepository userRepository = new FileUserRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        MessageRepository messageRepository = new FileMessageRepository();
+
+        UserService userService = new BasicUserService(userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository);
+        MessageService messageService = new BasicMessageService(messageRepository);
 
 //        User user = setupUser(userService);
 //        Channel channel = setupChannel(channelService);
@@ -88,7 +98,7 @@ public class JavaApplication {
                             default:
                                 break; // 뒤로가기(취소)
                         }
-                    } catch (IllegalArgumentException e) {
+                    } catch (InputMismatchException e) {
                         System.out.println("잘못된 형식입니다.");
                     }   // 1. 등록 try종료
                     break;  // case 1 종료
@@ -133,7 +143,7 @@ public class JavaApplication {
                                 break;
                             default: break;     // 나가기
                         }
-                    }catch (IllegalArgumentException e) {
+                    }catch (InputMismatchException e) {
                         System.out.println("잘못된 형식입니다.");
                     }   // 2. 조회 try 종료
 
@@ -204,7 +214,7 @@ public class JavaApplication {
                                 break;  // case 3 종료
                             default: break; // 나가기
                         }
-                    } catch (IllegalArgumentException e) {
+                    } catch (InputMismatchException e) {
                         System.out.println("잘못된 형식입니다.");
                     }   // 3. 수정 try 종료
 
@@ -266,7 +276,7 @@ public class JavaApplication {
                                 break;  // delete_case 3: 종료
                             default: break; // 삭제 취소 -> 메인 메뉴로 돌아감
                         }
-                    } catch (IllegalArgumentException e) {
+                    } catch (InputMismatchException e) {
                         System.out.println("잘못된 형식입니다.");
                     }   // 4. 삭제 try종료
                     break;

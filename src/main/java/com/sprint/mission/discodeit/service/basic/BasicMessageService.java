@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
@@ -7,10 +7,14 @@ import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
 
 import java.util.*;
 
-public class FileMessageService implements MessageService{
+public class BasicMessageService implements MessageService{
 
-    private final MessageRepository messageRepository = new FileMessageRepository();
+//    private final MessageRepository messageRepository = new FileMessageRepository();
 
+    private final MessageRepository messageRepository;
+    public BasicMessageService(MessageRepository messageRepository){
+        this.messageRepository = messageRepository;
+    }
 
     @Override
     public Message getMessage(UUID id) { return messageRepository.findById(id); }

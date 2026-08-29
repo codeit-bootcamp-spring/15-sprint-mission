@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
@@ -7,9 +7,15 @@ import com.sprint.mission.discodeit.repository.file.FileUserRepository;
 
 import java.util.*;
 
-public class FileUserService implements UserService{
+public class BasicUserService implements UserService{
 
-    private final UserRepository userRepository = new FileUserRepository();
+    //private final UserRepository userRepository = new FileUserRepository();
+
+    private final UserRepository userRepository;
+
+    public BasicUserService(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Override
     public User getUser(UUID id) {

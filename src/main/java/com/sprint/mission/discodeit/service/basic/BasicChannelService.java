@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.service.file;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -7,10 +7,14 @@ import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 
 import java.util.*;
 
-public class FileChannelService implements ChannelService{
+public class BasicChannelService implements ChannelService{
 
-    private final ChannelRepository channelRepository = new FileChannelRepository();
+//    private final ChannelRepository channelRepository = new FileChannelRepository();
 
+    private final ChannelRepository channelRepository;
+    public BasicChannelService(ChannelRepository channelRepository){
+        this.channelRepository = channelRepository;
+    }
 
     @Override
     public Channel getChannel(UUID id) { return channelRepository.findById(id); }
