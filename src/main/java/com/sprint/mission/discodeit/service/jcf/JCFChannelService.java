@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> data;
@@ -21,7 +22,9 @@ public class JCFChannelService implements ChannelService {
     }
     @Override
     public List<Channel> readAll(){
-        return new ArrayList<>(data.values());
+        return data.values()
+                .stream()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     @Override
     public Channel update(UUID id, String channelName) {

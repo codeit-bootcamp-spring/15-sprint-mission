@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.ChannelService;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
     private final Map<UUID, Message> data;
@@ -34,7 +35,9 @@ public class JCFMessageService implements MessageService {
     }
     @Override
     public List<Message> readAll(){
-        return new ArrayList<>(data.values());
+        return data.values()
+                .stream()
+                .collect(Collectors.toCollection(ArrayList::new));
     }
     @Override
     public Message update(UUID id, String content){

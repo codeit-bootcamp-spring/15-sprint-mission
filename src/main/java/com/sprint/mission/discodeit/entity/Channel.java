@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.entity;
+import java.io.Serializable;
 import java.util.UUID;
 
-public class Channel {
+public class Channel implements Serializable {
     private final UUID channelId;
     private final long createAt;
     private long updatedAt;
