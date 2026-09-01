@@ -1,10 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
-public class Message {
+public class Message implements Serializable {
+    private static final long seriaVersionUID = 1L;
 
     private UUID id;
     private UUID userid;
