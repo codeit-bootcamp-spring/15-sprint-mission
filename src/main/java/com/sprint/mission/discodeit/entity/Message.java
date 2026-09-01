@@ -1,5 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
 public class Message extends Common {
     private String message;
     private Channel channel;
@@ -12,24 +16,12 @@ public class Message extends Common {
         this.user = user;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
     public void setMessage(String message) {
         this.message = message;
     }
 
-    public Channel getChannel() {
-        return channel;
-    }
-
     public void setChannel(Channel channel) {
         this.channel = channel;
-    }
-
-    public User getUser() {
-        return user;
     }
 
     public void setUser(User user) {

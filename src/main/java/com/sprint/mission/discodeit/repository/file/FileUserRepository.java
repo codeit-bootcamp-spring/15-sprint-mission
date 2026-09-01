@@ -2,12 +2,15 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.*;
 import java.util.HashSet;
 import java.util.Set;
 
+@Repository
 public class FileUserRepository implements UserRepository, Serializable {
     private final Path path;
 

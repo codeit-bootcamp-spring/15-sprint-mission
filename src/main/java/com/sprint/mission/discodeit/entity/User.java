@@ -1,39 +1,19 @@
 package com.sprint.mission.discodeit.entity;
 
+
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+import java.util.UUID;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class User extends Common {
-    String user;
-    String email;
-    String userId;
+    private String user;
+    private String email;
+    private String userId;
 
-    public User(String user, String email, String userId) {
-        super();
-        this.user = user;
-        this.email = email;
-        this.userId = userId;
-    }
-
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
+    private UUID profileId;
 }

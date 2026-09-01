@@ -1,5 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
 public class Channel extends Common {
     ChannelType channelType;
     String channelName;
@@ -10,30 +15,6 @@ public class Channel extends Common {
         super();
         this.channelType = channelType;
         this.channelName = channelName;
-        this.channelDescription = channelDescription;
-    }
-
-    public ChannelType getChannelType() {
-        return channelType;
-    }
-
-    public void setChannelType(ChannelType channelType) {
-        this.channelType = channelType;
-    }
-
-    public String getChannelName() {
-        return channelName;
-    }
-
-    public void setChannelName(String channelName) {
-        this.channelName = channelName;
-    }
-
-    public String getChannelDescription() {
-        return channelDescription;
-    }
-
-    public void setChannelDescription(String channelDescription) {
         this.channelDescription = channelDescription;
     }
 }
