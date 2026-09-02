@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.List;
 import java.util.UUID;
@@ -11,7 +10,7 @@ public class Message extends Common {
     private String content;
     private final UUID channelId;
     private final UUID authorId;
-    private List<UUID> attachmentIds; //binaryContent의 id
+    private final List<UUID> attachmentIds; //binaryContent의 id
 
     public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         super();

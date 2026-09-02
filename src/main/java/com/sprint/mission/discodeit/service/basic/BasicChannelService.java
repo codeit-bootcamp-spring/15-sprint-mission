@@ -3,7 +3,6 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;

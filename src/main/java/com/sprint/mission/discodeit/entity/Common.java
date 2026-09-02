@@ -9,7 +9,7 @@ import java.util.UUID;
 
 @Getter
 public class Common implements Serializable {
-    private UUID id;
+    private final UUID id;
     @Setter
     private Instant createdAt;
     // 서로 의존 관계로 한번에 업데이트가 되는 경우 업데이트 시각 동기화.

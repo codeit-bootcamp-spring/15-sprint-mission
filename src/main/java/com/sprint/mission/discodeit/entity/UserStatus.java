@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public class UserStatus extends Common {
     @Getter
-    private UUID userId;
+    private final UUID userId;
     private Instant lastOnlineAt;
 
 

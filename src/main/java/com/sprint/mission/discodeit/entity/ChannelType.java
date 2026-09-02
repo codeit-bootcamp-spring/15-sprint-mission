@@ -4,7 +4,7 @@ public enum ChannelType {
     PUBLIC(true),
     PRIVATE(false);
 
-    private boolean isPublic;
+    private final boolean isPublic;
 
     ChannelType(boolean b) {
         this.isPublic = b;

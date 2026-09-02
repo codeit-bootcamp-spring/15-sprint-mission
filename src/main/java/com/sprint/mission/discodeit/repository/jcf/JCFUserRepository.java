@@ -38,7 +38,7 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public Set<User> readAll() {
         return this.data.stream()
-                .map(e -> (User) e)
+                .map(e -> e)
                 .collect(Collectors.toSet());
     }
 
