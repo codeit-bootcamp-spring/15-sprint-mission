@@ -9,11 +9,18 @@ import java.util.UUID;
 
 @Getter
 @Setter
-@RequiredArgsConstructor
 public class User extends Common {
-    private String user;
+    private String username;
     private String email;
-    private String userId;
-
+    private String password;
     private UUID profileId;
+
+
+    public User(String username, String email, String password, UUID profileId) {
+        super();
+        this.username = username;
+        this.email = email;
+        this.password = password;
+        this.profileId = profileId;
+    }
 }

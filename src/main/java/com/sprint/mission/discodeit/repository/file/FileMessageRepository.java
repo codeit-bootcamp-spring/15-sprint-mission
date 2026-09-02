@@ -15,32 +15,15 @@ public class FileMessageRepository implements MessageRepository, Serializable {
     private final Path path;
 
     public FileMessageRepository() {
-        Path parentPath = Paths.get("data");
+        path = Paths.get("data", "messages");
         try {
-            Files.createDirectory(parentPath);
-        } catch (FileAlreadyExistsException ignored) {
-
+            Files.createDirectories(path);
         }
         catch (NoSuchFileException e) {
             System.out.println("폴더 경로가 없음");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        path = Paths.get("data\\messages");
-
-        try {
-            Files.createDirectory(path);
-            System.out.println("[초기화 단계] user 데이터 저장을 위한 디렉토리가 생성되었습니다.");
-        } catch (FileAlreadyExistsException ignored) {
-
-        }
-        catch (NoSuchFileException e) {
-            System.out.println("폴더 경로가 없음");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override

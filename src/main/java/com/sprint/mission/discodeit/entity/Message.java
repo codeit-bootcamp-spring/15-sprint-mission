@@ -3,28 +3,26 @@ package com.sprint.mission.discodeit.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+import java.util.UUID;
+
 @Getter
 public class Message extends Common {
-    private String message;
-    private Channel channel;
-    private User user;
+    private String content;
+    private final UUID channelId;
+    private final UUID authorId;
+    private List<UUID> attachmentIds; //binaryContent의 id
 
-    public Message(String message, Channel channel, User user) {
+    public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
         super();
-        this.message = message;
-        this.channel = channel;
-        this.user = user;
+        this.content = content;
+        this.channelId = channelId;
+        this.authorId = authorId;
+        this.attachmentIds = attachmentIds;
     }
 
-    public void setMessage(String message) {
-        this.message = message;
-    }
 
-    public void setChannel(Channel channel) {
-        this.channel = channel;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
+    public void setMessage(String content) {
+        this.content = content;
     }
 }

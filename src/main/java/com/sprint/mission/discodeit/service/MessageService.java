@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message create(String mes, Channel channel, User user);
+    Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds);
     List<Message> userReadAll(User user);
     List<Message> channelReadAll(Channel channel);
     Message read(UUID channelId, UUID userId);
     List<Message> readAll();
-    void update(Message message, String mes);
+    void update(UUID id, String content);
     void delete(Message message);
 }

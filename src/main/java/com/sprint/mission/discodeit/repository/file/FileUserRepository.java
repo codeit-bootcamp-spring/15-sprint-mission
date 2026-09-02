@@ -8,43 +8,65 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.nio.file.*;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+import java.util.UUID;
 
 @Repository
 public class FileUserRepository implements UserRepository, Serializable {
     private final Path path;
 
     public FileUserRepository() {
-        Path parentPath = Paths.get("data");
+        path = Paths.get("data", "users");
         try {
-            Files.createDirectory(parentPath);
-        } catch (FileAlreadyExistsException ignored) {
-
+            Files.createDirectories(path);
         }
         catch (NoSuchFileException e) {
             System.out.println("폴더 경로가 없음");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        path = Paths.get("data\\users");
-
-        try {
-            Files.createDirectory(path);
-            System.out.println("[초기화 단계] user 데이터 저장을 위한 디렉토리가 생성되었습니다.");
-        } catch (FileAlreadyExistsException ignored) {
-
-        }
-        catch (NoSuchFileException e) {
-            System.out.println("폴더 경로가 없음");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
-    public Set<User> readAll() {
+    public boolean create(User user) {
+        Path filePath = Paths.get("data", "users", "user-" + user.getId() + ".ser");
+        //중복 검사는 여기서 안한다고 일단 생각하자.
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(filePath.toFile())))
+        {
+            oos.writeObject(user);
+            System.out.println("["+ user.getUsername() + "] 유저 저장 완료");
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public User find(UUID userId) {
+        Set<User> users = this.findAll();
+        for (User user: users) {
+            if (user.getId().equals(userId)) return user;
+        }
+
+        return null; // Users 가 빈 배열인 경우.
+    }
+
+    @Override
+    public User findByName(String name) {
+        Set<User> users = this.findAll();
+        for (User user: users) {
+            if (user.getUsername().equals(name)) return user;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Set<User> findAll() {
         File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
         Set<User> result = new HashSet<>();
 
@@ -67,33 +89,13 @@ public class FileUserRepository implements UserRepository, Serializable {
         return result;
     }
 
-    @Override
-    public boolean create(User user) {
-        //중복 검사는 여기서 안한다고 일단 생각하자.
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                     new FileOutputStream("data\\users\\user-" + user.getId() + ".ser")
-             )) {
-            oos.writeObject(user);
-            System.out.println("["+ user.getUser() + "] 유저 저장 완료");
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
 
     @Override
     public boolean update(User user) {
-        if (user == null) {
-            System.out.println("User가 정상적이지 않습니다.");
-            return false;
-        }
+        Path filePath = Paths.get("data", "users", "user-" + user.getId() + ".ser");
 
-        try (
-                ObjectOutputStream oos = new ObjectOutputStream(
-                        new FileOutputStream("data\\users\\user-" + user.getId() + ".ser")
-                ))
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(filePath.toFile())))
         {
             oos.writeObject(user);
             return true;
@@ -104,12 +106,9 @@ public class FileUserRepository implements UserRepository, Serializable {
     }
 
     @Override
-    public boolean delete(User user) {
-        if (user == null) {
-            System.out.println("User를 삭제하려고 했으나 삭제하려는 User 데이터가 정상적이지 않습니다. 아마도 Null");
-            return false;
-        }
-        File file = new File("data\\users\\user-" + user.getId() + ".ser");
+    public boolean delete(UUID userId) {
+        Path filePath = Paths.get("data", "users", "user-" + userId + ".ser");
+        File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }
 }
