@@ -76,12 +76,12 @@ public class FileChannelService implements ChannelService {
     public void addUserToChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
         User user = fileUserService.getUser(userId);
-        channel.addUserToChannel(user);
+        channel.addUserToChannel(userId);
         saveToFile(channel);
     }
 
     @Override
-    public List<User> getUserInChannel(UUID id) {
+    public List<UUID> getUserInChannel(UUID id) {
         Channel channel = findChannel(id);
         return channel.getUserInChannel();
     }
@@ -90,7 +90,7 @@ public class FileChannelService implements ChannelService {
     public void deleteUserInChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
         User user = fileUserService.getUser(userId);
-        channel.deleteUserToChannel(user);
+        channel.deleteUserToChannel(userId);
         saveToFile(channel);
     }
 

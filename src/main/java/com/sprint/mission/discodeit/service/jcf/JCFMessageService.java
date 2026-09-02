@@ -1,8 +1,6 @@
 package com.sprint.mission.discodeit.service.jcf;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.HashMap;
@@ -24,8 +22,8 @@ public class JCFMessageService implements MessageService {
     }
 
     public Message createMessage(UUID channelId, UUID authorId, String content){
-        Channel channel = jcfChannelService.getChannelInfo(channelId);
-        User user = jcfUserService.getUser(authorId);
+        jcfChannelService.getChannelInfo(channelId);
+        jcfUserService.getUser(authorId);
         Message message = new Message(channelId,authorId,content);
         data.put(message.getId(),message);
         return message;

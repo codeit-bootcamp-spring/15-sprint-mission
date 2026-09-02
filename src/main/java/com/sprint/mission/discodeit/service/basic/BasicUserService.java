@@ -50,7 +50,7 @@ public class BasicUserService implements UserService {
         if (!userRepository.existsById(id)) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다. id = " + id);
         }
-        userRepository.deleteById(id);
+        userRepository.deleteUser(id);
     }
 
     private User findUser(UUID id) {

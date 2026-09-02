@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -22,14 +21,14 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel createChannel(String channelName) {
         Channel channel = new Channel(channelName);
-        return channelRepository.save(channel);
+        return channelRepository.createChannel(channel);
     }
 
     @Override
     public void updateChannelName(UUID id, String channelName) {
         Channel channel = findChannel(id);
         channel.update(channelName);
-        channelRepository.save(channel);
+        channelRepository.createChannel(channel);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<Channel> getAllChannel() {
-        return channelRepository.findAll();
+        return channelRepository.getChannelAll();
     }
 
     @Override
@@ -47,20 +46,20 @@ public class BasicChannelService implements ChannelService {
         if (!channelRepository.existsById(id)) {
             throw new IllegalArgumentException("존재하지 않는 채널입니다. id = " + id);
         }
-        channelRepository.deleteById(id);
+        channelRepository.deleteChannel(id);
     }
 
     @Override
     public void addUserToChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
-        User user = userRepository.getUser(userId)
+        userRepository.getUser(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. id = " + userId));
-        channel.addUserToChannel(user);
-        channelRepository.save(channel);
+        channel.addUserToChannel(userId);
+        channelRepository.createChannel(channel);
     }
 
     @Override
-    public List<User> getUserInChannel(UUID id) {
+    public List<UUID> getUserInChannel(UUID id) {
         Channel channel = findChannel(id);
         return channel.getUserInChannel();
     }
@@ -68,14 +67,14 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteUserInChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
-        User user = userRepository.getUser(userId)
+        userRepository.getUser(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다. id = " + userId));
-        channel.deleteUserToChannel(user);
-        channelRepository.save(channel);
+        channel.deleteUserToChannel(userId);
+        channelRepository.createChannel(channel);
     }
 
     private Channel findChannel(UUID id) {
-        return channelRepository.findById(id)
+        return channelRepository.getChannel(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 채널입니다. id = " + id));
     }
 }

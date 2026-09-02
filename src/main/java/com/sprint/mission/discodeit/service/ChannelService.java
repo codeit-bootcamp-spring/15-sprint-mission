@@ -20,7 +20,7 @@ public interface ChannelService {
 
     void addUserToChannel(UUID channelId, UUID userId);
 
-    List<User> getUserInChannel(UUID id);
+    List<UUID> getUserInChannel(UUID id);
 
     void deleteUserInChannel(UUID channelId, UUID userId);
 

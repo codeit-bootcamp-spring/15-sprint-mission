@@ -8,13 +8,13 @@ import java.util.UUID;
 
 public interface MessageRepository {
 
-    Message save(Message message);
+    Message createMessage(Message message);
 
-    Optional<Message> findById(UUID id);
+    Optional<Message> getMessage(UUID id);
 
-    List<Message> findAll();
+    List<Message> getMessageAll();
 
-    void deleteById(UUID id);
+    void deleteMessage(UUID id);
 
     boolean existsById(UUID id);
 }

@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class FileMessageRepository implements MessageRepository {
 
@@ -32,7 +33,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message save(Message message) {
+    public Message createMessage(Message message) {
         Path path = resolvePath(message.getId());
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
             oos.writeObject(message);
@@ -43,7 +44,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Optional<Message> findById(UUID id) {
+    public Optional<Message> getMessage(UUID id) {
         Path path = resolvePath(id);
         if (Files.notExists(path)) {
             return Optional.empty();
@@ -52,19 +53,19 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
-        try {
-            List<Path> paths = Files.list(directory)
-                    .filter(p -> p.toString().endsWith(".ser"))
+    public List<Message> getMessageAll() {
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(".ser"))
+                    .map(this::readMessage)
                     .toList();
-            return paths.stream().map(this::readMessage).toList();
         } catch (IOException e) {
-            throw new UncheckedIOException("메세지 목록을 불러오지 못했습니다.", e);
+            throw new UncheckedIOException("메시지 목록을 불러오지 못했습니다.",e);
         }
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteMessage(UUID id) {
         try {
             Files.deleteIfExists(resolvePath(id));
         } catch (IOException e) {

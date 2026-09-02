@@ -33,19 +33,19 @@ public class BasicMessageService implements MessageService {
             throw new IllegalArgumentException("존재하지 않는 유저입니다. id = " + authorId);
         }
         Message message = new Message(channelId, authorId, content);
-        return messageRepository.save(message);
+        return messageRepository.createMessage(message);
     }
 
     @Override
     public List<Message> getMessagesByChannel(UUID channelId) {
-        return messageRepository.findAll().stream()
+        return messageRepository.getMessageAll().stream()
                 .filter(m -> m.getChannelId().equals(channelId))
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<Message> getMessagesByUser(UUID userId) {
-        return messageRepository.findAll().stream()
+        return messageRepository.getMessageAll().stream()
                 .filter(m -> m.getAuthorId().equals(userId))
                 .collect(Collectors.toList());
     }
@@ -54,7 +54,7 @@ public class BasicMessageService implements MessageService {
     public void updateMessageContents(UUID uuid, String newContents) {
         Message message = findMessage(uuid);
         message.update(newContents);
-        messageRepository.save(message);
+        messageRepository.createMessage(message);
     }
 
     @Override
@@ -62,11 +62,11 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(id)) {
             throw new IllegalArgumentException("존재하지 않는 메세지 입니다. id = " + id);
         }
-        messageRepository.deleteById(id);
+        messageRepository.deleteMessage(id);
     }
 
     private Message findMessage(UUID id) {
-        return messageRepository.findById(id)
+        return messageRepository.getMessage(id)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 메세지 입니다. id = " + id));
     }
 }

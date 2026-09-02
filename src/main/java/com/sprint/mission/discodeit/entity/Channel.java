@@ -14,7 +14,7 @@ public class Channel implements Serializable {
     private String channelName;
     private final Long createAt;
     private Long updateAt;
-    private List<User> userList;
+    private List<UUID> userList;
 
     public Channel(String channelName){
         this.id = UUID.randomUUID();
@@ -41,7 +41,7 @@ public class Channel implements Serializable {
         return channelName;
     }
 
-    public List<User> getUserList() {
+    public List<UUID> getUserList() {
         return userList;
     }
 
@@ -49,15 +49,15 @@ public class Channel implements Serializable {
         return updateAt;
     }
 
-    public void addUserToChannel(User user){
+    public void addUserToChannel(UUID user){
         this.userList.add(user);
     }
 
-    public void deleteUserToChannel(User user){
+    public void deleteUserToChannel(UUID user){
         this.userList.remove(user);
     }
 
-    public List<User> getUserInChannel(){
+    public List<UUID> getUserInChannel(){
         return this.userList;
     }
 

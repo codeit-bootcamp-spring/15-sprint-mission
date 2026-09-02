@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 public class FileChannelRepository implements ChannelRepository {
 
@@ -32,7 +33,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel save(Channel channel) {
+    public Channel createChannel(Channel channel) {
         Path path = resolvePath(channel.getId());
         try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
             oos.writeObject(channel);
@@ -43,7 +44,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Optional<Channel> findById(UUID id) {
+    public Optional<Channel> getChannel(UUID id) {
         Path path = resolvePath(id);
         if (Files.notExists(path)) {
             return Optional.empty();
@@ -52,19 +53,19 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
-        try {
-            List<Path> paths = Files.list(directory)
-                    .filter(p -> p.toString().endsWith(".ser"))
+    public List<Channel> getChannelAll() {
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(".ser"))
+                    .map(this::readChannel)
                     .toList();
-            return paths.stream().map(this::readChannel).toList();
         } catch (IOException e) {
             throw new UncheckedIOException("채널 목록을 불러오지 못했습니다.", e);
         }
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteChannel(UUID id) {
         try {
             Files.deleteIfExists(resolvePath(id));
         } catch (IOException e) {

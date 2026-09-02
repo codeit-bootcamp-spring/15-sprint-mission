@@ -54,11 +54,11 @@ public class JCFChannelService implements ChannelService {
     public void addUserToChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
         User user = jcfUserService.getUser(userId);
-        channel.addUserToChannel(user);
+        channel.addUserToChannel(userId);
     }
 
     @Override
-    public List<User> getUserInChannel(UUID id) {
+    public List<UUID> getUserInChannel(UUID id) {
         Channel channel = findChannel(id);
         return channel.getUserInChannel();
     }
@@ -67,7 +67,7 @@ public class JCFChannelService implements ChannelService {
     public void deleteUserInChannel(UUID channelId, UUID userId) {
         Channel channel = findChannel(channelId);
         User user = jcfUserService.getUser(userId);
-        channel.deleteUserToChannel(user);
+        channel.deleteUserToChannel(userId);
     }
 
     private Channel findChannel(UUID id) {

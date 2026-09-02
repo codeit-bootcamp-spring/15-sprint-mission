@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+import java.util.stream.Stream;
 
 public class FileUserRepository implements UserRepository {
 
@@ -51,18 +52,18 @@ public class FileUserRepository implements UserRepository {
 
     @Override
     public List<User> getUserAll() {
-        try {
-            List<Path> paths = Files.list(directory)
-                    .filter(p -> p.toString().endsWith(".ser"))
+        try (Stream<Path> paths = Files.list(directory)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(".ser"))
+                    .map(this::readUser)
                     .toList();
-            return paths.stream().map(this::readUser).toList();
         } catch (IOException e) {
             throw new UncheckedIOException("유저 목록을 불러오지 못했습니다.", e);
         }
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public void deleteUser(UUID id) {
         try {
             Files.deleteIfExists(resolvePath(id));
         } catch (IOException e) {
