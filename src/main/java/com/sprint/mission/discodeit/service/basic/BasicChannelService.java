@@ -137,7 +137,6 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelResponse> findAllByUserId(UUID userId) {
         List<ChannelResponse> result = new ArrayList<>();
         List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
-        readStatuses.stream().map(ReadStatus::getChannelId).toList();
 
         for(ReadStatus r: readStatuses) {
             Channel channel = channelRepository.find(r.getChannelId());
