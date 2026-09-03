@@ -31,7 +31,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean create(Channel channel) {
-        Path filePath = Paths.get("data", "users", "user-" + channel.getId() + ".ser");
+        Path filePath = Paths.get("data", "channels", "channel-" + channel.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())
@@ -92,7 +92,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean update(Channel channel) {
-        Path filePath = Paths.get("data", "users", "user-" + channel.getId() + ".ser");
+        Path filePath = Paths.get("data", "channels", "channel-" + channel.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -107,7 +107,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean delete(UUID id) {
-        Path filePath = Paths.get("data", "users", "user-" + id + ".ser");
+        Path filePath = Paths.get("data", "channels", "channel-" + id + ".ser");
 
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();

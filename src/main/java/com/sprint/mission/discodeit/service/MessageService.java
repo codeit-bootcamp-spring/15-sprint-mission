@@ -1,18 +1,17 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 
+import javax.management.InstanceNotFoundException;
 import java.util.List;
 import java.util.UUID;
 
 public interface MessageService {
-    Message create(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds);
-    List<Message> userReadAll(User user);
-    List<Message> channelReadAll(Channel channel);
-    Message read(UUID channelId, UUID userId);
-    List<Message> readAll();
-    void update(UUID id, String content);
-    void delete(Message message);
+    Message create(MessageCreateRequest mcr, List<BinaryContentCreateRequest> bccr) throws InstanceNotFoundException;
+    List<Message> findAllByChannelId(UUID channelId);
+    void update(MessageUpdateRequest mur);
+    void delete(UUID messageId);
 }

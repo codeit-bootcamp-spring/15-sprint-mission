@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public interface UserStatusRepository {
     boolean save(UserStatus userStatus);
-    UserStatus find(UUID userid);
+    UserStatus find(UUID id);
+    UserStatus findByUserId(UUID userid);
     boolean delete(UUID userId);
 }

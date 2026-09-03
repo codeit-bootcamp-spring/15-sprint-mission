@@ -42,6 +42,31 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
+    public ReadStatus isAlreadyExist(UUID userId, UUID channelId) {
+        File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
+
+        if (files == null || files.length == 0) {
+            System.out.println("읽을 파일이 없습니다.");
+            return null;
+        }
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                Object obj = ois.readObject();
+                ReadStatus temp = (ReadStatus) obj;
+                if (temp.getUserId().equals(userId) && temp.getChannelId().equals(channelId)) {
+                    return temp;
+                }
+
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("파일 역직렬화 실패: " + file.getName());
+            }
+        }
+
+        return null;
+    }
+
+    @Override
     public ReadStatus find(UUID id) {
         File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
@@ -72,8 +97,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         List<ReadStatus> result = new ArrayList<>();
 
         if (files == null || files.length == 0) {
-            System.out.println("읽을 파일이 없습니다.");
-            return new ArrayList<>();
+            return null;
         }
 
         for (File file : files) {
@@ -85,7 +109,6 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 }
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new ArrayList<>();
             }
         }
 

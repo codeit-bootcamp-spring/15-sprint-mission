@@ -41,7 +41,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public UserStatus find(UUID userid) {
+    public UserStatus find(UUID id) {
         File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
 
         if (files == null || files.length == 0) {
@@ -53,7 +53,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Object obj = ois.readObject();
                 UserStatus temp = (UserStatus) obj;
-                if (temp.getUserId().equals(userid)) {
+                if (temp.getId().equals(id)) {
                     return temp;
                 }
 
@@ -66,8 +66,33 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        Path filePath = Paths.get("data", "userStatus", "userStatus-" + userId + ".ser");
+    public UserStatus findByUserId(UUID userId) {
+        File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
+
+        if (files == null || files.length == 0) {
+            System.out.println("읽을 파일이 없습니다.");
+            return null;
+        }
+
+        for (File file : files) {
+            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+                Object obj = ois.readObject();
+                UserStatus temp = (UserStatus) obj;
+                if (temp.getUserId().equals(userId)) {
+                    return temp;
+                }
+
+            } catch (IOException | ClassNotFoundException e) {
+                System.err.println("파일 역직렬화 실패: " + file.getName());
+            }
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean delete(UUID id) {
+        Path filePath = Paths.get("data", "userStatus", "userStatus-" + id + ".ser");
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }

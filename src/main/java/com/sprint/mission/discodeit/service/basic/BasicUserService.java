@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentUpdateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserReadRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
@@ -15,6 +15,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import javax.management.InstanceNotFoundException;
+import javax.security.auth.login.AccountException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -28,18 +30,14 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
 
     @Override
-    public User create(UserCreateRequest cr, BinaryContentCreateRequest br) {
+    public User create(UserCreateRequest cr, BinaryContentCreateRequest br) throws AccountException, IllegalStateException{
         Set<User> users = userRepository.findAll();
         UUID profileId = null;
 
         // 이메일 || 아이디 중복 검사.
         for (User u : users) {
             if (u.getUsername().equals(cr.username()) || u.getEmail().equals(cr.email())) {
-                System.out.println("[중복된 이메일또는 아이디 입니다]" + u.getEmail() + " " + u.getUsername());
-                System.out.println("이메일: " + u.getEmail());
-                System.out.println("아이디: " + u.getUsername());
-
-                return null;
+                throw new AccountException("중복된 이메일또는 아이디 입니다.");
             }
         }
 
@@ -55,71 +53,77 @@ public class BasicUserService implements UserService {
         User user = new User(cr.username(), cr.email(), cr.password(), profileId);
 
         if (userRepository.create(user)) {
+            UserStatus userStatus = new UserStatus(user.getId());
+            // 중복 검사. 안찾아지는 경우에만 저장.
+            if (userStatusRepository.find(userStatus.getId()) == null) {
+                userStatusRepository.save(userStatus);
+            }
+
             return user;
         }
 
-        UserStatus userStatus = new UserStatus(user.getId());
-        // 중복 검사. 안찾아지는 경우에만 저장.
-        if (userStatusRepository.find(userStatus.getId()) == null) {
-            userStatusRepository.save(userStatus);
-        }
-
-        System.out.println("알 수 없는 이유로 생성에 실패했습니다.");
-        return null;
+        throw new IllegalStateException("알 수 없는 이유로 생성에 실패했습니다.");
     }
 
     @Override
-    public UserReadRequest find(UUID userId) {
+    public UserResponse find(UUID userId) throws InstanceNotFoundException{
         User user = userRepository.find(userId);
         if (user == null) {
-            return null;
+            throw new InstanceNotFoundException("user 미존재");
         }
 
         UserStatus userStatus = userStatusRepository.find(user.getId());
         if (userStatus == null) {
-            return null;
+            throw new InstanceNotFoundException("userStatus 미존재");
         }
 
 
-        return new UserReadRequest(user.getUsername(), user.getEmail(), user.getProfileId(), userStatus.isOnline());
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getProfileId(), user.getCreatedAt(), user.getUpdatedAt(), userStatus.isOnline());
     }
 
     @Override
-    public UserReadRequest findByName(String name) {
+    public UserResponse findByName(String name) throws InstanceNotFoundException{
         User user = userRepository.findByName(name);
         if (user == null) {
-            return null;
+            throw new InstanceNotFoundException("user 미존재");
         }
 
-        UserStatus userStatus = userStatusRepository.find(user.getId());
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         if (userStatus == null) {
-            return null;
+            throw new InstanceNotFoundException("userStatus 미존재");
         }
 
 
-        return new UserReadRequest(user.getUsername(), user.getEmail(), user.getProfileId(), userStatus.isOnline());
+        return new UserResponse(user.getId(), user.getUsername(), user.getEmail(), user.getProfileId(), user.getCreatedAt(), user.getUpdatedAt(), userStatus.isOnline());
     }
 
     @Override
-    public List<UserReadRequest> findAll() {
+    public List<UserResponse> findAll() {
         Set<User> users = userRepository.findAll();
-        List<UserReadRequest> userReadRequests = new ArrayList<>();
+        List<UserResponse> userResponses = new ArrayList<>();
         for (User u : users) {
 
-            UserReadRequest userReadRequest = new UserReadRequest(u.getUsername(), u.getEmail(), u.getProfileId(),
-                    userStatusRepository.find(u.getId()).isOnline());
-           userReadRequests.add(userReadRequest);
+            UserResponse userResponse = new UserResponse(u.getId(), u.getUsername(), u.getEmail(), u.getProfileId(), u.getCreatedAt(), u.getUpdatedAt(),
+                    userStatusRepository.findByUserId(u.getId()).isOnline());
+           userResponses.add(userResponse);
         }
 
-        return userReadRequests;
+        return userResponses;
     }
 
     @Override
-    public void update(UUID userId, UserUpdateRequest updateRequest, BinaryContentUpdateRequest bcur) {
-        User user = userRepository.find(userId);
+    public void update(UserUpdateRequest updateRequest, BinaryContentUpdateRequest bcur) throws AccountException, InstanceNotFoundException {
+        Set<User> users = userRepository.findAll();
+        User user = userRepository.find(updateRequest.id());
         if (user == null) {
-            System.out.println("유저를 찾을 수 없음.");
-            return;
+            throw new InstanceNotFoundException("user 미존재");
+        }
+
+        // 이메일 || 아이디 중복 검사.
+        for (User u : users) {
+            if (u.getUsername().equals(updateRequest.username()) || u.getEmail().equals(updateRequest.email())) {
+                throw new AccountException("중복된 이메일또는 아이디 입니다.");
+            }
         }
 
         if (bcur != null) {
@@ -144,15 +148,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public void delete(UUID id) {
-        if (binaryContentRepository.find(id) != null) {
-            binaryContentRepository.delete(id);
+    public void delete(UUID userId) throws InstanceNotFoundException {
+        User user = userRepository.find(userId);
+        if (user == null) {
+            System.out.println("유저를 찾을 수 없음.");
+            throw new InstanceNotFoundException("user 미존재");
         }
 
-        if (userRepository.delete(id)) {
-            if (userStatusRepository.delete(id)) {
-                System.out.println("정상적으로 메세지가 삭제되었습니다.");
-                return;
+        if (binaryContentRepository.find(user.getProfileId()) != null) {
+            binaryContentRepository.delete(user.getProfileId());
+        }
+
+        if (userRepository.delete(userId)) {
+            UserStatus userStatus = userStatusRepository.findByUserId(userId);
+            if (userStatus != null) {
+                if (userStatusRepository.delete(userStatus.getId())) {
+                    System.out.println("정상적으로 메세지가 삭제되었습니다.");
+                    return;
+                }
             }
         }
 

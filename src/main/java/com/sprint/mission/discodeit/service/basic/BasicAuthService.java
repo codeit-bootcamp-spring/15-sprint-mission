@@ -6,20 +6,19 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 
-import java.util.UUID;
+import javax.security.auth.login.AccountNotFoundException;
 
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
 
     @Override
-    public UUID login(AuthRequest authRequest) {
-        for (User u : userRepository.findAll()) {
-            if (u.getUsername().equals(authRequest.username()) && u.getPassword().equals(authRequest.password())) {
-                    return u.getId();
+    public User login(AuthRequest authRequest) throws Exception {
+            for (User u : userRepository.findAll()) {
+                if (u.getUsername().equals(authRequest.username()) && u.getPassword().equals(authRequest.password())) {
+                    return u;
+                }
             }
-        }
-
-        return null;
+            throw new AccountNotFoundException("해당하는 User를 찾을 수 없음");
     }
 }
