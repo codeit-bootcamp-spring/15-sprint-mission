@@ -11,10 +11,14 @@ import java.util.UUID;
 
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final String dataFile = "channel.ser";
+    private static final String dataFile = "data/channel.ser";
 
     public FileChannelRepository() {
         File file = new File(dataFile);
+        File parentDir = file.getParentFile();
+        if (parentDir != null&& !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
         if (!file.exists()) {
             saveToFile(new HashMap<>());
         }
@@ -40,7 +44,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel save(Channel channel) {
+    public synchronized Channel save(Channel channel) {
         Map<UUID, Channel> data = loadFromFile();
         data.put(channel.getId(), channel);
         saveToFile(data);
@@ -60,7 +64,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public void delete(UUID channelId) {
+    public synchronized void delete(UUID channelId) {
         Map<UUID, Channel> data = loadFromFile();
         data.remove(channelId);
         saveToFile(data);

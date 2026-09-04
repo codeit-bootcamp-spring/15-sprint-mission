@@ -11,10 +11,14 @@ import java.util.UUID;
 
 public class FileUserRepository implements UserRepository {
 
-    private static final String dataFile = "user.ser";
+    private static final String dataFile = "data/user.ser";
 
     public FileUserRepository() {
         File file = new File(dataFile);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
         if (!file.exists()) {
             saveToFile(new HashMap<>());
         }
@@ -40,7 +44,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
+    public synchronized User save(User user) {
         Map<UUID, User> data = loadFromFile();
         data.put(user.getId(), user);
         saveToFile(data);
@@ -60,7 +64,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public void delete(UUID userId) {
+    public synchronized void delete(UUID userId) {
         Map<UUID, User> data = loadFromFile();
         data.remove(userId);
         saveToFile(data);

@@ -11,10 +11,14 @@ import java.util.UUID;
 
 public class FileMessageRepository implements MessageRepository {
 
-    private static final String dataFile = "message.ser";
+    private static final String dataFile = "data/message.ser";
 
     public FileMessageRepository() {
         File file = new File(dataFile);
+        File parentDir = file.getParentFile();
+        if (parentDir != null && !parentDir.exists()) {
+            parentDir.mkdirs();
+        }
         if (!file.exists()) {
             saveToFile(new HashMap<>());
         }
@@ -40,7 +44,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public Message save(Message message) {
+    public synchronized Message save(Message message) {
         Map<UUID, Message> data = loadFromFile();
         data.put(message.getId(), message);
         saveToFile(data);
@@ -60,7 +64,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public void delete(UUID messageId) {
+    public synchronized void delete(UUID messageId) {
         Map<UUID, Message> data = loadFromFile();
         data.remove(messageId);
         saveToFile(data);

@@ -50,6 +50,7 @@ public class JavaApplication {
 
         // 수정된 데이터 조회
         System.out.println("수정된 데이터 조회: " + userService.read(user1.getId()).getUserName());
+        System.out.println("이메일 확인: " + userService.read(user1.getId()).getEmail());
 
         // 삭제
         userService.delete(user2.getId());

@@ -24,9 +24,17 @@ public class User extends Common {
     }
 
     public void update(String userName, String email, String password) {
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
+        if (userName != null) {
+            this.userName = userName;
+        }
+
+        if (email != null) {
+            this.email = email;
+        }
+
+        if (password != null) {
+            this.password = password;
+        }
 
         updateUpdatedAt();
     }
