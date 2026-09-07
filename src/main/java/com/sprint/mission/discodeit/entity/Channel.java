@@ -4,32 +4,30 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Channel implements Serializable {
+public class Channel extends Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
     private String channelName;
-    private final Long createAt;
-    private Long updateAt;
+    private Instant updateAt;
     private List<UUID> userList;
 
     public Channel(String channelName){
-        this.id = UUID.randomUUID();
+        super(UUID.randomUUID());
         this.channelName = channelName;
-        this.createAt = System.currentTimeMillis();
-        this.updateAt = this.createAt;
+        this.updateAt = super.getCreateAt();
         this.userList = new ArrayList<>();
     }
 
     public void update(String nickName){
         this.channelName = nickName;
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 
     public void addUserToChannel(UUID user){
@@ -46,20 +44,20 @@ public class Channel implements Serializable {
 
     public String getChannelInfo(){
         return "Channel{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", channelName='" + channelName + '\'' +
-                ", createAt=" + Instant.ofEpochMilli(createAt) +
-                ", updateAt=" + Instant.ofEpochMilli(updateAt) +
+                ", createAt=" + getCreateAt().atZone(ZoneId.of("Asia/Seoul")) +
+                ", updateAt=" + updateAt.atZone(ZoneId.of("Asia/Seoul")) +
                 '}';
     }
 
     @Override
     public String toString() {
         return "Channel{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", channelName='" + channelName + '\'' +
-                ", createAt=" + Instant.ofEpochMilli(createAt) +
-                ", updateAt=" + Instant.ofEpochMilli(updateAt) +
+                ", createAt=" + getCreateAt().atZone(ZoneId.of("Asia/Seoul")) +
+                ", updateAt=" + updateAt.atZone(ZoneId.of("Asia/Seoul")) +
                 ", userList=" + userList +
                 '}';
     }

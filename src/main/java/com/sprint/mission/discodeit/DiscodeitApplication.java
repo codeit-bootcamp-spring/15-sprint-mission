@@ -16,6 +16,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.List;
 
 @SpringBootApplication
@@ -24,6 +26,8 @@ public class DiscodeitApplication {
 	public static void main(String[] args) {
 		ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
+		// System.out.println("**(())"+Instant.now().atZone(ZoneId.of("Asia/Seoul")));
+		
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);

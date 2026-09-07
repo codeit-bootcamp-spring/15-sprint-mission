@@ -4,51 +4,38 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
-public class User implements Serializable {
+public class User extends Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private final UUID id;
     private String nickName;
-    private final Long createAt;
-    private Long updateAt;
+    private Instant updateAt;
 
     public User(String nickName){
-        this.id = UUID.randomUUID();
+        super(UUID.randomUUID());
         this.nickName = nickName;
-        this.createAt = System.currentTimeMillis();
-        this.updateAt = this.createAt;
+        this.updateAt = getCreateAt();
     }
 
     public void updateUser(String nickName){
         this.nickName = nickName;
-        this.updateAt = System.currentTimeMillis();
+        this.updateAt = Instant.now();
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "id=" + id +
+                "id=" + getId() +
                 ", nickName=" + nickName +
-                ", createAt=" + Instant.ofEpochMilli(createAt) +
-                ", updateAt=" + Instant.ofEpochMilli(updateAt) +
+                ", createAt=" + getCreateAt().atZone(ZoneId.of("Asia/Seoul")) +
+                ", updateAt=" + updateAt.atZone(ZoneId.of("Asia/Seoul")) +
                 '}';
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return Objects.equals(id, user.id);
-    }
 
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
-    }
 }
