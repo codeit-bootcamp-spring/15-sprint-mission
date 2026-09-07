@@ -15,7 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
-@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileUserRepository implements UserRepository, Serializable {
     private final Path path;
 
