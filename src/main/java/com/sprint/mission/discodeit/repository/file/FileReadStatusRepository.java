@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
 public class FileReadStatusRepository implements ReadStatusRepository {
     private final Path path;
 
@@ -27,7 +29,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public boolean save(ReadStatus readStatus) {
-        Path filePath = Paths.get("data", "readStatus", "readStatus-" + readStatus.getId() + ".ser");
+        Path filePath = path.resolve("readStatus-" + readStatus.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -143,7 +145,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public boolean delete(UUID id) {
-        Path filePath = Paths.get("data", "readStatus", "readStatus-" + id + ".ser");
+        Path filePath = path.resolve("readStatus-" + id + ".ser");
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }

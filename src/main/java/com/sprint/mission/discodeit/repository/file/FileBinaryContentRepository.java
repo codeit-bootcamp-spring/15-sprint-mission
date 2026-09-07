@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path path;
 
@@ -28,7 +30,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public boolean save(BinaryContent binaryContent) {
-        Path filePath = Paths.get("data", "binaryContent", "binaryContent-" + binaryContent.getId() + ".ser");
+        Path filePath = path.resolve("binaryContent-" + binaryContent.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -95,7 +97,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public boolean delete(UUID id) {
-        Path filePath = Paths.get("data", "binaryContent", "binaryContent-" + id + ".ser");
+        Path filePath = path.resolve("binaryContent-" + id + ".ser");
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }

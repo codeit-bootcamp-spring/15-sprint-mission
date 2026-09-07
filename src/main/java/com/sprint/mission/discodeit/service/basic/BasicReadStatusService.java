@@ -56,6 +56,9 @@ public class BasicReadStatusService implements ReadStatusService {
 
         readStatus.setLastReadAt(rur.lastReadAt());
         readStatus.autoSetUpdatedAt();
+
+        readStatusRepository.delete(rur.id());
+        readStatusRepository.save(readStatus);
     }
 
     @Override

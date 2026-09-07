@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.Set;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
 public class FileUserRepository implements UserRepository, Serializable {
     private final Path path;
 
@@ -31,8 +33,7 @@ public class FileUserRepository implements UserRepository, Serializable {
 
     @Override
     public boolean create(User user) {
-        Path filePath = Paths.get("data", "users", "user-" + user.getId() + ".ser");
-        //중복 검사는 여기서 안한다고 일단 생각하자.
+        Path filePath = path.resolve("user-" + user.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -93,7 +94,7 @@ public class FileUserRepository implements UserRepository, Serializable {
 
     @Override
     public boolean update(User user) {
-        Path filePath = Paths.get("data", "users", "user-" + user.getId() + ".ser");
+        Path filePath = path.resolve("user-" + user.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -108,7 +109,7 @@ public class FileUserRepository implements UserRepository, Serializable {
 
     @Override
     public boolean delete(UUID userId) {
-        Path filePath = Paths.get("data", "users", "user-" + userId + ".ser");
+        Path filePath = path.resolve("user-" + userId + ".ser");
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }

@@ -2,69 +2,52 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "jcf", matchIfMissing = true)
 public class JCFUserRepository implements UserRepository {
-    private final Set<User> data;
+    private final Set<User> users;
 
     public JCFUserRepository() {
-        this.data = new HashSet<>();
+        this.users = new HashSet<>();
     }
+
 
     @Override
     public boolean create(User user) {
-        try {
-            this.data.add(user);
-        } catch (Exception e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+        return this.users.add(user);
     }
 
-/*    @Override
-    public User read(String name) {
-        for (User u : this.data) {
-            if (u.getUser().equals(name)) {
-                return u;
-            }
-        }
-        return null;
-    }*/
+    @Override
+    public User find(UUID userId) {
+        return this.users.stream().filter(x-> x.getId().equals(userId)).findFirst().orElse(null);
+    }
 
     @Override
-    public Set<User> readAll() {
-        return this.data.stream()
-                .map(e -> e)
-                .collect(Collectors.toSet());
+    public User findByName(String name) {
+        return this.users.stream().filter(x-> x.getUsername().equals(name)).findFirst().orElse(null);
+    }
+
+    @Override
+    public Set<User> findAll() {
+        return new HashSet<>(this.users);
     }
 
     @Override
     public boolean update(User user) {
-        for (User u : this.data) {
-            if (u.getId().equals(user.getId())) {
-                u.setEmail(user.getEmail());
-                u.setUser(user.getUser());
-                u.setUserId(user.getUserId());
-                u.setUpdatedAt(user.getUpdatedAt());
-
-                return true;
-            }
-        }
-        return false;
+        boolean isExist = this.users.removeIf(x-> x.getId().equals(user.getId()));
+        return isExist && this.users.add(user);
     }
 
     @Override
-    public boolean delete(User user) {
-        for (User u : this.data) {
-            if (u.getId().equals(user.getId())) {
-                this.data.remove(u);
-                return true;
-            }
-        }
-        return false;
+    public boolean delete(UUID userId) {
+        return this.users.removeIf(x-> x.getId().equals(userId));
     }
 }

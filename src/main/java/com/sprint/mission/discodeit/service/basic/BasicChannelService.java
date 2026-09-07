@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.*;
@@ -21,13 +22,14 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
 
     @Override
-    public Channel createPublicChannel(String name, String description) {
-        Channel channel = new Channel(ChannelType.PUBLIC, name, description);
+    public Channel createPublicChannel(ChannelCreateRequest cr) {
+        Channel channel = new Channel(ChannelType.PUBLIC, cr.name(), cr.description());
         List<Channel> channels = channelRepository.findAll();
 
         // 중복 여부 확인
         for (Channel c : channels) {
-            if (c.getName().equals(name)) throw new IllegalArgumentException("채널 이름은 중복될 수 없습니다.");
+            if (c.getType().equals(ChannelType.PUBLIC) && c.getName().equals(cr.name()))
+                throw new IllegalArgumentException("채널 이름은 중복될 수 없습니다.");
         }
 
         boolean isCreated = channelRepository.create(channel);
@@ -127,7 +129,7 @@ public class BasicChannelService implements ChannelService {
                     channel.getType(),
                     channel.getName(),
                     latestTime,
-                    null); // new ArrayList<>() 도 고려해볼만 함.
+                    null); // null대신 new ArrayList<>() 도 고려해볼만 함.
         }
 
         return channelResponse;
@@ -137,25 +139,30 @@ public class BasicChannelService implements ChannelService {
     public List<ChannelResponse> findAllByUserId(UUID userId) {
         List<ChannelResponse> result = new ArrayList<>();
         List<ReadStatus> readStatuses = readStatusRepository.findAllByUserId(userId);
+        List<Channel> channels = channelRepository.findAll();
 
-        for(ReadStatus r: readStatuses) {
-            Channel channel = channelRepository.find(r.getChannelId());
-            Instant latestTime = messageRepository.findByChannelId(channel.getId()).stream()
+        for (Channel c: channels) {
+            Instant latestTime = messageRepository.findByChannelId(c.getId()).stream()
                     .map(Message::getCreatedAt)
                     .max(Comparator.naturalOrder())
                     .orElse(null);
 
-            if (channel.getType().equals(ChannelType.PUBLIC)) {
-                result.add(new ChannelResponse(r.getChannelId(), channel.getType(), channel.getName(), latestTime, null));
+            if (c.getType().equals(ChannelType.PRIVATE)) {
+                if (readStatuses == null) continue;
+
+                for (ReadStatus r: readStatuses) {
+                    if (c.getId().equals(r.getChannelId())) {
+                        List<ReadStatus> readStatus = readStatusRepository.findAllByChannelId(c.getId());
+                        if (readStatus == null) throw new IllegalArgumentException("읽을 파일이 없습니다.");
+
+                        List<UUID> users = readStatus.stream().map(ReadStatus::getUserId).toList();
+                        result.add(new ChannelResponse(c.getId(), c.getType(), c.getName(), latestTime, users));
+                    }
+                }
             }
             else {
-                List<ReadStatus> readStatus = readStatusRepository.findAllByChannelId(channel.getId());
-                if (readStatus == null) throw new IllegalArgumentException("읽을 파일이 없습니다.");
-
-                List<UUID> users = readStatus.stream().map(ReadStatus::getUserId).toList();
-                result.add(new ChannelResponse(r.getChannelId(), channel.getType(), channel.getName(), latestTime, users));
+                result.add(new ChannelResponse(c.getId(), c.getType(), c.getName(), latestTime, null));
             }
-
         }
 
         return result;

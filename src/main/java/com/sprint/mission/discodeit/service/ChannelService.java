@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -9,7 +10,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
-    Channel createPublicChannel(String name, String description);
+    Channel createPublicChannel(ChannelCreateRequest cr);
     Channel createPrivateChannel(List<User> userIds);
     ChannelResponse find(UUID id) throws IllegalArgumentException;
     ChannelResponse findByChannelName(String channelName) throws IllegalArgumentException;

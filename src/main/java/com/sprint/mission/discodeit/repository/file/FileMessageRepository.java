@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
 public class FileMessageRepository implements MessageRepository, Serializable {
     private final Path path;
 
@@ -117,7 +119,7 @@ public class FileMessageRepository implements MessageRepository, Serializable {
 
     @Override
     public boolean create(Message message) {
-        Path filePath = Paths.get("data", "messages", "message-" + message.getId() + ".ser");
+        Path filePath = path.resolve("message-" + message.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())
@@ -133,7 +135,7 @@ public class FileMessageRepository implements MessageRepository, Serializable {
 
     @Override
     public boolean update(Message message) {
-        Path filePath = Paths.get("data", "messages", "message-" + message.getId() + ".ser");
+        Path filePath = path.resolve("message-" + message.getId() + ".ser");
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
         {
@@ -147,7 +149,7 @@ public class FileMessageRepository implements MessageRepository, Serializable {
 
     @Override
     public boolean delete(UUID id) {
-        Path filePath = Paths.get("data", "messages", "message-" + id + ".ser");
+        Path filePath = path.resolve("message-" + id + ".ser");
 
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();

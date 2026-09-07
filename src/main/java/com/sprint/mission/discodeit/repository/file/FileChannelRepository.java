@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file", matchIfMissing = false)
 public class FileChannelRepository implements ChannelRepository, Serializable {
     private final Path path;
 
@@ -31,7 +33,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean create(Channel channel) {
-        Path filePath = Paths.get("data", "channels", "channel-" + channel.getId() + ".ser");
+        Path filePath = path.resolve("channel-" + channel.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())
@@ -92,7 +94,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean update(Channel channel) {
-        Path filePath = Paths.get("data", "channels", "channel-" + channel.getId() + ".ser");
+        Path filePath = path.resolve("channel-" + channel.getId() + ".ser");
 
         try (ObjectOutputStream oos = new ObjectOutputStream(
                 new FileOutputStream(filePath.toFile())))
@@ -107,7 +109,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public boolean delete(UUID id) {
-        Path filePath = Paths.get("data", "channels", "channel-" + id + ".ser");
+        Path filePath = path.resolve("channel-" + id + ".ser");
 
         File file = new File(filePath.toUri());
         return file.exists() && file.delete();

@@ -72,7 +72,7 @@ public class BasicUserService implements UserService {
             throw new InstanceNotFoundException("user 미존재");
         }
 
-        UserStatus userStatus = userStatusRepository.find(user.getId());
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
         if (userStatus == null) {
             throw new InstanceNotFoundException("userStatus 미존재");
         }
@@ -121,6 +121,7 @@ public class BasicUserService implements UserService {
 
         // 이메일 || 아이디 중복 검사.
         for (User u : users) {
+            if (u.getId().equals(user.getId())) continue; // 업데이트 될 자기 자신은 제외.
             if (u.getUsername().equals(updateRequest.username()) || u.getEmail().equals(updateRequest.email())) {
                 throw new AccountException("중복된 이메일또는 아이디 입니다.");
             }
