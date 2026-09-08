@@ -4,16 +4,17 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.io.IOException;
+import java.util.*;
 
 public class JCFUserService implements UserService {
 
+    //User 객체들을 메모리에 저장하는 리스트(JCF = Java
     private final List<User> data;
 
     public JCFUserService() {
         this.data = new ArrayList<>();
+
     }
 
 
@@ -24,13 +25,18 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID id) {
+    public User create(String username, String email, String password) throws IOException {
+        return null;
+    }
+
+    @Override
+    public Optional<User> findById(UUID id) {
         for (User user : data) {
             if (user.getId().equals(id)) {
-                return user;
+                return Optional.of(user);
             }
         }
-        return null;
+        return Optional.empty();
     }
 
     @Override
@@ -39,20 +45,32 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public User update(UUID id, String name) {
-        User user = findById(id);
-        if (user != null) {
-            user.update(name);
-        }
-        return user;
+    public Optional<Object> update(UUID id, String name) {
+        Optional<User> optionalUser = findById(id);
+        optionalUser.ifPresent(user -> user.update(name));
+        return Optional.of(optionalUser);
+    }
+
+
+
+    @Override
+    public void delete(UUID id) throws IOException {
+        findById(id).ifPresent(data::remove);
+
     }
 
     @Override
-    public void delete(UUID id) {
-        User user = findById(id);
-        if (user != null) {
-            data.remove(user);
-        }
-
+    public List<User> findall() {
+        return List.of();
     }
+
 }
+
+
+
+
+
+
+
+
+

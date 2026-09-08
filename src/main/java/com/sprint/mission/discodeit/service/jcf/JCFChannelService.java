@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public class JCFChannelService implements ChannelService {
@@ -19,11 +20,17 @@ public class JCFChannelService implements ChannelService {
     @Override
     public Channel create(Channel channel) {
         data.add(channel);
+
         return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
+    public Channel create(ChannelType type, String name, String description) {
+        return null;
+    }
+
+    @Override
+    public Optional<Channel> findById(UUID id) {
         return null;
     }
 

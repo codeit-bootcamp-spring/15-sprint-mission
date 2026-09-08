@@ -19,6 +19,9 @@ public class Channel implements Serializable {
         this.type = ChannelType.PUBLIC;
     }
 
+    public Channel(ChannelType type, String name, String description) {
+    }
+
     public UUID getId() {
         return id;
     }

@@ -55,8 +55,6 @@ public class Message implements Serializable {
     }
 
     public void update(String content) {
-        this.content = content;
-        this.updateAt =System.currentTimeMillis();
     }
 
     public void setContent(String content) {

@@ -16,7 +16,7 @@ public class FileMessageService implements MessageService {
         messages = load();
     }
 
-    @Override
+        @Override
     public Message create(Message message) {
         messages.put(message.getId(), message);
         save();
@@ -24,8 +24,13 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message findById(UUID id) {
-        return messages.get(id);
+    public Message create(String content, UUID channelId, UUID autorId) {
+        return null;
+    }
+
+    @Override
+    public Optional<Message> findById(UUID id) {
+        return Optional.ofNullable(messages.get(id));
     }
 
     @Override
@@ -34,7 +39,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, String content) {
+    public Optional<Message> update(UUID id, String content) {
 
         Message message = messages.get(id);
 
@@ -48,7 +53,7 @@ public class FileMessageService implements MessageService {
 
         save();
 
-        return message;
+        return Optional.of(message);
     }
 
     @Override
@@ -85,6 +90,11 @@ public class FileMessageService implements MessageService {
         message.getLikeUserIds().remove(userId);
 
         save();
+    }
+
+    @Override
+    public Set<UUID> getLikeUserIds(UUID messageId) {
+        return Set.of();
     }
 
     @Override

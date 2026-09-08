@@ -1,21 +1,16 @@
+
 package com.sprint.mission.discodeit.service.jcf;
 
-
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
 
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 
 public class JCFMessageService implements MessageService {
 
     private final List<Message> data;
-
     private final UserService userService;
     private final ChannelService channelService;
 
@@ -24,23 +19,28 @@ public class JCFMessageService implements MessageService {
         this.userService = userService;
         this.channelService = channelService;
 
+
+
     }
 
 
     @Override
-    public Message create(Message message) {
+    public Message create(String content, UUID channelId, UUID authorId) {
+        userService.findById(authorId).orElseThrow(() -> new IllegalArgumentException(
+                "존재하지 않는 사용자입니다."));
+
+        channelService.findById(channelId).orElseThrow(() -> new IllegalArgumentException(
+                "존재하지 않는 채널입니다"));
+
+        Message message = new Message(authorId, channelId, content);
         data.add(message);
         return message;
     }
 
     @Override
-    public Message findById(UUID id) {
-        for (Message message : data) {
-            if (message.getId().equals(id)) {
-                return message;
-            }
-        }
-        return null;
+    public Optional<Message> findById(UUID id) {
+        return data.stream().filter(message -> message.getId().equals(id)).findFirst();
+
     }
 
     @Override
@@ -49,56 +49,38 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, String content) {
-        Message message = findById(id);
+    public Optional<Message> update(UUID id, String content) {
+        Optional<Message> optionalMessage =findById(id);
 
-        if (message == null) {
-            return null;
+        if (optionalMessage.isEmpty()) {
+            return Optional.empty();
         }
-        message.update(content);
-        return message;
+
+      Message message = optionalMessage.get();
+        message.setContent(content);
+        return Optional.of(message);
     }
 
     @Override
     public void delete(UUID id) {
-        Message message = findById(id);
-
-        if (message != null) {
-            data.remove(message);
-        }
-
+        data.removeIf(message -> message.getId().equals(id));
 
     }
 
     @Override
     public void like(UUID messageId, UUID userId) {
-        Message message = findById(messageId);
-
-        if (message == null) {
-            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
-
-        }
-        message.getLikeUserIds().add(userId);
 
     }
-    @Override
-    public Set<UUID> getlikeUserIds(UUID messageId) {
-        Message message = findById(messageId);
 
-        if (message == null) {
-            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
-        }
-
-        return message.getLikeUserIds();
-    }
     @Override
     public void unlike(UUID messageId, UUID userId) {
-        Message message = findById(messageId);
 
-        if (message == null) {
-            throw new IllegalArgumentException("메시지가 존재하지 않습니다.");
-        }
-        message.getLikeUserIds().remove(userId);
+    }
+
+    @Override
+    public Set<UUID> getLikeUserIds(UUID messageId) {
+        return Set.of();
     }
 
 }
+

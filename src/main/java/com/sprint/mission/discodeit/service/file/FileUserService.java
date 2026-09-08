@@ -19,7 +19,14 @@ public class FileUserService implements UserService {
 
     @Override
     public User create(User user) {
-        return null;
+        users.put(user.getId(),user);
+
+        try{
+            save();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return user;
     }
 
     @Override
@@ -38,11 +45,12 @@ public class FileUserService implements UserService {
 
     @Override
     public List<User> findAll() {
-        return List.of();
+        return new ArrayList<>(users.values());
     }
 
     @Override
     public Optional<Object> update(UUID id, String name) {
+        User user = users.get(id);
         return Optional.empty();
     }
 
