@@ -4,18 +4,16 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import org.springframework.stereotype.Service;
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
-
-    public BasicMessageService(MessageRepository messageRepository) {
-        this.messageRepository = messageRepository;
-    }
 
     @Override
     public Message create(String contents, UUID userId, UUID channelId) {

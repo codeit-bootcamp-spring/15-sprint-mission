@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
+@Getter
 public class User extends Common {
     private String userName;
     private String email;
@@ -9,18 +12,6 @@ public class User extends Common {
         this.userName = userName;
         this.email = email;
         this.password = password;
-    }
-
-    public String getUserName() {
-        return userName;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
     }
 
     public void update(String userName, String email, String password) {
