@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.NitroLevel;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
+import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -22,12 +20,14 @@ import java.util.List;
 
 public class JavaApplication {
     static User setupUser(UserService userService) {
-        User user = userService.create("woody@codeit.com", "woody1234", "woody", NitroLevel.BASIC);
+        UserCreateRequest request =
+                new UserCreateRequest("woody@codeit.com", "woody1234", "woody", NitroLevel.BASIC, null);
+        User user = userService.create(request);
         return user;
     }
 
     static Channel setupChannel(ChannelService channelService) {
-        Channel channel = channelService.create("공지");
+        Channel channel = channelService.create("공지", ChannelType.PUBLIC);
         return channel;
     }
 
