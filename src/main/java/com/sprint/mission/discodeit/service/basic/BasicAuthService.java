@@ -5,9 +5,11 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.AccountNotFoundException;
 
+@Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
     private final UserRepository userRepository;
