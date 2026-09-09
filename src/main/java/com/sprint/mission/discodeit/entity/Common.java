@@ -2,33 +2,22 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 @Getter
 public class Common implements Serializable {
 
     private final UUID id;
-    private final Long createdAt;
-    private Long updatedAt;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     public Common() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
+        this.createdAt = Instant.now();
     }
 
     protected void updateUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 }
