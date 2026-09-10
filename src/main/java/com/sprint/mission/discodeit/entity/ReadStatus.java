@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import lombok.Getter;
 
+import java.util.UUID;
+@Getter
 public class ReadStatus extends BaseClass{
     private final UUID userId;
     private final UUID channelId;

@@ -32,10 +32,6 @@ public class User extends BaseClass {
 
     ) {
         super(id, createdAt, updatedAt);
-
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new IllegalArgumentException("메일 형식이 아님.");
-        }
         this.email=email;
         this.password=password;
         this.name=name;
@@ -44,10 +40,6 @@ public class User extends BaseClass {
     }
     public User(String email, String password, String name, NitroLevel nitroLevel, UUID profileId) {
         super();
-
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new IllegalArgumentException("메일 형식이 아님.");
-        }
         this.email=email;
         this.password=password;
         this.name=name;
@@ -58,9 +50,7 @@ public class User extends BaseClass {
 
 
     public void update(String email, String password, String name, NitroLevel nitroLevel, UUID profileId) {
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
-            throw new IllegalArgumentException("메일 형식이 아님.");
-        }
+
         this.email=email;
         this.password=password;
         this.name=name;

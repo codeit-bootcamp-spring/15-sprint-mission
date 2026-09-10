@@ -23,10 +23,7 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-/*
-    public BasicUserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }*/
+
     @Override
     public User create(UserCreateRequest userCreateRequest) {
         /*if (userRepository.findAll().stream().anyMatch(user -> user.getName().equals(userCreateRequest.name()))){
@@ -44,6 +41,9 @@ public class BasicUserService implements UserService {
                 throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
             }
         }
+
+        validateEmail(userCreateRequest.email());
+
         UUID profileId = userCreateRequest.profileId().orElse(null);
 
         User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.name(),userCreateRequest.nitroLevel(),profileId);
@@ -90,6 +90,9 @@ public class BasicUserService implements UserService {
 
             }
         }
+
+        validateEmail(userUpdateRequest.email());
+
         UUID profileId = userUpdateRequest.profileId().orElse(null);
         user.update(userUpdateRequest.email(), userUpdateRequest.password(), userUpdateRequest.name(), userUpdateRequest.nitroLevel(),profileId);
         return userRepository.save(user);
@@ -126,6 +129,12 @@ public class BasicUserService implements UserService {
                 Optional.ofNullable(user.getProfileId()),
                 online
         );
+    }
+
+    private void validateEmail(String email){
+        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+            throw new IllegalArgumentException("메일 형식이 아님.");
+        }
     }
 }
 

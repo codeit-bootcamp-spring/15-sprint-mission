@@ -72,6 +72,18 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByName(String name) {
+        User user = null;
+        for(User entry : findAll()){
+            if(entry.getName().equals(name)){
+                user = entry;
+                break;
+            }
+        }
+        return Optional.ofNullable(user);
+    }
+
+    @Override
     public List<User> findAll() {
         try {
             return Files.list(DIRECTORY)
