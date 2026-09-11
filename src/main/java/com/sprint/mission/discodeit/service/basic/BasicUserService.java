@@ -2,8 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.UserReadResponse;
-import com.sprint.mission.discodeit.entity.NitroLevel;
+import com.sprint.mission.discodeit.dto.Response.UserFindResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -55,13 +54,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserReadResponse read(UUID id) {
+    public UserFindResponse find(UUID id) {
         return userRepository.findById(id).map(this::toDto)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
     }
 
     @Override
-    public List<UserReadResponse> readAll() {
+    public List<UserFindResponse> findAll() {
         return userRepository.findAll().stream().map(this::toDto).toList();
     }
 
@@ -113,13 +112,14 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(id);
     }
 
-    private UserReadResponse toDto(User user) {
-        boolean online = userStatusRepository.findByUserId(user.getId())
-                .isOnline();
+    private UserFindResponse toDto(User user) {
+        UserStatus userStatus = userStatusRepository
+                .findByUserId(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저의 스테이터스가 없습니다."));
+        boolean online = userStatus.isOnline();
 
         //UUID testId= Optional.ofNullable(user.getProfileId()).orElse(null);
 
-        return new UserReadResponse(
+        return new UserFindResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),

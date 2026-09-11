@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 @RequiredArgsConstructor
 @Service
@@ -19,42 +22,46 @@ public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
-
+    private final BinaryContentRepository binaryContentRepository;
 
 
     @Override
-    public Message create(UUID channelId, UUID userId, String messageString) {
-        if(!channelRepository.existsById(channelId)){
-            throw new NoSuchElementException("채널 id 없음 : "+ channelId);
+    public Message create(MessageCreateRequest messageCreateRequest) {
+        if(!channelRepository.existsById(messageCreateRequest.channelId())){
+            throw new NoSuchElementException("채널 id 없음 : "+ messageCreateRequest.channelId());
         }
 
-        if(!userRepository.existsById(userId)){
-            throw new NoSuchElementException("유저 id 없음 : "+ userId);
+        if(!userRepository.existsById(messageCreateRequest.userId())){
+            throw new NoSuchElementException("유저 id 없음 : "+ messageCreateRequest.userId());
         }
 
 
-        Message message = new Message(channelId,userId,messageString);
+        Message message = new Message(messageCreateRequest.channelId(),messageCreateRequest.userId(),
+                messageCreateRequest.messageString(), messageCreateRequest.binaryIds().orElse(null));
         return messageRepository.save(message);
     }
 
     @Override
-    public Message read(UUID id) {
+    public Message find(UUID id) {
         return messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
     }
 
     @Override
-    public List<Message> readAll() {
+    public List<Message> findallByChannelId(UUID channelId){
+        return messageRepository.findAllByChannelId(channelId);
+    }
+
+    @Override
+    public List<Message> findAll() {
         return messageRepository.findAll();
     }
 
     @Override
-    public Message update(UUID id, String messageString) {
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
-        message.update(messageString);
-
-        message.update(messageString);
+    public Message update(MessageUpdateRequest messageUpdateRequest) {
+        Message message = messageRepository.findById(messageUpdateRequest.id())
+                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + messageUpdateRequest.id()));
+        message.update(messageUpdateRequest.messageString());
         return messageRepository.save(message);
     }
 
@@ -63,6 +70,9 @@ public class BasicMessageService implements MessageService {
         if (!messageRepository.existsById(id)) {
             throw new NoSuchElementException("메세지 id 없음 : " + id);
         }
+
+
+        binaryContentRepository.deleteByMessageId(id);
         messageRepository.deleteById(id);
 
     }

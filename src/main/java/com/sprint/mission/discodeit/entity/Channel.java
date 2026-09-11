@@ -13,7 +13,7 @@ public class Channel extends BaseClass {
     ///////////////////////////////////////////
 
     private String name;
-    private ChannelType channelType;
+    private final ChannelType channelType;
     ///////////////////////////////////////////
 
     @JsonCreator
@@ -26,7 +26,8 @@ public class Channel extends BaseClass {
     ) {
         super(id, createdAt, updatedAt);
         this.name = name;
-    }
+        this.channelType=channelType;
+   }
 
     public Channel(String name , ChannelType channelType) {
         super();
@@ -34,9 +35,9 @@ public class Channel extends BaseClass {
         this.channelType=channelType;
     }
 
-    public void update(String name, ChannelType channelType){
+    public void update(String name){
         this.name = name;
-        this.channelType = channelType;
+        //this.channelType = channelType;
         setUpdatedAt();
     }
 
