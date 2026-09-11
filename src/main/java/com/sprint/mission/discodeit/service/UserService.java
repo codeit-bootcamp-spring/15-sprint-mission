@@ -1,8 +1,7 @@
 package com.sprint.mission.discodeit.service;
 
 import com.sprint.mission.discodeit.entity.User;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+
 
 import java.io.IOException;
 import java.util.List;
@@ -20,10 +19,13 @@ public interface UserService {
 
     List<User> findAll();
 
-    Optional<Object> update(UUID id, String name);
+    Optional<User> update(UUID id, String name);
+
+    User create(String 길춘배);
+
+    List<User> findall();
 
     void delete(UUID id) throws IOException;
 
-    List<User> findall();
 }
 
