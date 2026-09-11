@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -12,8 +13,8 @@ public class Message implements Serializable {
     private UUID userid;
     private UUID ChannelId;
     private String content;
-    private Long createdAt;
-    private Long updateAt;
+    private Instant createdAt;
+    private Instant  updateAt;
 
     // 좋아요를 누른 사용자 ID
     private final Set<UUID> likeUserIds = new HashSet<>();
@@ -23,7 +24,7 @@ public class Message implements Serializable {
 
     public Message(UUID userid , UUID channelId, String content) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.userid = userid;
         this.ChannelId = channelId;
         this.content = content;
@@ -45,12 +46,12 @@ public class Message implements Serializable {
         return content;
     }
 
-    public Long getCreatedAt() {
+    public Instant  getCreatedAt() {
         return createdAt;
     }
 
 
-    public Long getUpdateAt() {
+    public Instant  getUpdateAt() {
         return updateAt;
     }
 

@@ -2,6 +2,7 @@
         package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class User implements Serializable {
@@ -11,20 +12,20 @@ public class User implements Serializable {
 
     private UUID id;
     private String name;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant  createdAt;
+    private Instant updatedAt;
 
     // User 생성
     public User(String name) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+       this.createdAt = Instant.now();
         this.name = name;
     }
 
     // User 생성
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.name = username;
     }
 
@@ -39,19 +40,19 @@ public class User implements Serializable {
     }
 
     // 생성 시간 조회
-    public Long getCreatedAt() {
+    public Instant  getCreatedAt() {
         return createdAt;
     }
 
     // 수정 시간 조회
-    public Long getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
     // 이름 수정
     public void update(String name) {
         this.name = name;
-        this.updatedAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
     }
 }
 
