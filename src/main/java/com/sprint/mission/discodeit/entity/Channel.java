@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
 public class Channel implements Serializable {
@@ -9,12 +10,13 @@ public class Channel implements Serializable {
     private UUID id;
     private String name;
     private ChannelType type;
-    private Long createdAt;
-    private Long updatedAt;
+    private Instant  createdAt;
+    private Instant updatedAt;
+
 
     public Channel(String name,ChannelType type) {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
+        this.createdAt = Instant.now();
         this.name = name;
         this.type = ChannelType.PUBLIC;
     }
@@ -34,17 +36,17 @@ public class Channel implements Serializable {
         return type;
     }
 
-    public Long getCreatedAt() {
+    public Instant getCreatedAt() {
         return createdAt;
     }
 
-    public Long getUpdatedAt() {
+    public Instant getUpdatedAt() {
         return updatedAt;
     }
 
     public void update(String name, ChannelType type) {
         this.name = name;
         this.type = type;
-        this.updatedAt = System.currentTimeMillis();
+        this.updatedAt = Instant.now();
     }
 }
