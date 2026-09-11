@@ -13,12 +13,14 @@ public class BinaryContent implements Serializable {
     private final String fileName;
     private final Long fileSize;
     private final String fileType;
+    private final byte[] bytes;
 
-    public BinaryContent(String fileName, Long fileSize, String fileType) {
+    public BinaryContent(String fileName, Long fileSize, String fileType, byte[] bytes) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.fileName = fileName;
         this.fileSize = fileSize;
         this.fileType = fileType;
+        this.bytes = bytes;
     }
 }
