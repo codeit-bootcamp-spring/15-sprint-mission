@@ -55,13 +55,13 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserReadResponse read(UUID id) {
+    public UserReadResponse find(UUID id) {
         return userRepository.findById(id).map(this::toDto)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
     }
 
     @Override
-    public List<UserReadResponse> readAll() {
+    public List<UserReadResponse> findAll() {
         return userRepository.findAll().stream().map(this::toDto).toList();
     }
 

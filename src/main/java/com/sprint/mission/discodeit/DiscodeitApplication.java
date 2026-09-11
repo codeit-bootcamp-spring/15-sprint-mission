@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit;
 
+import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.entity.*;
@@ -9,6 +10,8 @@ import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
+
+import java.util.ArrayList;
 
 @SpringBootApplication
 public class DiscodeitApplication {
@@ -27,7 +30,8 @@ public class DiscodeitApplication {
 	}
 
 	static void messageCreateTest(MessageService messageService , Channel channel, User user) {
-		Message message = messageService.create(channel.getId(), user.getId(),"안녕하세요.");
+		MessageCreateRequest mcr= new MessageCreateRequest( channel.getId(), user.getId(),"안녕하세요.",null);
+		Message message = messageService.create(mcr);
 		System.out.println("메시지 생성: " + message.getId());
 	}
 

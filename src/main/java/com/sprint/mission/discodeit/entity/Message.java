@@ -14,6 +14,7 @@ public class Message extends BaseClass  {
     private final UUID channelId;
     private final UUID userId;
     private String message;
+    private List<UUID> binaryIds;
 
 
     //////////////////////////////////
@@ -25,18 +26,21 @@ public class Message extends BaseClass  {
             @JsonProperty("updatedAt") Instant updatedAt,
             @JsonProperty("channelId") UUID channelId,
             @JsonProperty("userId") UUID userId,
-            @JsonProperty("message") String message
+            @JsonProperty("message") String message,
+            @JsonProperty("binaryIds") List<UUID> binaryIds
     ) {
         super(id, createdAt, updatedAt);
         this.channelId = channelId;
         this.userId = userId;
         this.message = message;
+        this.binaryIds=binaryIds;
     }
 
-    public Message(UUID channelId, UUID userId , String message){
+    public Message(UUID channelId, UUID userId , String message, List<UUID> binaryIds){
         this.channelId=channelId;
         this.userId=userId;
         this.message=message;
+        this.binaryIds=binaryIds;
     }
 
 
@@ -45,6 +49,7 @@ public class Message extends BaseClass  {
 
     public void update(String message){
         this.message=message;
+        this.binaryIds=binaryIds;
         setUpdatedAt();
     }
 

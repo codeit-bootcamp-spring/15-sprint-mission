@@ -11,8 +11,8 @@ import java.util.UUID;
 
 public interface UserService {
     User create(UserCreateRequest userCreateRequest);
-    UserReadResponse read(UUID id);
-    List<UserReadResponse> readAll();
+    UserReadResponse find(UUID id);
+    List<UserReadResponse> findAll();
     User update(UUID id, UserUpdateRequest userUpdateRequest);
     void delete(UUID id);
 
