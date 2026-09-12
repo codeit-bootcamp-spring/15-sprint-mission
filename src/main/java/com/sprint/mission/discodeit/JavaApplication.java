@@ -1,132 +1,129 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
-import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
-import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.dto.channel.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
+import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.message.MessageResponse;
+import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserResponse;
+import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
-public class JavaApplication {
-    public static void main(String[] args) {
-        UserRepository userRepository = new FileUserRepository();
-        ChannelRepository channelRepository = new FileChannelRepository();
-        MessageRepository messageRepository = new FileMessageRepository();
+import java.util.List;
+import java.util.UUID;
 
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository);
+@SpringBootApplication
+public class DiscodeitApplication {
 
-
+    static UserResponse setupUser(UserService userService) {
         System.out.println("=== User CRUD ===");
 
-        // 등록
-        User user1 = userService.create("민영", "minyeong@naver.com", "1234a");
-        User user2 = userService.create("탱이", "taeng@naver.com", "5678a");
-        System.out.println("등록: " + user1.getUserName() + ", " + user2.getUserName());
+        UserResponse user1 = userService.create(
+                new UserCreateRequest("민영", "minyeong@naver.com", "1234a"), null);
+        UserResponse user2 = userService.create(
+                new UserCreateRequest("탱이", "taeng@naver.com", "5678a"), null);
+        System.out.println("등록: " + user1.userName() + ", " + user2.userName());
 
-        // 단건 조회
-        User foundUser = userService.read(user1.getId());
-        System.out.println("단건 조회: " + foundUser.getUserName());
-
-        // 다건 조회
+        UserResponse foundUser = userService.read(user1.id());
+        System.out.println("단건 조회: " + foundUser.userName());
         System.out.println("다건 조회:");
-        for (User user : userService.readAll()) {
-            System.out.println("- " + user.getUserName());
+        for (UserResponse user : userService.readAll()) {
+            System.out.println("- " + user.userName());
         }
 
-        // 수정
-        userService.update(user1.getId(), "민영(수정됨)", null, null);
+        userService.update(user1.id(), new UserUpdateRequest("민영(수정됨)", null, null), null);
         System.out.println("수정 완료");
+        UserResponse updated = userService.read(user1.id());
+        System.out.println("수정된 데이터 조회: " + updated.userName());
+        System.out.println("이메일 확인: " + updated.email());
 
-        // 수정된 데이터 조회
-        System.out.println("수정된 데이터 조회: " + userService.read(user1.getId()).getUserName());
-        System.out.println("이메일 확인: " + userService.read(user1.getId()).getEmail());
-
-        // 삭제
-        userService.delete(user2.getId());
+        userService.delete(user2.id());
         System.out.println("삭제 완료");
-
-        // 조회를 통해 삭제되었는지 확인
         System.out.println("삭제 후 조회:");
-        for (User user : userService.readAll()) {
-            System.out.println("- " + user.getUserName());
+        for (UserResponse user : userService.readAll()) {
+            System.out.println("- " + user.userName());
         }
 
+        return updated;
+    }
+
+    static ChannelResponse setupChannel(ChannelService channelService) {
         System.out.println("=== Channel CRUD ===");
 
-        // 등록
-        Channel channel1 = channelService.create("공부");
-        Channel channel2 = channelService.create("수다");
-        Channel channel3 = channelService.create("여행");
-        System.out.println("등록: " + channel1.getChannelName() + ", " + channel2.getChannelName() + ", " + channel3.getChannelName());
+        ChannelResponse channel1 = channelService.createPublicChannel(
+                new PublicChannelCreateRequest("공부", "공부 채널입니다."));
+        ChannelResponse channel2 = channelService.createPublicChannel(
+                new PublicChannelCreateRequest("수다", "수다 채널입니다."));
+        ChannelResponse channel3 = channelService.createPublicChannel(
+                new PublicChannelCreateRequest("여행", "여행 채널입니다."));
+        System.out.println("등록: " + channel1.channelName() + ", " + channel2.channelName() + ", " + channel3.channelName());
 
-        // 단건 조회
-        System.out.println("단건 조회: " + channelService.read(channel1.getId()).getChannelName());
+        System.out.println("단건 조회: " + channelService.read(channel1.id()).channelName());
 
-        // 다건 조회
         System.out.println("다건 조회:");
-        for (Channel channel : channelService.readAll()) {
-            System.out.println("- " + channel.getChannelName());
+        for (ChannelResponse channel : channelService.readAllByUserId(null)) {
+            System.out.println("- " + channel.channelName());
         }
 
-        // 수정
-        channelService.update(channel1.getId(), "공부(수정됨)");
+        channelService.update(channel1.id(),
+                new com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest("공부(수정됨)", null));
         System.out.println("수정 완료");
+        System.out.println("수정된 데이터 조회: " + channelService.read(channel1.id()).channelName());
 
-        // 수정된 데이터 조회
-        System.out.println("수정된 데이터 조회: " + channelService.read(channel1.getId()).getChannelName());
-
-        // 삭제
-        channelService.delete(channel2.getId());
+        channelService.delete(channel2.id());
         System.out.println("삭제 완료");
-
-        // 조회를 통해 삭제되었는지 확인
         System.out.println("삭제 후 조회:");
-        for (Channel channel : channelService.readAll()) {
-            System.out.println("- " + channel.getChannelName());
+        for (ChannelResponse channel : channelService.readAllByUserId(null)) {
+            System.out.println("- " + channel.channelName());
         }
 
+        return channel1;
+    }
+
+    static void messageCreateTest(MessageService messageService, ChannelResponse channel, UserResponse author) {
         System.out.println("=== Message CRUD ===");
 
-        // 등록
-        Message message1 = messageService.create("안녕하세요", user1.getId(), channel1.getId());
-        Message message2 = messageService.create("환영합니다", user2.getId(), channel1.getId());
-        System.out.println("등록: " + message1.getContents() + ", " + message2.getContents());
+        MessageResponse message1 = messageService.create(
+                new MessageCreateRequest("안녕하세요", channel.id(), author.id(), null));
+        MessageResponse message2 = messageService.create(
+                new MessageCreateRequest("환영합니다", channel.id(), author.id(), null));
+        System.out.println("등록: " + message1.contents() + ", " + message2.contents());
 
-        // 단건 조회
-        System.out.println("단건 조회: " + messageService.read(message1.getId()).getContents());
+        System.out.println("단건 조회: " + messageService.read(message1.id()).contents());
 
-        // 다건 조회
         System.out.println("다건 조회:");
-        for (Message message : messageService.readAll()) {
-            System.out.println("- " + message.getContents());
+        for (MessageResponse message : messageService.readAllByChannelId(channel.id())) {
+            System.out.println("- " + message.contents());
         }
 
-        // 수정
-        messageService.update(message1.getId(), "안녕하세요(수정됨)");
+        messageService.update(message1.id(), new MessageUpdateRequest("안녕하세요(수정됨)"));
         System.out.println("수정 완료");
+        System.out.println("수정된 데이터 조회: " + messageService.read(message1.id()).contents());
 
-        // 수정된 데이터 조회
-        System.out.println("수정된 데이터 조회: " + messageService.read(message1.getId()).getContents());
-
-        // 삭제
-        messageService.delete(message1.getId());
+        messageService.delete(message1.id());
         System.out.println("삭제 완료");
-
-        // 조회를 통해 삭제되었는지 확인
         System.out.println("삭제 후 조회:");
-        for (Message message : messageService.readAll()) {
-            System.out.println("- " + message.getContents());
+        for (MessageResponse message : messageService.readAllByChannelId(channel.id())) {
+            System.out.println("- " + message.contents());
         }
+    }
+
+    public static void main(String[] args) {
+        ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
+
+        UserResponse user = setupUser(userService);
+        ChannelResponse channel = setupChannel(channelService);
+        messageCreateTest(messageService, channel, user);
     }
 }
