@@ -1,25 +1,24 @@
 package com.sprint.mission.discodeit.entity;
-
 import lombok.Getter;
-
-import java.time.Duration;
-import java.time.Instant;
+import java.time.*;
 import java.util.UUID;
-
 @Getter
-public class UserStatus extends Common{
-
-    // 마지막 활동(접속)시간
-    private Instant updateAt;
-
-    public UserStatus(UUID id) {
-        super(id);
+public class UserStatus extends Common {
+    private final UUID userId;
+    private Instant lastActiveAt;
+    private Instant updatedAt = getCreatedAt();
+    public UserStatus(UUID userId, Instant lastActiveAt) {
+        this.userId = userId;
+        this.lastActiveAt = java.util.Objects.requireNonNull(lastActiveAt);
     }
-
-    public boolean isOnline(){
+    public void update(Instant lastActiveAt) {
+        this.lastActiveAt = java.util.Objects.requireNonNull(lastActiveAt);
+        updatedAt = Instant.now();
+    }
+    public boolean isOnline() {
         Instant now = Instant.now();
-        Duration diff = Duration.between(now , updateAt);
-        return diff.toMinutes() < 5;
+        Duration elapsed = Duration.between(lastActiveAt, now);
+        // Session decision: exactly five minutes is offline.
+        return !elapsed.isNegative() && elapsed.compareTo(Duration.ofMinutes(5)) < 0;
     }
-
 }

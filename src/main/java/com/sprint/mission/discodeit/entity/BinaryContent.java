@@ -1,17 +1,16 @@
 package com.sprint.mission.discodeit.entity;
-
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.time.Instant;
-import java.util.UUID;
-
 @Getter
-public class BinaryContent extends Common{
-
-    private Instant updateAt;
-
-    public BinaryContent(UUID id) {
-        super(id);
+public final class BinaryContent extends Common {
+    private final String fileName;
+    private final String contentType;
+    private final byte[] bytes;
+    public BinaryContent(String fileName, String contentType, byte[] bytes) {
+        this.fileName = fileName;
+        this.contentType = contentType;
+        this.bytes = bytes.clone();
+    }
+    public byte[] getBytes() {
+        return bytes.clone();
     }
 }

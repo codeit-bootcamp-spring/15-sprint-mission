@@ -1,90 +1,98 @@
 package com.sprint.mission.discodeit.repository.file;
-
+import org.springframework.stereotype.Repository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.beans.factory.annotation.Value;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Repository;
-
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.UncheckedIOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.io.*;
+import java.nio.file.*;
+import java.util.*;
 import java.util.stream.Stream;
-
 @Repository
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileMessageRepository implements MessageRepository {
-
     private final Path directory;
-
-    public FileMessageRepository() {
-        this.directory = Paths.get(System.getProperty("user.dir"), "data", "message");
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String root) {
+        this.directory = Path.of(root).resolve("message");
         try {
             Files.createDirectories(directory);
-        } catch (IOException e) {
-            throw new UncheckedIOException("메세지 데이터 디렉토리를 생성할 수 없습니다.", e);
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("저장 폴더 생성 실패", e);
         }
     }
-
-    private Path resolvePath(UUID id) {
-        return directory.resolve(id.toString() + ".ser");
+    private Path path(UUID id) {
+        return directory.resolve(id + ".ser");
     }
-
+    // 같은 ID의 파일이 있으면 기존 내용을 수정된 객체로 덮어씁니다.
     @Override
-    public Message createMessage(Message message) {
-        Path path = resolvePath(message.getId());
-        try (ObjectOutputStream oos = new ObjectOutputStream(Files.newOutputStream(path))) {
-            oos.writeObject(message);
-        } catch (IOException e) {
-            throw new UncheckedIOException("메세지 저장에 실패했습니다. id = " + message.getId(), e);
+    public Message save(Message entity) {
+        Path file = path(entity.getId());
+        try (ObjectOutputStream output = new ObjectOutputStream(Files.newOutputStream(file))) {
+            output.writeObject(entity);
         }
-        return message;
+        catch (IOException e) {
+            throw new UncheckedIOException("저장 실패: " + entity.getId(), e);
+        }
+        return entity;
     }
-
     @Override
-    public Optional<Message> getMessage(UUID id) {
-        Path path = resolvePath(id);
+    public Optional<Message> findById(UUID id) {
+        Path path = path(id);
         if (Files.notExists(path)) {
             return Optional.empty();
         }
-        return Optional.of(readMessage(path));
-    }
-
-    @Override
-    public List<Message> getMessageAll() {
-        try (Stream<Path> paths = Files.list(directory)) {
-            return paths
-                    .filter(path -> path.toString().endsWith(".ser"))
-                    .map(this::readMessage)
-                    .toList();
-        } catch (IOException e) {
-            throw new UncheckedIOException("메시지 목록을 불러오지 못했습니다.",e);
+        try (ObjectInputStream in = new ObjectInputStream(Files.newInputStream(path))) {
+            return Optional.of((Message) in.readObject());
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException("조회 실패: " + id, e);
+        }
+        catch (ClassNotFoundException | ClassCastException e) {
+            throw new IllegalStateException("잘못된 저장 데이터: " + path, e);
         }
     }
-
     @Override
-    public void deleteMessage(UUID id) {
+    public List<Message> findAll() {
+        List<Message> result = new ArrayList<>();
+        // Files.list가 연 자원은 try-with-resources로 닫습니다.
+        try (Stream<Path> files = Files.list(directory)) {
+            for (Path file : files.toList()) {
+                String name = file.getFileName().toString();
+                if (name.endsWith(".ser")) {
+                    UUID id = UUID.fromString(name.substring(0, name.length() - 4));
+                    Optional<Message> entity = findById(id);
+                    if (entity.isPresent()) {
+                        result.add(entity.get());
+                    }
+                }
+            }
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+        return result;
+    }
+    @Override
+    public void deleteById(UUID id) {
         try {
-            Files.deleteIfExists(resolvePath(id));
-        } catch (IOException e) {
-            throw new UncheckedIOException("메세지 삭제에 실패했습니다. id = " + id, e);
+            Files.deleteIfExists(path(id));
+        }
+        catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
-
     @Override
     public boolean existsById(UUID id) {
-        return Files.exists(resolvePath(id));
+        return Files.exists(path(id));
     }
-
-    private Message readMessage(Path path) {
-        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(path))) {
-            return (Message) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException("메세지 역직렬화에 실패했습니다. path = " + path, e);
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> result = new ArrayList<>();
+        for (Message message : findAll()) {
+            if (message.getChannelId().equals(channelId)) {
+                result.add(message);
+            }
         }
+        return result;
     }
 }

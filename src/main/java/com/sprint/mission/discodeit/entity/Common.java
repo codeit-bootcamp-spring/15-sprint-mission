@@ -1,32 +1,17 @@
 package com.sprint.mission.discodeit.entity;
-
 import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Objects;
 import java.util.UUID;
-
 @Getter
-public class Common implements Serializable {
-    private UUID id;
-    private Instant createAt;
-
-    public Common(UUID id){
-        this.id = id;
-        this.createAt = Instant.now();
+public abstract class Common implements Serializable {
+    private static final long serialVersionUID = 1L;
+    private final UUID id = UUID.randomUUID();
+    private final Instant createdAt = Instant.now();
+    @Override public final boolean equals(Object other) {
+        return this == other || other != null && getClass() == other.getClass()                 && id.equals(((Common) other).id);
     }
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Common common = (Common) o;
-        return Objects.equals(id, common.id);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id);
+    @Override public final int hashCode() {
+        return id.hashCode();
     }
 }

@@ -1,133 +1,109 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
-import com.sprint.mission.discodeit.service.basic.BasicChannelService;
-import com.sprint.mission.discodeit.service.basic.BasicMessageService;
-import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.service.*;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-		// System.out.println("**(())"+Instant.now().atZone(ZoneId.of("Asia/Seoul")));
-		
 		UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
-		runScenario(userService, channelService, messageService);
-	}
+		AuthService authService = context.getBean(AuthService.class);
+		UserStatusService statusService = context.getBean(UserStatusService.class);
+		ReadStatusService readService = context.getBean(ReadStatusService.class);
 
-	static void runScenario(UserService userService, ChannelService channelService, MessageService messageService) {
+		UserCreateRequest userRequestDTO1 = new UserCreateRequest("userNickName01","user01","user01@naver.com","user01password");
+		byte[] photo = Files.readAllBytes(Path.of("examples/profile.png"));
+		BinaryContentCreateRequest profile = new BinaryContentCreateRequest("profile.png", "image/png", photo);
 
-		// 유저 생성
-		User user01 = userService.createUser("userNickName01");
-		System.out.println("<< 최초 생성한 유저1 정보 >> \n" + user01 + "\n");
+		UserResponse user01 = userService.create(userRequestDTO1, profile);
 
-		// 유저1 닉네임 변경 후 출력
-		userService.updateUser(user01.getId(), "userChangeNickName01");
-		System.out.println("<< 최초 생성한 유저1 닉네임 변경 후 >>\n" + userService.getUser(user01.getId()) + "\n");
+		UserUpdateRequest userUpdateDTO = new UserUpdateRequest(user01.getId(), "userChangeNickName01","userChange01","userChangeEmail@naver.com","user01ChangePassword");
+		user01 = userService.update(userUpdateDTO,null);
+		System.out.println("<< 최초 생성한 유저1 닉네임 변경 후 >>\n" + userService.find(user01.getId()).toString() + "\n");
 
-		// 유저2, 3, 4 추가 후 전체 출력
-		User user02 = userService.createUser("userNickName02");
-		User user03 = userService.createUser("userNickName03");
-		User user04 = userService.createUser("userNickName04");
-		List<User> allUser01 = userService.getUserAll();
-		System.out.println("<< 유저2, 3, 4 추가 후 유저 전체 출력 >>");
+		UserCreateRequest userRequestDTO2 = new UserCreateRequest("userNickName02","user02","user02password","user02@naver.com");
+		UserResponse user02 = userService.create(userRequestDTO2,null);
+		UserCreateRequest userRequestDTO3 = new UserCreateRequest("userNickName03","user03","user03password","user03@naver.com");
+		UserResponse user03 = userService.create(userRequestDTO3,null);
+
+		// 모든 사용자의 접속 상태 조회
+		System.out.println("<< 전체 유저 접속 상태 >>");
+		statusService.findAll().forEach(status -> {
+			System.out.println("접속 상태 ID: " + status.getId());
+			System.out.println("사용자 ID: " + status.getUserId());
+			System.out.println("마지막 접속 시각: " + status.getLastActiveAt());
+			System.out.println("생성 시각: " + status.getCreatedAt().atZone(ZoneId.of("Asia/Seoul")));
+			System.out.println("수정 시각: " + status.getUpdatedAt().atZone(ZoneId.of("Asia/Seoul")));
+			System.out.println("현재 접속 중: " + status.isOnline());
+			System.out.println();
+		});
+
+		List<UserResponse> allUser01 = userService.findAll();
 		allUser01.forEach(System.out::println);
 		System.out.println();
 
-		// 유저3 삭제 후 전체 출력 (유저1, 유저2, 유저4)
-		userService.userDelete(user03.getId());
-		System.out.println("<< 유저3 삭제 후 유저 전체 출력 >>");
-		userService.getUserAll().forEach(System.out::println);
+		userService.delete(user02.getId());
+		userService.findAll().forEach(System.out::println);
 		System.out.println();
+		UserResponse loggedIn = authService.login(new LoginRequest(user01.getUsername(), "user01ChangePassword"));
+		System.out.println("로그인 성공: userId=" + loggedIn.getId());
 
 		// 채널1, 2 생성
-		Channel channel01 = channelService.createChannel("channel01nickName");
-		Channel channel02 = channelService.createChannel("channel02nickName");
-		System.out.println("<< 최초 생성 Channel01, 02 정보 출력 >> \n" + channel01.getChannelInfo());
-		System.out.println(channel02.getChannelInfo() + "\n");
+		ChannelResponse publicChannel = channelService.createPublic(new PublicChannelCreateRequest("publicChannel", "channelDST"));
+		ChannelResponse privateChannel = channelService.createPrivate(new PrivateChannelCreateRequest(List.of(user01.getId(),user03.getId())));
 
 		// 채널1 채널명 변경
-		channelService.updateChannelName(channel01.getId(), "channel01ChangeNickName");
-		System.out.println("<< Channel01 채널명 변경 후 출력 >> \n" + channelService.getChannelInfo(channel01.getId()) + "\n");
+		ChannelUpdateRequest channelUpdateRequest = new ChannelUpdateRequest(publicChannel.getId(),"publicChannelUpdate","channelDSTUpdate");
+		channelService.update(channelUpdateRequest);
+		System.out.println("<< Channel01 채널명 변경 후 출력 >> \n" + channelService.find(publicChannel.getId()) + "\n");
 
 		// 채널 전체 출력
-		System.out.println("<< 채널 전체 호출 >>");
-		channelService.getAllChannel().forEach(x -> System.out.println(x.getChannelInfo()));
+		System.out.println("<< PUBLIC 채널 전체 호출 >>");
+		channelService.findAllPublic().forEach(x -> System.out.println(x.toString()));
 		System.out.println();
 
-		// 채널2 삭제 후 전체 호출
-		channelService.deleteChannel(channel02.getId());
-		System.out.println("<< 채널2 삭제 후 전체 호출 >>"); // 채널1만 남음
-		channelService.getAllChannel().forEach(x -> System.out.println(x.getChannelInfo()));
+		ChannelResponse publicChannel2 = channelService.createPublic(new PublicChannelCreateRequest("publicChannel", "channelDST"));
+		channelService.delete(publicChannel2.getId());
 		System.out.println();
 
-		// 채널1에 유저1, 2, 4 등록
-		channelService.addUserToChannel(channel01.getId(), user01.getId());
-		channelService.addUserToChannel(channel01.getId(), user02.getId());
-		channelService.addUserToChannel(channel01.getId(), user04.getId());
-		System.out.println("<< 채널1에 유저1,2,4 등록 후 채널1에 유저 리스트 호출 >> ");
-		channelService.getUserInChannel(channel01.getId()).forEach(System.out::println);
-		System.out.println();
+		channelService.addUserToChannel(publicChannel.getId(), user01.getId());
+		channelService.addUserToChannel(publicChannel.getId(), user03.getId());
+		channelService.findAllByUserId(user01.getId()).forEach(x -> System.out.println(x.toString()));
 
-		// 채널1에 포함된 유저4 삭제
-		channelService.deleteUserInChannel(channel01.getId(), user04.getId());
-		System.out.println("<< 채널1에 유저4 삭제 후 채널1에 유저 리스트 호출 >> ");
-		channelService.getUserInChannel(channel01.getId()).forEach(System.out::println); // 유저 1,2
-		System.out.println();
+		MessageCreateRequest messageCreateRequest1 = new MessageCreateRequest(publicChannel.getId(), user01.getId(), "How are you?");
+		Message message1 = messageService.create(messageCreateRequest1,null);
 
-		// 채널1에서 유저1,2 메세지 보내기 및 채널1 메세지 전체 호출
-		Message user01Message1 = messageService.createMessage(channel01.getId(), user01.getId(), "How are you?");
-		messageService.createMessage(channel01.getId(), user02.getId(), "i'm fine!");
-		Message user01Message3 = messageService.createMessage(channel01.getId(), user01.getId(), "Ok bye~");
+		MessageCreateRequest messageCreateRequest2 = new MessageCreateRequest(publicChannel.getId(), user03.getId(), "I'm Fine");
+		Message message2 = messageService.create(messageCreateRequest2,null);
+
+		MessageCreateRequest messageCreateRequest3 = new MessageCreateRequest(publicChannel.getId(), user01.getId(), "Ok bye~");
+		Message message3 = messageService.create(messageCreateRequest3,null);
+
 		System.out.println("<< 채널1 전체 메세지 출력 >>");
-		messageService.getMessagesByChannel(channel01.getId()).forEach(x ->
-				System.out.println(userService.getUserNickname(x.getAuthorId()) + " : " + x.getContents()));
+		messageService.findAllByChannelId(publicChannel.getId())
+				.forEach(message ->
+						System.out.println(userService.find(message.getAuthorId()).getNickname()+ " : "+ message.getContent()));
 		System.out.println();
 
-		// 유저1이 보낸 전체 메세지 호출
-		System.out.println("<< 유저1 전체 메세지 출력 >>");
-		messageService.getMessagesByUser(user01.getId()).forEach(x -> System.out.println(x.getContents()));
-		System.out.println();
+		MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(message3.getId(),"NONONO");
+		messageService.update(messageUpdateRequest);
 
-		// 메세지 내용 변경
-		messageService.updateMessageContents(user01Message3.getId(), "NONONO");
-		System.out.println("<< 유저1 마지막 메세지 변경 >>\n" +
-				messageService.getMessagesByUser(user01.getId()).stream()
-						.filter(m -> m.getId().equals(user01Message3.getId()))
-						.findFirst().map(Message::getContents).orElse("") + "\n");
-
-		// 메세지 삭제
-		messageService.deleteMessage(user01Message1.getId());
-
-		// 다시 전체 메세지 호출
-		System.out.println("<< 첫번째 메세지 삭제 후 전체 메세지 호출 >>");
-		messageService.getMessagesByChannel(channel01.getId()).forEach(x ->
-				System.out.println(userService.getUserNickname(x.getAuthorId()) + " : " + x.getContents()));
-
-		// 연관 도메인 검증 테스트: 존재하지 않는 채널/유저로 메세지 생성 시 예외 발생 확인
-		try {
-			messageService.createMessage(java.util.UUID.randomUUID(), user01.getId(), "존재하지 않는 채널 테스트");
-		} catch (IllegalArgumentException e) {
-			System.out.println("\n<< 존재하지 않는 채널로 메세지 생성 시 예외 발생 확인 >>\n" + e.getMessage());
-		}
+		messageService.delete(message3.getId());
 	}
 }
