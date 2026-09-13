@@ -1,4 +1,8 @@
 package com.sprint.mission.discodeit.dto.userstatus;
 
-public class UserStatusUpdateRequest {
+import java.time.Instant;
+
+public record UserStatusUpdateRequest(
+        Instant lastAccessedAt
+) {
 }
