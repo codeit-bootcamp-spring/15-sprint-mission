@@ -26,7 +26,6 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    // 객체 직렬화
     private void saveToFile(Map<UUID, User> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFile))) {
             oos.writeObject(data);
@@ -35,7 +34,6 @@ public class FileUserRepository implements UserRepository {
         }
     }
 
-    // 객체 역직렬화
     @SuppressWarnings("unchecked")
     private Map<UUID, User> loadFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFile))) {
@@ -70,5 +68,17 @@ public class FileUserRepository implements UserRepository {
         Map<UUID, User> data = loadFromFile();
         data.remove(userId);
         saveToFile(data);
+    }
+
+    @Override
+    public boolean existsByUserName(String userName) {
+        Map<UUID, User> data = loadFromFile();
+        return data.values().stream().anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public boolean existsByEmail(String email) {
+        Map<UUID, User> data = loadFromFile();
+        return data.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
 }

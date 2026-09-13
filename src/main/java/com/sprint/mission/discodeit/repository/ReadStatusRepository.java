@@ -9,5 +9,8 @@ public interface ReadStatusRepository {
     ReadStatus save(ReadStatus readStatus);
     ReadStatus read(UUID id);
     List<ReadStatus> readAllByUserId(UUID userId);
+    List<ReadStatus> readAllByChannelId(UUID channelId);
     void delete(UUID id);
+    void deleteAllByChannelId(UUID channelId);
+    boolean existsByUserIdAndChannelId(UUID userId, UUID channelId);
 }

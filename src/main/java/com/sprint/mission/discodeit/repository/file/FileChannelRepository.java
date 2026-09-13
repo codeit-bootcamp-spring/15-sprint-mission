@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
@@ -14,11 +16,13 @@ import java.util.UUID;
 public class FileChannelRepository implements ChannelRepository {
 
     private static final String dataFile = "data/channel.ser";
+    private final ReadStatusRepository readStatusRepository;
 
-    public FileChannelRepository() {
+    public FileChannelRepository(ReadStatusRepository readStatusRepository) {
+        this.readStatusRepository = readStatusRepository;
         File file = new File(dataFile);
         File parentDir = file.getParentFile();
-        if (parentDir != null&& !parentDir.exists()) {
+        if (parentDir != null && !parentDir.exists()) {
             parentDir.mkdirs();
         }
         if (!file.exists()) {
@@ -26,7 +30,6 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    // 객체 직렬화
     private void saveToFile(Map<UUID, Channel> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFile))) {
             oos.writeObject(data);
@@ -35,7 +38,6 @@ public class FileChannelRepository implements ChannelRepository {
         }
     }
 
-    // 객체 역직렬화
     @SuppressWarnings("unchecked")
     private Map<UUID, Channel> loadFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFile))) {
@@ -63,6 +65,20 @@ public class FileChannelRepository implements ChannelRepository {
     public List<Channel> readAll() {
         Map<UUID, Channel> data = loadFromFile();
         return data.values().stream().toList();
+    }
+
+    @Override
+    public List<Channel> readAllByUserId(UUID userId) {
+        Map<UUID, Channel> data = loadFromFile();
+        return data.values().stream()
+                .filter(channel -> {
+                    if (channel.getChannelType() == ChannelType.PUBLIC) {
+                        return true;
+                    }
+                    return readStatusRepository.readAllByChannelId(channel.getId()).stream()
+                            .anyMatch(readStatus -> readStatus.getUserId().equals(userId));
+                })
+                .toList();
     }
 
     @Override

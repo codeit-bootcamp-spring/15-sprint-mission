@@ -9,5 +9,8 @@ public interface UserStatusRepository {
     UserStatus save(UserStatus userStatus);
     UserStatus read(UUID id);
     List<UserStatus> readAll();
+    UserStatus readByUserId(UUID userId);
     void delete(UUID id);
+    void deleteByUserId(UUID userId);
+    boolean existsByUserId(UUID userId);
 }

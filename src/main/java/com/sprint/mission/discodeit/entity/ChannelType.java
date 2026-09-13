@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-public class ChannelType {
+public enum ChannelType {
     PUBLIC,
     PRIVATE
 }

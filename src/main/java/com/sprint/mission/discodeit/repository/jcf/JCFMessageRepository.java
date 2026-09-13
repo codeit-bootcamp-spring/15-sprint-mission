@@ -28,8 +28,10 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> readAll() {
-        return data.values().stream().toList();
+    public List<Message> readAllByChannelId(UUID channelId) {
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override

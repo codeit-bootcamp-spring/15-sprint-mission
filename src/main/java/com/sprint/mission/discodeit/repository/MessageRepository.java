@@ -8,6 +8,6 @@ import java.util.UUID;
 public interface MessageRepository {
     Message save(Message message);
     Message read(UUID messageId);
-    List<Message> readAll();
+    List<Message> readAllByChannelId(UUID channelId);
     void delete(UUID messageId);
 }

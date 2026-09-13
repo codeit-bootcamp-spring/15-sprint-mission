@@ -26,7 +26,6 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    // 객체 직렬화
     private void saveToFile(Map<UUID, Message> data) {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(dataFile))) {
             oos.writeObject(data);
@@ -35,7 +34,6 @@ public class FileMessageRepository implements MessageRepository {
         }
     }
 
-    // 객체 역직렬화
     @SuppressWarnings("unchecked")
     private Map<UUID, Message> loadFromFile() {
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(dataFile))) {
@@ -60,9 +58,11 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> readAll() {
+    public List<Message> readAllByChannelId(UUID channelId) {
         Map<UUID, Message> data = loadFromFile();
-        return data.values().stream().toList();
+        return data.values().stream()
+                .filter(message -> message.getChannelId().equals(channelId))
+                .toList();
     }
 
     @Override
