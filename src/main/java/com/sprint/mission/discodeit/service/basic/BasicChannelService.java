@@ -121,14 +121,4 @@ public class BasicChannelService implements ChannelService {
         }
         channelRepository.deleteById(id);
     }
-/*
-if(message.getBinaryIds()!=null){
-            for(UUID entry : message.getBinaryIds()){
-                if (binaryContentRepository.existsById(entry)) {
-                    binaryContentRepository.deleteById(entry);
-                }
-            }
-        }
- */
-
 }

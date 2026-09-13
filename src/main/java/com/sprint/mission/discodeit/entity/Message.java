@@ -49,7 +49,7 @@ public class Message extends BaseClass  {
 
     public void update(String message){
         this.message=message;
-        this.binaryIds=binaryIds;
+        //this.binaryIds=binaryIds;
         setUpdatedAt();
     }
 

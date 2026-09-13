@@ -7,7 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 public interface UserStatusRepository {
-    UserStatus save(UserStatus user);
+    UserStatus save(UserStatus userStatus);
     Optional<UserStatus> findById(UUID id);
     List<UserStatus> findAll();
     Optional<UserStatus> findByUserId(UUID userId);

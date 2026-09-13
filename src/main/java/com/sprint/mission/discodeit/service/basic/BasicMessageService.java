@@ -44,7 +44,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message find(UUID id) {
         return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
+                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
     }
 
     @Override
