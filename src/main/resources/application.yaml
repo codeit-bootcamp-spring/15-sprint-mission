@@ -6,5 +6,5 @@ spring:
 
 discodeit:
   repository:
-    type: file   # jcf | file
-    file-directory: .file-data-map
+    type: jcf   # jcf | file
+    file-directory: file-data-map

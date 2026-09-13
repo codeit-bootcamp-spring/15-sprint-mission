@@ -1,4 +1,4 @@
-package test;
+package com.sprint.mission.discodeit;
 
 //package com.sprint.mission.discodeit;
 
@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @SpringBootApplication
@@ -83,7 +84,7 @@ public class TotalTest {
                         "woody1234",
                         "woody-" + uniqueValue,
                         NitroLevel.BASIC,
-                        null
+                        Optional.empty()
                 );
 
         User user = userService.create(request);
@@ -154,7 +155,7 @@ public class TotalTest {
                         channel.getId(),
                         user.getId(),
                         "안녕하세요.",
-                        null
+                        Optional.empty()
                 );
 
         Message message =
