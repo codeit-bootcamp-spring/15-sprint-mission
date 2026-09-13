@@ -101,20 +101,34 @@ public class BasicChannelService implements ChannelService {
             throw new NoSuchElementException("채널 id 없음 : " + id);
         }
 
-        List<UUID> messages =messageRepository.findAllByChannelId(id).stream().map(message -> message.getId()).toList();
+        List<Message> messages =messageRepository.findAllByChannelId(id);
         List<UUID> readStatus = readStatusRepository.findAllByChannelId(id).stream().map(r -> r.getId()).toList();
 
-        for(UUID messageId : messages){
-            messageRepository.deleteById(messageId);
-            binaryContentRepository.deleteByMessageId(messageId);
+        for(Message message : messages){
+            if(message.getBinaryIds()!=null){
+                for(UUID entry : message.getBinaryIds()){
+                    if (binaryContentRepository.existsById(entry)) {
+                        binaryContentRepository.deleteById(entry);
+                    }
+                }
+            }
+            messageRepository.deleteById(message.getId());
         }
+
+
         for(UUID readStatusId : readStatus){
             readStatusRepository.deleteById(readStatusId);
         }
-
         channelRepository.deleteById(id);
-
     }
-
+/*
+if(message.getBinaryIds()!=null){
+            for(UUID entry : message.getBinaryIds()){
+                if (binaryContentRepository.existsById(entry)) {
+                    binaryContentRepository.deleteById(entry);
+                }
+            }
+        }
+ */
 
 }

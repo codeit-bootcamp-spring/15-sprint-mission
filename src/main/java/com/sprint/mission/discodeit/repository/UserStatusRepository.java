@@ -12,7 +12,7 @@ public interface UserStatusRepository {
     List<UserStatus> findAll();
     Optional<UserStatus> findByUserId(UUID userId);
     void deleteById(UUID id);
-    void deleteByUserId(UUID id);
+    void deleteByUserId(UUID userId);
     boolean existsById(UUID id);
     boolean existsByUserId(UUID userId);
 }

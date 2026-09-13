@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import lombok.val;
 //import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.*;
@@ -26,7 +27,8 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public Optional<User> findByName(String name){
-        return null;
+        Optional<User> findUser = data.values().stream().filter(user -> user.getName().equals(name)).findFirst();
+        return findUser;
     }
 
     @Override

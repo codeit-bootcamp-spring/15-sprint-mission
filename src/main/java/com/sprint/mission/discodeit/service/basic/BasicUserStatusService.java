@@ -64,7 +64,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public void delete(UUID id) {
-        if(!userStatusRepository.existsById(id)){
+        if (!userStatusRepository.existsById(id)) {
             throw new NoSuchElementException("유저 스테이터스 id 없음 : " + id);
         }
         userStatusRepository.deleteById(id);

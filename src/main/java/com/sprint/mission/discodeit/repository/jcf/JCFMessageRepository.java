@@ -26,7 +26,15 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
-        return List.of();
+        List<Message> messageList = new ArrayList<>();
+
+        for (Message entry : findAll()){
+            if(entry.getChannelId().equals(channelId)){
+                messageList.add(entry);
+            }
+        }
+
+        return messageList;
     }
 
     @Override

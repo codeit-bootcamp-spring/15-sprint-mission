@@ -48,7 +48,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public List<Message> findallByChannelId(UUID channelId){
+    public List<Message> findAllByChannelId(UUID channelId){
         return messageRepository.findAllByChannelId(channelId);
     }
 
@@ -67,12 +67,18 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public void delete(UUID id) {
-        if (!messageRepository.existsById(id)) {
-            throw new NoSuchElementException("메세지 id 없음 : " + id);
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException("메시지 id 없음 : " + id));
+
+
+        if(message.getBinaryIds()!=null){
+            for(UUID entry : message.getBinaryIds()){
+                if (binaryContentRepository.existsById(entry)) {
+                    binaryContentRepository.deleteById(entry);
+                }
+            }
         }
-
-
-        binaryContentRepository.deleteByMessageId(id);
         messageRepository.deleteById(id);
 
     }
