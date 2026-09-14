@@ -18,7 +18,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     private final String dataFile;
 
-    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory:.discodeit") String fileDirectory) {
+    public FileReadStatusRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
         this.dataFile = fileDirectory + "/read_status.ser";
 
         File file = new File(dataFile);
