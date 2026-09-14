@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -83,6 +84,25 @@ public class BasicChannelService implements ChannelService {
     public List<Channel> findAll() {
         return channelRepository.findAll();
     }
+
+    @Override
+    public List<Channel> findAllByUserId(UUID userId) {
+        List<Channel> list1 = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
+        List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
+                .map(readStatus -> readStatus.getChannelId()).toList();
+        List<Channel> list2 = new ArrayList<>();
+        for(UUID id : privateChannelIdList){
+            if(channelRepository.existsById(id)){
+                list2.add(channelRepository.findById(id).get());
+            }
+        }
+
+        List<Channel> concatList = list2;
+        concatList.addAll(list1);
+
+        return concatList;
+    }
+
 
     @Override
     public Channel update(ChannelUpdateRequest channelUpdateRequest) {
