@@ -1,8 +1,8 @@
-package com.sprint.mission.discodeit.Basic;
+package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.repository.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -65,3 +65,4 @@ public class BasicChannelService implements ChannelService {
         channelRepository.delete(id);
     }
 }
+
