@@ -1,0 +1,10 @@
+discodeit:
+  repository:
+    type: jcf
+    file-directory: .discodeit
+
+    ##discodeit:
+    #  repository:
+    #    type: file
+    #    file-directory: .discodeit
+    ## 파일로 테스트 할 경우의 경로

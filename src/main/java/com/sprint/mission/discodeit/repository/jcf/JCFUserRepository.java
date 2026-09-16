@@ -2,12 +2,18 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "jcf",
+        matchIfMissing = true
+)
 public class JCFUserRepository implements UserRepository {
 
     private final Map<UUID, User> data;
@@ -25,9 +31,9 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public User findById(UUID id) {
+    public Optional<User> findById(UUID id) {
 
-        return data.get(id);
+        return Optional.ofNullable(data.get(id));
     }
 
     @Override
@@ -37,8 +43,19 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public void deleteById(UUID id) {
+    public boolean existsById(UUID id) {
+        return data.containsKey(id);
+    }
 
+    @Override
+    public void deleteById(UUID id) {
         data.remove(id);
+    }
+
+    @Override
+    public Optional<User> findByName(String username) {
+        return findAll().stream()
+                .filter(user -> user.getName().equals(username))
+                .findFirst();
     }
 }

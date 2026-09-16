@@ -2,25 +2,55 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
+@Repository
+@ConditionalOnProperty(
+        prefix = "discodeit.repository",
+        name = "type",
+        havingValue = "file"
+)
 public class FileChannelRepository implements ChannelRepository {
 
-    private static final String FILE_PATH = "channels.ser";
+    private final Path filePath;
+
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:.discodeit}")
+            String fileDirectory
+    ) {
+        this.filePath = Path.of(
+                fileDirectory,
+                "channels.ser"
+        );
+    }
 
 
     private void saveAll(List<Channel> channels) {
 
-        try (
-                FileOutputStream fos = new FileOutputStream(FILE_PATH);
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
+        try {
 
-            oos.writeObject(channels);
+            // 저장 폴더가 없으면 생성
+            Files.createDirectories(filePath.getParent());
+
+            try (
+                    FileOutputStream fos =
+                            new FileOutputStream(filePath.toFile());
+                    ObjectOutputStream oos =
+                            new ObjectOutputStream(fos)
+            ) {
+
+                oos.writeObject(channels);
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -31,15 +61,17 @@ public class FileChannelRepository implements ChannelRepository {
     @SuppressWarnings("unchecked")
     private List<Channel> loadAll() {
 
-        File file = new File(FILE_PATH);
+        File file = filePath.toFile();
 
         if (!file.exists()) {
             return new ArrayList<>();
         }
 
         try (
-                FileInputStream fis = new FileInputStream(FILE_PATH);
-                ObjectInputStream ois = new ObjectInputStream(fis)
+                FileInputStream fis =
+                        new FileInputStream(file);
+                ObjectInputStream ois =
+                        new ObjectInputStream(fis)
         ) {
 
             return (List<Channel>) ois.readObject();
@@ -77,23 +109,36 @@ public class FileChannelRepository implements ChannelRepository {
 
 
     @Override
-    public Channel findById(UUID id) {
+    public Optional<Channel> findById(UUID id) {
 
         for (Channel channel : loadAll()) {
 
             if (channel.getId().equals(id)) {
-                return channel;
+                return Optional.of(channel);
             }
         }
 
-        return null;
+        return Optional.empty();
     }
 
 
     @Override
     public List<Channel> findAll() {
-
         return loadAll();
+    }
+
+
+    @Override
+    public boolean existsById(UUID id) {
+
+        for (Channel channel : loadAll()) {
+
+            if (channel.getId().equals(id)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
 
@@ -102,7 +147,9 @@ public class FileChannelRepository implements ChannelRepository {
 
         List<Channel> channels = new ArrayList<>(loadAll());
 
-        channels.removeIf(channel -> channel.getId().equals(id));
+        channels.removeIf(
+                channel -> channel.getId().equals(id)
+        );
 
         saveAll(channels);
     }
