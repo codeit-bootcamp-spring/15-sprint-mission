@@ -10,4 +10,6 @@ public interface UserRepository {
     User read(UUID userId);
     List<User> readAll();
     void delete(UUID userId);
+    boolean existsByUserName(String userName);
+    boolean existsByEmail(String email);
 }

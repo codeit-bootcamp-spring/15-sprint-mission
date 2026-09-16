@@ -1,32 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import java.util.UUID;
+
+@Getter
 public class User extends Common {
     private String userName;
     private String email;
     private String password;
+    private UUID profileId;
 
-    public User(String userName, String email, String password) {
+    public User(String userName, String email, String password, UUID profileId) {
         this.userName = userName;
         this.email = email;
         this.password = password;
+        this.profileId = profileId;
     }
 
-    public String getUserName() {
-        return userName;
-    }
+    public void update(String userName, String email, String password, UUID profileId) {
+        if (userName != null) {
+            this.userName = userName;
+        }
 
-    public String getEmail() {
-        return email;
-    }
+        if (email != null) {
+            this.email = email;
+        }
 
-    public String getPassword() {
-        return password;
-    }
+        if (password != null) {
+            this.password = password;
+        }
 
-    public void update(String userName, String email, String password) {
-        this.userName = userName;
-        this.email = email;
-        this.password = password;
+        if (profileId != null) {
+            this.profileId = profileId;
+        }
 
         updateUpdatedAt();
     }
