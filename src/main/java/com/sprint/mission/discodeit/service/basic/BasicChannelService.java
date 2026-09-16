@@ -59,7 +59,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelResponse> readAllByUserId(UUID userId) {
-        return channelRepository.readAllByUserId(userId).stream()
+        return channelRepository.readAll().stream()
+                .filter(channel -> isVisibleToUser(channel, userId))
                 .map(this::toResponse)
                 .toList();
     }
@@ -93,6 +94,15 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteAllByChannelId(channelId);
 
         channelRepository.delete(channelId);
+    }
+
+    // PUBLIC 채널은 전부 볼 수 있고, PRIVATE 채널은 참여자만 볼 수 있음
+    private boolean isVisibleToUser(Channel channel, UUID userId) {
+        if (channel.getChannelType() == ChannelType.PUBLIC) {
+            return true;
+        }
+        return readStatusRepository.readAllByChannelId(channel.getId()).stream()
+                .anyMatch(readStatus -> readStatus.getUserId().equals(userId));
     }
 
     private ChannelResponse toResponse(Channel channel) {

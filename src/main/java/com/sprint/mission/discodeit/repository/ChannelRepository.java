@@ -9,6 +9,5 @@ public interface ChannelRepository {
     Channel save(Channel channel);
     Channel read(UUID channelId);
     List<Channel> readAll();
-    List<Channel> readAllByUserId(UUID userId);
     void delete(UUID channelId);
 }
