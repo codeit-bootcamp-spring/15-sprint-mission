@@ -2,17 +2,24 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.service.jcf.JCFUserService;
+import lombok.val;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+//import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        name = "discodeit.repository.type",
+        havingValue = "jcf",
+        matchIfMissing = true
+)
 public class JCFUserRepository implements UserRepository {
-    final Map<UUID, User> data = new HashMap<>();
+    private final Map<UUID, User> data = new HashMap<>();
 
-    private final static JCFUserRepository instance = new JCFUserRepository();
-    private JCFUserRepository() { }
-    public static JCFUserRepository getInstance() {
-        return instance;
+    public JCFUserRepository(){
     }
 
 
@@ -28,6 +35,12 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByName(String name){
+        Optional<User> findUser = data.values().stream().filter(user -> user.getName().equals(name)).findFirst();
+        return findUser;
+    }
+
+    @Override
     public List<User> findAll() {
         return data.values().stream().toList();
     }
@@ -36,4 +49,11 @@ public class JCFUserRepository implements UserRepository {
     public void deleteById(UUID id) {
         this.data.remove(id);
     }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
+    }
+
+
 }

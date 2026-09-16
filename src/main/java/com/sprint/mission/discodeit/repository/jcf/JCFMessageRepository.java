@@ -2,17 +2,23 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        name = "discodeit.repository.type",
+        havingValue = "jcf",
+        matchIfMissing = true
+)
 public class JCFMessageRepository implements MessageRepository {
 
-    final Map<UUID, Message> data = new HashMap<>();
+    private final Map<UUID, Message> data = new HashMap<>();
 
-    private final static JCFMessageRepository instance = new JCFMessageRepository();
-    private JCFMessageRepository() { }
-    public static JCFMessageRepository getInstance() {
-        return instance;
+    public JCFMessageRepository(){
     }
 
 
@@ -28,6 +34,19 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
+    public List<Message> findAllByChannelId(UUID channelId) {
+        List<Message> messageList = new ArrayList<>();
+
+        for (Message entry : findAll()){
+            if(entry.getChannelId().equals(channelId)){
+                messageList.add(entry);
+            }
+        }
+
+        return messageList;
+    }
+
+    @Override
     public List<Message> findAll() {
         return data.values().stream().toList();
     }
@@ -35,5 +54,10 @@ public class JCFMessageRepository implements MessageRepository {
     @Override
     public void deleteById(UUID id) {
         this.data.remove(id);
+    }
+
+    @Override
+    public boolean existsById(UUID id) {
+        return this.data.containsKey(id);
     }
 }
