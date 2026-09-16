@@ -1,62 +1,175 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageDto;
+import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Service
+@RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
     private final MessageRepository messageRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
-    public BasicMessageService(MessageRepository messageRepository,
-                               UserRepository userRepository,
-                               ChannelRepository channelRepository) {
-        this.messageRepository = messageRepository;
-        this.userRepository = userRepository;
-        this.channelRepository = channelRepository;
+    @Override
+    public MessageDto create(MessageCreateRequest request) {
+
+        userRepository.findById(request.authorId())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 작성자입니다. ID: " + request.authorId()
+                        )
+                );
+
+        channelRepository.findById(request.channelId())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 채널입니다. ID: " + request.channelId()
+                        )
+                );
+
+        List<UUID> attachmentIds;
+
+        if (request.attachments() == null) {
+            attachmentIds = List.of();
+        } else {
+            attachmentIds = request.attachments().stream()
+                    .map(attachmentRequest -> {
+                        BinaryContent binaryContent = new BinaryContent(
+                                attachmentRequest.fileName(),
+                                attachmentRequest.contentType(),
+                                attachmentRequest.bytes()
+                        );
+
+                        return binaryContentRepository
+                                .save(binaryContent)
+                                .getId();
+                    })
+                    .toList();
+        }
+
+        Message message = new Message(
+                request.content(),
+                request.channelId(),
+                request.authorId(),
+                attachmentIds
+        );
+
+        Message savedMessage = messageRepository.save(message);
+
+        return new MessageDto(
+                savedMessage.getId(),
+                savedMessage.getContent(),
+                savedMessage.getChannelId(),
+                savedMessage.getAuthorId(),
+                savedMessage.getAttachmentIds(),
+                savedMessage.getCreatedAt(),
+                savedMessage.getUpdatedAt()
+        );
     }
 
     @Override
-    public Message create(String content, UUID channelId, UUID authorId) {
-        // 메시지 생성 전 외래 키 참조 검증 (비즈니스 로직)
-        userRepository.findById(authorId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 작성자입니다. ID: " + authorId));
+    public MessageDto find(UUID id) {
+
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 메시지입니다. ID: " + id
+                        )
+                );
+
+        return new MessageDto(
+                message.getId(),
+                message.getContent(),
+                message.getChannelId(),
+                message.getAuthorId(),
+                message.getAttachmentIds(),
+                message.getCreatedAt(),
+                message.getUpdatedAt()
+        );
+    }
+
+    @Override
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
+
         channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 채널입니다. ID: " + channelId));
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 채널입니다. ID: " + channelId
+                        )
+                );
 
-        Message message = new Message(content, channelId, authorId);
-        return messageRepository.save(message);
+        return messageRepository.findAllByChannelId(channelId)
+                .stream()
+                .map(message ->
+                        new MessageDto(
+                                message.getId(),
+                                message.getContent(),
+                                message.getChannelId(),
+                                message.getAuthorId(),
+                                message.getAttachmentIds(),
+                                message.getCreatedAt(),
+                                message.getUpdatedAt()
+                        )
+                )
+                .toList();
     }
 
     @Override
-    public Message find(UUID id) {
-        return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 메시지입니다. ID: " + id));
-    }
+    public MessageDto update(MessageUpdateRequest request) {
 
-    @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
-    }
+        Message message = messageRepository.findById(request.id())
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 메시지입니다. ID: " + request.id()
+                        )
+                );
 
-    @Override
-    public Message update(UUID id, String content) {
-        Message message = find(id);
-        message.update(content);
-        return messageRepository.save(message);
+        message.update(request.content());
+
+        Message savedMessage = messageRepository.save(message);
+
+        return new MessageDto(
+                savedMessage.getId(),
+                savedMessage.getContent(),
+                savedMessage.getChannelId(),
+                savedMessage.getAuthorId(),
+                savedMessage.getAttachmentIds(),
+                savedMessage.getCreatedAt(),
+                savedMessage.getUpdatedAt()
+        );
     }
 
     @Override
     public void delete(UUID id) {
-        find(id); // 존재 여부 검증
+
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() ->
+                        new NoSuchElementException(
+                                "존재하지 않는 메시지입니다. ID: " + id
+                        )
+                );
+
+        message.getAttachmentIds()
+                .forEach(binaryContentRepository::deleteById);
+
         messageRepository.deleteById(id);
     }
+
 }
