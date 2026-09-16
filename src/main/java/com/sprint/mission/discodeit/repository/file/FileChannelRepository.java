@@ -2,46 +2,74 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
+@Repository
+@ConditionalOnProperty(prefix = "discodeit.repository", name = "type", havingValue = "file")
 public class FileChannelRepository implements ChannelRepository, Serializable {
     private final Path path;
 
-    public FileChannelRepository() {
-        Path parentPath = Paths.get("data");
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory}") String directory) {
+        path = Paths.get(directory, "channels");
         try {
-            Files.createDirectory(parentPath);
-        } catch (FileAlreadyExistsException ignored) {
-
+            Files.createDirectories(path);
         }
         catch (NoSuchFileException e) {
             System.out.println("폴더 경로가 없음");
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        path = Paths.get("data\\channels");
-
-        try {
-            Files.createDirectory(path);
-            System.out.println("[초기화 단계] user 데이터 저장을 위한 디렉토리가 생성되었습니다.");
-        } catch (FileAlreadyExistsException ignored) {
-
-        }
-        catch (NoSuchFileException e) {
-            System.out.println("폴더 경로가 없음");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
     }
 
     @Override
-    public List<Channel> readAll() {
+    public boolean create(Channel channel) {
+        Path filePath = path.resolve("channel-" + channel.getId() + ".ser");
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(filePath.toFile())
+        )) {
+            oos.writeObject(channel);
+            System.out.println("["+ channel.getName() + "] 채널 저장 완료");
+            return true;
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    @Override
+    public Channel find(UUID id) {
+        List<Channel> channels = this.findAll();
+        for (Channel channel: channels) {
+            if (channel.getId().equals(id)) return channel;
+        }
+
+        return null;
+    }
+
+    @Override
+    public Channel findByChannelName(String channelName) {
+        List<Channel> channels = this.findAll();
+        for (Channel channel: channels) {
+            if (channel.getName().equals(channelName)) return channel;
+        }
+
+        return null;
+    }
+
+    @Override
+    public List<Channel> findAll() {
         File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
         List<Channel> result = new ArrayList<>();
 
@@ -64,28 +92,13 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
         return result;
     }
 
-    @Override
-    public boolean create(Channel channel) {
-        //중복 검사는 여기서 안한다고 일단 생각하자.
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream("data\\channels\\channel-" + channel.getId() + ".ser")
-        )) {
-            oos.writeObject(channel);
-            System.out.println("["+ channel.getChannelName() + "] 채널 저장 완료");
-            return true;
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return false;
-    }
-
 
     @Override
     public boolean update(Channel channel) {
-        try (
-                ObjectOutputStream oos = new ObjectOutputStream(
-                        new FileOutputStream("data\\channels\\channel-" + channel.getId() + ".ser")
-                ))
+        Path filePath = path.resolve("channel-" + channel.getId() + ".ser");
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(
+                new FileOutputStream(filePath.toFile())))
         {
             oos.writeObject(channel);
             return true;
@@ -96,8 +109,10 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
     }
 
     @Override
-    public boolean delete(Channel channel) {
-        File file = new File("data\\channels\\channel-" + channel.getId() + ".ser");
+    public boolean delete(UUID id) {
+        Path filePath = path.resolve("channel-" + id + ".ser");
+
+        File file = new File(filePath.toUri());
         return file.exists() && file.delete();
     }
 }

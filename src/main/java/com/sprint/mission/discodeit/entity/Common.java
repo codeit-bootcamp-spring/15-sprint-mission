@@ -1,48 +1,29 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.UUID;
 
+@Getter
 public class Common implements Serializable {
-    private UUID id;
-    private Long createdAt, updatedAt;
+    private final UUID id;
+    @Setter
+    private Instant createdAt;
+    // 서로 의존 관계로 한번에 업데이트가 되는 경우 업데이트 시각 동기화.
+    @Setter
+    private Instant updatedAt;
 
 
     public Common() {
         this.id = UUID.randomUUID();
-        this.createdAt = System.currentTimeMillis();
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public void setId(UUID id) {
-        this.id = id;
-    }
-
-    public Long getCreatedAt() {
-        return createdAt;
-    }
-
-    public void autoSetCreatedAt() {
-        this.createdAt = System.currentTimeMillis();
-    }
-
-    public Long getUpdatedAt() {
-        return updatedAt;
+        this.createdAt = Instant.now();
+        this.updatedAt = Instant.now();
     }
 
     public void autoSetUpdatedAt() {
-        this.updatedAt = System.currentTimeMillis();
-    }
-
-    public void setCreatedAt(Long createdAt) {
-        this.createdAt = createdAt;
-    }
-
-    public void setUpdatedAt(Long updatedAt) {
-        this.updatedAt = updatedAt;
+        this.updatedAt = Instant.now();
     }
 }
