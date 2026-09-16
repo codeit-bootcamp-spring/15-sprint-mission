@@ -18,26 +18,27 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicMessageService;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import org.springframework.boot.SpringApplication;
+import org.springframework.context.ApplicationContext;
 
 import java.util.List;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        System.out.println("========== JCF Repository 기반 테스트 ==========\n");
-        runScenario(new JCFUserRepository(), new JCFChannelRepository(), new JCFMessageRepository());
+        ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
+/*
+        // System.out.println("**(())"+Instant.now().atZone(ZoneId.of("Asia/Seoul")));
 
-        System.out.println("\n========== File Repository 기반 테스트 ==========\n");
-        runScenario(new FileUserRepository(), new FileChannelRepository(), new FileMessageRepository());
+        UserService userService = context.getBean(UserService.class);
+        ChannelService channelService = context.getBean(ChannelService.class);
+        MessageService messageService = context.getBean(MessageService.class);
+        runScenario(userService, channelService, messageService);
     }
 
-    static void runScenario(UserRepository userRepository,ChannelRepository channelRepository,MessageRepository messageRepository) {
-
-        UserService userService = new BasicUserService(userRepository);
-        ChannelService channelService = new BasicChannelService(channelRepository, userRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+    static void runScenario(UserService userService, ChannelService channelService, MessageService messageService) {
 
         // 유저 생성
-        User user01 = userService.createUser("userNickName01");
+        User user01 = userService.createUser("userNickName01","user01@naver.com","user01","user01password");
         System.out.println("<< 최초 생성한 유저1 정보 >> \n" + user01 + "\n");
 
         // 유저1 닉네임 변경 후 출력
@@ -45,9 +46,9 @@ public class JavaApplication {
         System.out.println("<< 최초 생성한 유저1 닉네임 변경 후 >>\n" + userService.getUser(user01.getId()) + "\n");
 
         // 유저2, 3, 4 추가 후 전체 출력
-        User user02 = userService.createUser("userNickName02");
-        User user03 = userService.createUser("userNickName03");
-        User user04 = userService.createUser("userNickName04");
+        User user02 = userService.createUser("userNickName02","user02@naver.com","user02","user02password");
+        User user03 = userService.createUser("userNickName03","user03@naver.com","user03","user03password");
+        User user04 = userService.createUser("userNickName04","user04@naver.com","user04","user04password");
         List<User> allUser01 = userService.getUserAll();
         System.out.println("<< 유저2, 3, 4 추가 후 유저 전체 출력 >>");
         allUser01.forEach(System.out::println);
@@ -128,6 +129,8 @@ public class JavaApplication {
             messageService.createMessage(java.util.UUID.randomUUID(), user01.getId(), "존재하지 않는 채널 테스트");
         } catch (IllegalArgumentException e) {
             System.out.println("\n<< 존재하지 않는 채널로 메세지 생성 시 예외 발생 확인 >>\n" + e.getMessage());
-        }
+        }*/
     }
 }
+
+

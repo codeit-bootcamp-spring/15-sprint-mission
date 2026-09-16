@@ -1,57 +1,22 @@
 package com.sprint.mission.discodeit.entity;
-
-import java.io.Serializable;
-import java.util.UUID;
-
-public class Message implements Serializable {
-
-    private static final long serialVersionUID = 1L;
-
-    private final UUID id;
-    private final Long createAt;
-    private Long updateAt;
-
-    private String contents;
+import lombok.Getter;
+import java.time.Instant;
+import java.util.*;
+@Getter
+public class Message extends Common {
     private final UUID channelId;
     private final UUID authorId;
-
-    public Message(UUID channelId, UUID authorId, String contents){
-        this.id = UUID.randomUUID();
-        this.createAt = System.currentTimeMillis();
-        this.updateAt = this.createAt;
-        this.authorId = authorId;
+    private String content;
+    private final List<UUID> attachmentIds;
+    private Instant updatedAt = getCreatedAt();
+    public Message(UUID channelId, UUID authorId, String content, List<UUID> attachmentIds) {
         this.channelId = channelId;
-        this.contents = contents;
+        this.authorId = authorId;
+        this.content = content;
+        this.attachmentIds = List.copyOf(attachmentIds);
     }
-
-    public void update(String contents){
-        this.contents = contents;
-        this.updateAt = System.currentTimeMillis();
+    public void update(String content) {
+        this.content = content;
+        updatedAt = Instant.now();
     }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public Long getCreateAt() {
-        return createAt;
-    }
-
-    public Long getUpdateAt() {
-        return updateAt;
-    }
-
-
-    public String getContents() {
-        return contents;
-    }
-
-    public UUID getChannelId() {
-        return channelId;
-    }
-
-    public UUID getAuthorId() {
-        return authorId;
-    }
-
 }
