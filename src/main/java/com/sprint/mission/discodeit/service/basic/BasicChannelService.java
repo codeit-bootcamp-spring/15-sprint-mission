@@ -18,14 +18,13 @@ public class BasicChannelService implements ChannelService {
     private final BinaryContentRepository binaries;
 
     public ChannelResponse createPublic(PublicChannelCreateRequest request) {
-        return toResponse(channels.save(new Channel("PUBLIC", request.getName(), request.getDescription())));
+        return toResponse(channels.save(new Channel("PUBLIC", request.name(), request.description())));
     }
 
     public ChannelResponse createPrivate(PrivateChannelCreateRequest request) {
         List<UUID> ids = new ArrayList<>();
-        for (UUID id : request.getUserIds()) {
-            users.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
+        for (UUID id : request.userIds()) {
+            users.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
             if (!ids.contains(id)) {
                 ids.add(id);
             }
@@ -87,9 +86,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     public ChannelResponse update(ChannelUpdateRequest request) {
-        Channel channel = channels.findById(request.getId())
+        Channel channel = channels.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
-        channel.update(request.getName(), request.getDescription());
+        channel.update(request.name(), request.description());
         return toResponse(channels.save(channel));
     }
 

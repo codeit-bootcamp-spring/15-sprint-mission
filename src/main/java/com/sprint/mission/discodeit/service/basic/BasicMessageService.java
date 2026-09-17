@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.*;
+
 import java.util.*;
 @Service
 @RequiredArgsConstructor
@@ -13,18 +13,25 @@ public class BasicMessageService implements MessageService {
 
     private final MessageRepository messages;
     private final BinaryContentRepository binaries;
+    private final UserRepository userRepository;
+    private final ChannelRepository channelRepository;
 
     public Message create(MessageCreateRequest request, List<BinaryContentCreateRequest> attachments) {
+        if(!channelRepository.existsById(request.channelId())){
+            throw new IllegalArgumentException("존재하지 않는 채널입니다. " + request.channelId());
+        }
+        if(!userRepository.existsById(request.authorId())){
+            throw new IllegalArgumentException("존재하지 않는 유저입니다. " + request.authorId());
+        }
         List<UUID> attachmentIds = new ArrayList<>();
         if (attachments != null) {
             for (BinaryContentCreateRequest attachment : attachments) {
-                BinaryContent file = new BinaryContent(
-                        attachment.getFileName(), attachment.getContentType(), attachment.getBytes());
+                BinaryContent file = new BinaryContent(attachment.getFileName(), attachment.getContentType(), attachment.getBytes());
                 binaries.save(file);
                 attachmentIds.add(file.getId());
             }
         }
-        Message message = new Message(request.getChannelId(), request.getAuthorId(), request.getContent(), attachmentIds);
+        Message message = new Message(request.channelId(), request.authorId(), request.content(), attachmentIds);
         return messages.save(message);
     }
 
@@ -33,9 +40,9 @@ public class BasicMessageService implements MessageService {
     }
 
     public Message update(MessageUpdateRequest request) {
-        Message message = messages.findById(request.getId())
+        Message message = messages.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Message"));
-        message.update(request.getContent());
+        message.update(request.content());
         return messages.save(message);
     }
 

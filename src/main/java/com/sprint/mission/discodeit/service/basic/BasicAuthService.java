@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.*;
+
 import java.util.*;
 @Service
 @RequiredArgsConstructor
@@ -16,8 +16,8 @@ public class BasicAuthService implements AuthService {
     private final UserStatusRepository statuses;
 
     public UserResponse login(LoginRequest request) {
-        Optional<User> result = users.findByUsername(request.getUsername());
-        if (result.isEmpty() || !result.get().getPassword().equals(request.getPassword())) {
+        Optional<User> result = users.findByUsername(request.username());
+        if (result.isEmpty() || !result.get().getPassword().equals(request.password())) {
             throw new IllegalArgumentException("로그인 정보가 일치하지 않습니다.");
         }
         User user = result.get();

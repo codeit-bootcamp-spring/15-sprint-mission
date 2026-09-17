@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import java.time.*;
+
 import java.util.*;
 @Service
 @RequiredArgsConstructor
@@ -18,18 +18,18 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channels;
 
     public ReadStatus create(ReadStatusCreateRequest request) {
-        users.findById(request.getUserId())
+        users.findById(request.userId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
-        Channel channel = channels.findById(request.getChannelId())
+        Channel channel = channels.findById(request.channelId())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
 
         // 읽음 상태를 새로 만들더라도 PRIVATE의 참여자 목록은 바꾸지 않습니다.
         if ("PRIVATE".equals(channel.getType())
-                && !channel.getUserIds().contains(request.getUserId())) {
+                && !channel.getUserIds().contains(request.userId())) {
             throw new IllegalArgumentException("PRIVATE 채널의 참여자가 아닙니다.");
         }
-        if (reads.findByUserIdAndChannelId(request.getUserId(), request.getChannelId()).isPresent()) throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
-        return reads.save(new ReadStatus(request.getUserId(), request.getChannelId(), request.getLastReadAt()));
+        if (reads.findByUserIdAndChannelId(request.userId(), request.channelId()).isPresent()) throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
+        return reads.save(new ReadStatus(request.userId(), request.channelId(), request.lastReadAt()));
     }
 
     public ReadStatus find(UUID id) {
@@ -42,9 +42,9 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     public ReadStatus update(ReadStatusUpdateRequest request) {
-        ReadStatus status = find(request.getId());
+        ReadStatus status = find(request.id());
 
-        status.update(request.getLastReadAt());
+        status.update(request.lastReadAt());
         return reads.save(status);
     }
 
