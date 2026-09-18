@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import tools.jackson.databind.cfg.MapperBuilder;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +27,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-
+    private final MapperBuilder mapperBuilder;
 
 
     @Override
@@ -54,10 +55,10 @@ public class BasicChannelService implements ChannelService {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
 
-        return toChannelReadResponse(channel);
+        return toChannelFindResponse(channel);
     }
 
-    public ChannelFindResponse toChannelReadResponse(Channel channel){
+    public ChannelFindResponse toChannelFindResponse(Channel channel){
         List<UUID> memberIds = readStatusRepository.findAllByChannelId(channel.getId())
                 .stream()
                 .map(ReadStatus::getUserId)
@@ -81,12 +82,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<ChannelFindResponse> findAll() {
+        return channelRepository.findAll().stream().map(this::toChannelFindResponse).toList();
     }
 
     @Override
-    public List<Channel> findAllByUserId(UUID userId) {
+    public List<ChannelFindResponse> findAllByUserId(UUID userId) {
         List<Channel> list1 = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
         List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannelId()).toList();
@@ -97,10 +98,16 @@ public class BasicChannelService implements ChannelService {
             }
         }
 
-        List<Channel> concatList = list2;
-        concatList.addAll(list1);
+        List<Channel> concatList = new ArrayList<>();
+        List<ChannelFindResponse> resultList;
 
-        return concatList;
+        concatList.addAll(list1);
+        concatList.addAll(list2);
+
+        resultList = concatList.stream().map(this::toChannelFindResponse).toList();
+
+
+        return resultList;
     }
 
 

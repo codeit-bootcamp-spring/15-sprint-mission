@@ -69,27 +69,20 @@ public class BasicUserService implements UserService {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
 
+
+
         for (User entry : userRepository.findAll()) {
+            if (entry.getId().equals(id)) continue;
+
             if (entry.getName().equals(userUpdateRequest.name())) {
-                if(user.getName().equals(userUpdateRequest.name())){
-                    System.out.println("기존 이름 그대로");
-                }
-                else{
-                    throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
-                }
+
+                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
+
             }
-
             if (entry.getEmail().equals(userUpdateRequest.email())) {
-                if(user.getEmail().equals(userUpdateRequest.email())){
-                    System.out.println("기존 메일 그대로");
-                }
-                else{
-                    throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.email());
-                }
-
+                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.email());
             }
         }
-
         validateEmail(userUpdateRequest.email());
 
         UUID profileId = userUpdateRequest.profileId().orElse(null);
