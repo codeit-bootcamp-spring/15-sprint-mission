@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://localhost:8080/api/channels/public
+method: POST
+body:
+  type: json
+  content: |2-
+      {
+          "channelName": "여행게시판",
+          "description": "여행 기록을 남기는 공간"
+      }
+examples: .resources/공개 채널 생성.resources/examples
+order: 4501964532741783

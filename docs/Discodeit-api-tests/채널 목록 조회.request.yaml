@@ -1,0 +1,7 @@
+$kind: http-request
+url: "  http://localhost:8080/api/channels?userId=d12e0c39-6e91-4dc2-91f5-0c7e69765705"
+method: GET
+queryParams:
+  userId: d12e0c39-6e91-4dc2-91f5-0c7e69765705
+examples: .resources/채널 목록 조회.resources/examples
+order: 4503454187276304

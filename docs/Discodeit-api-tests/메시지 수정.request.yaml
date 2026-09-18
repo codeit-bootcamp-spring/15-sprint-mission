@@ -1,0 +1,11 @@
+$kind: http-request
+url: "   http://localhost:8080/api/messages/ff14a25e-ace5-4fe8-8405-83122a56b18e"
+method: PATCH
+body:
+  type: json
+  content: |2-
+       {
+           "contents": "안녕하세요! 반갑습니다. (수정됨)"
+       }
+examples: .resources/메시지 수정.resources/examples
+order: 4503598676405558

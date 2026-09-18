@@ -1,0 +1,34 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/messages
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: messageCreateRequest
+        value: '     {"contents":"안녕하세요! 반갑습니다.","channelId":"40c6b700-e7f9-43d4-b072-f5d2e1520bbc","authorId":"d12e0c39-6e91-4dc2-91f5-0c7e69765705","attachmentIds":[]}'
+        description: ""
+        disabled: false
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:48:57 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "ff14a25e-ace5-4fe8-8405-83122a56b18e",
+        "contents": "안녕하세요! 반갑습니다.",
+        "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+        "authorId": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "attachmentIds": null,
+        "createdAt": "2026-09-18T05:48:57.739251Z",
+        "updatedAt": null
+      }
+order: 1789710581824

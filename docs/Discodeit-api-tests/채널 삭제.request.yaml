@@ -1,0 +1,5 @@
+$kind: http-request
+url: "   http://localhost:8080/api/channels/9d738c8d-464f-4e70-97a1-aaab8e0637d4"
+method: DELETE
+examples: .resources/채널 삭제.resources/examples
+order: 4503599627355634

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
@@ -27,13 +29,15 @@ public class UserController {
 
     private final UserService userService;
     private final UserStatusService userStatusService;
+    private final JsonMapper jsonMapper;
 
     // 사용자 등록 (프로필 이미지는 선택)
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> create(
-            @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @RequestPart("userCreateRequest") String userCreateRequestJson,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
+        UserCreateRequest userCreateRequest = parseJson(userCreateRequestJson, UserCreateRequest.class);
         BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
         UserResponse response = userService.create(userCreateRequest, profileRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -43,9 +47,10 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> update(
             @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") String userUpdateRequestJson,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
+        UserUpdateRequest userUpdateRequest = parseJson(userUpdateRequestJson, UserUpdateRequest.class);
         BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
         UserResponse response = userService.update(userId, userUpdateRequest, profileRequest);
         return ResponseEntity.ok(response);
@@ -86,7 +91,15 @@ public class UserController {
                     profile.getBytes()
             );
         } catch (IOException e) {
-            throw new UncheckedIOException("프로필 이미지 처리 중 오류 발생", e);
+            throw new UncheckedIOException("프로필 이미지 처리 중 오류가 발생했습니다.", e);
+        }
+    }
+
+    private <T> T parseJson(String json, Class<T> type) {
+        try {
+            return jsonMapper.readValue(json, type);
+        } catch (JacksonException e) {
+            throw new IllegalArgumentException("잘못된 요청 형식입니다: " + type.getSimpleName());
         }
     }
 }

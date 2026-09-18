@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://localhost:8080/api/readStatuses
+method: POST
+body:
+  type: json
+  content: |2-
+      {
+          "userId": "10f6d460-b539-4d40-88f9-73f162d09767",
+          "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc"
+      }
+examples: .resources/메시지 수신 정보 생성.resources/examples
+order: 4503599609100389

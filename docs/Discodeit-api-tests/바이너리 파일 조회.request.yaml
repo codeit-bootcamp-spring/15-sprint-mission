@@ -1,0 +1,5 @@
+$kind: http-request
+url: "   http://localhost:8080/api/binaryContents/0eda3ceb-bbca-4556-ba79-030f594f1163"
+method: GET
+examples: .resources/바이너리 파일 조회.resources/examples
+order: 4503598463817378

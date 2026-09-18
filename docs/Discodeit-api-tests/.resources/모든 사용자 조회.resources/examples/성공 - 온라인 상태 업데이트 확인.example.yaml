@@ -1,0 +1,46 @@
+$kind: http-example
+request:
+  url: "  http://localhost:8080/api/users"
+  method: GET
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 06:17:33 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": "10f6d460-b539-4d40-88f9-73f162d09767",
+          "userName": "탱이",
+          "email": "taeng@naver.com",
+          "profileId": "e94732a2-4078-4f27-b34b-f6d50d5ad85b",
+          "online": false,
+          "createdAt": "2026-09-18T05:08:56.890663Z",
+          "updatedAt": null
+        },
+        {
+          "id": "ab3fea62-66d0-4dd2-ac53-c4c2b7c12f97",
+          "userName": "누구나",
+          "email": "anyone@naver.com",
+          "profileId": "97a10245-4598-4266-9d29-059d6b632238",
+          "online": false,
+          "createdAt": "2026-09-18T05:28:47.272096Z",
+          "updatedAt": null
+        },
+        {
+          "id": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+          "userName": "민영",
+          "email": "minyeong@naver.com",
+          "profileId": null,
+          "online": true,
+          "createdAt": "2026-09-18T05:08:04.657081Z",
+          "updatedAt": null
+        }
+      ]
+order: 2172923547337275

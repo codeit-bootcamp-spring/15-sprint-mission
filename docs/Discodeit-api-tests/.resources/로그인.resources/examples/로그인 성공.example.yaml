@@ -1,0 +1,33 @@
+$kind: http-example
+request:
+  url: "  http://localhost:8080/api/auth/login"
+  method: POST
+  body:
+    type: json
+    content: |2-
+        {
+            "userName": "민영",
+            "password": "1234a"
+        }
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:15:15 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "userName": "민영",
+        "email": "minyeong@naver.com",
+        "password": "1234a",
+        "profileId": null,
+        "createdAt": "2026-09-18T05:08:04.657081Z",
+        "id": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "updatedAt": null
+      }
+order: 1789708564803

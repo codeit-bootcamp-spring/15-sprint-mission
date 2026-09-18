@@ -1,0 +1,15 @@
+$kind: http-example
+request:
+  url: "   http://localhost:8080/api/messages/0a9c208f-61ac-41b6-9e0c-726988f18df7"
+  method: DELETE
+response:
+  statusCode: 204
+  statusText: ""
+  headers:
+    date: Fri, 18 Sep 2026 06:19:42 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: text
+    content: ""
+order: 1789712415708

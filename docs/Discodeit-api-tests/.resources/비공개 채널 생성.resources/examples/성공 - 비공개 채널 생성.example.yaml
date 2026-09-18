@@ -1,0 +1,39 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/channels/private
+  method: POST
+  body:
+    type: json
+    content: |2-
+         {
+             "participantIds": [
+                 "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+                 "10f6d460-b539-4d40-88f9-73f162d09767"
+             ]
+         }
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:22:42 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "9d738c8d-464f-4e70-97a1-aaab8e0637d4",
+        "channelName": null,
+        "description": null,
+        "channelType": "PRIVATE",
+        "lastMessageAt": null,
+        "participantIds": [
+          "10f6d460-b539-4d40-88f9-73f162d09767",
+          "d12e0c39-6e91-4dc2-91f5-0c7e69765705"
+        ],
+        "createdAt": "2026-09-18T05:22:42.366528Z",
+        "updatedAt": null
+      }
+order: 1789709009303

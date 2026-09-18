@@ -1,0 +1,11 @@
+$kind: http-request
+url: "   http://localhost:8080/api/readStatuses/98baf811-35b7-4d27-ad98-2067bfdcb5a6"
+method: PATCH
+body:
+  type: json
+  content: |2-
+       {
+           "lastReadAt": "2026-09-18T06:15:00Z"
+       }
+examples: .resources/메시지 수신 정보 수정.resources/examples
+order: 4503599619707413

@@ -1,0 +1,42 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/messages
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: messageCreateRequest
+        value: '     {"contents":"사진 첨부해봅니다.","channelId":"40c6b700-e7f9-43d4-b072-f5d2e1520bbc","authorId":"d12e0c39-6e91-4dc2-91f5-0c7e69765705","attachmentIds":[]}'
+        description: ""
+        disabled: false
+      - type: file
+        key: attachments
+        src:
+          - /Users/seongmin-yeong/Desktop/탱이2.png
+        description: ""
+        disabled: false
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:51:52 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "0a9c208f-61ac-41b6-9e0c-726988f18df7",
+        "contents": "사진 첨부해봅니다.",
+        "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+        "authorId": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "attachmentIds": [
+          "0eda3ceb-bbca-4556-ba79-030f594f1163"
+        ],
+        "createdAt": "2026-09-18T05:51:52.159099Z",
+        "updatedAt": null
+      }
+order: 1055023006691161

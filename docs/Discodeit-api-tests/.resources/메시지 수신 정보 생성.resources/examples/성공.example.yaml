@@ -1,0 +1,32 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/readStatuses
+  method: POST
+  body:
+    type: json
+    content: |2-
+        {
+            "userId": "10f6d460-b539-4d40-88f9-73f162d09767",
+            "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc"
+        }
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 06:08:40 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "userId": "10f6d460-b539-4d40-88f9-73f162d09767",
+        "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+        "lastReadAt": null,
+        "createdAt": "2026-09-18T06:08:40.693745Z",
+        "id": "98baf811-35b7-4d27-ad98-2067bfdcb5a6",
+        "updatedAt": null
+      }
+order: 1789711754639

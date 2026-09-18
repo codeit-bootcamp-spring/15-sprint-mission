@@ -1,0 +1,5 @@
+$kind: http-request
+url: "   http://localhost:8080/api/users/ab3fea62-66d0-4dd2-ac53-c4c2b7c12f97"
+method: DELETE
+examples: .resources/사용자 삭제.resources/examples
+order: 4503599627358229

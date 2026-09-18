@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:8080/api/users
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: userCreateRequest
+      value: '  {"userName":"누구나","email":"anyone@naver.com","password":"777"}'
+      description: ""
+      disabled: false
+    - type: file
+      key: profile
+      src:
+        - /Users/seongmin-yeong/Desktop/탱이.png
+      description: ""
+      disabled: false
+examples: .resources/사용자 등록.resources/examples
+order: 1789708016493

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.controller;
 
+import tools.jackson.core.JacksonException;
+import tools.jackson.databind.json.JsonMapper;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
@@ -26,13 +28,15 @@ public class MessageController {
 
     private final MessageService messageService;
     private final BinaryContentService binaryContentService;
+    private final JsonMapper jsonMapper;
 
     // 메시지 전송
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageResponse> create(
-            @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart("messageCreateRequest") String messageCreateRequestJson,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ) {
+        MessageCreateRequest messageCreateRequest = parseJson(messageCreateRequestJson, MessageCreateRequest.class);
         List<UUID> attachmentIds = resolveAttachmentIds(attachments);
 
         MessageCreateRequest requestWithAttachments = new MessageCreateRequest(
@@ -90,6 +94,14 @@ public class MessageController {
             );
         } catch (IOException e) {
             throw new UncheckedIOException("첨부파일 처리 중 오류 발생", e);
+        }
+    }
+
+    private <T> T parseJson(String json, Class<T> type) {
+        try {
+            return jsonMapper.readValue(json, type);
+        } catch (JacksonException e) {
+            throw new IllegalArgumentException("잘못된 요청 형식" + type.getSimpleName());
         }
     }
 }

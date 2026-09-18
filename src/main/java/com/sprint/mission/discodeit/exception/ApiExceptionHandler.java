@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
 import java.util.NoSuchElementException;
 
@@ -38,5 +39,12 @@ public class ApiExceptionHandler {
         log.error("예상하지 못한 서버 오류", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                 .body(ErrorResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, "서버 내부 오류가 발생했습니다."));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSize(MaxUploadSizeExceededException e) {
+        log.warn("업로드 파일 크기 초과: {}", e.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(ErrorResponse.of(HttpStatus.BAD_REQUEST, "업로드 가능한 파일 크기를 초과했습니다."));
     }
 }

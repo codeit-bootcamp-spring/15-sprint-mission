@@ -1,0 +1,39 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/users
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: userCreateRequest
+        value: '  {"userName":"민영","email":"minyeong@naver.com","password":"1234a"}'
+        description: ""
+        disabled: false
+      - type: file
+        key: profile
+        src: []
+        description: ""
+        disabled: false
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:08:04 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "userName": "민영",
+        "email": "minyeong@naver.com",
+        "profileId": null,
+        "online": true,
+        "createdAt": "2026-09-18T05:08:04.657081Z",
+        "updatedAt": null
+      }
+order: 1789708107174
