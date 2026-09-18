@@ -88,21 +88,21 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelFindResponse> findAllByUserId(UUID userId) {
-        List<Channel> list1 = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
+        List<Channel> publicChannels = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
         List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannelId()).toList();
-        List<Channel> list2 = new ArrayList<>();
+        List<Channel> PrivateChannels = new ArrayList<>();
         for(UUID id : privateChannelIdList){
             if(channelRepository.existsById(id)){
-                list2.add(channelRepository.findById(id).get());
+                PrivateChannels.add(channelRepository.findById(id).get());
             }
         }
 
         List<Channel> concatList = new ArrayList<>();
         List<ChannelFindResponse> resultList;
 
-        concatList.addAll(list1);
-        concatList.addAll(list2);
+        concatList.addAll(publicChannels);
+        concatList.addAll(PrivateChannels);
 
         resultList = concatList.stream().map(this::toChannelFindResponse).toList();
 
