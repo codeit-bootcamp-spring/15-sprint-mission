@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.UserDto.UserFindRequest;
+import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
 import com.sprint.mission.discodeit.dto.UserDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -75,7 +75,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserFindRequest find(UUID id) {
+    public UserFindResponse find(UUID id) {
 
         User user = userRepository.findById(id).orElse(null);
 
@@ -88,7 +88,7 @@ public class BasicUserService implements UserService {
 
         boolean online = status != null && status.isOnline();
 
-        return new UserFindRequest(
+        return new UserFindResponse(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
@@ -100,10 +100,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<UserFindRequest> findAll() {
+    public List<UserFindResponse> findAll() {
 
         List<User> users = userRepository.findAll();
-        List<UserFindRequest> result = new ArrayList<>();
+        List<UserFindResponse> result = new ArrayList<>();
 
         for (User user : users) {
 
@@ -112,7 +112,7 @@ public class BasicUserService implements UserService {
 
             boolean online = status != null && status.isOnline();
 
-            result.add(new UserFindRequest(
+            result.add(new UserFindResponse(
                     user.getId(),
                     user.getCreatedAt(),
                     user.getUpdatedAt(),

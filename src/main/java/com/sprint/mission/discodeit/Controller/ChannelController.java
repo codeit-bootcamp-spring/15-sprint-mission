@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.Controller;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindRequest;
+import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindResponse;
 import com.sprint.mission.discodeit.dto.ChannelDto.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PublicChannelCreateRequest;
@@ -53,7 +53,7 @@ public class ChannelController {
 
     // 특정 사용자가 볼 수 있는 채널 목록 조회
     @RequestMapping(method = RequestMethod.GET)
-    public List<ChannelFindRequest> findAllByUserId(
+    public List<ChannelFindResponse> findAllByUserId(
             @RequestParam("userId") UUID userId
     ) {
 

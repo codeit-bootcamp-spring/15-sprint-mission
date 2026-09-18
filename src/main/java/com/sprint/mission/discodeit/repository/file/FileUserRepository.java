@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Path;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -35,13 +36,16 @@ public class FileUserRepository implements UserRepository {
 
 
     private void saveAll(List<User> users) {
+        try {
+            // .discodeit 폴더가 없으면 생성
+            Files.createDirectories(filePath.getParent());
 
-        try (
-                FileOutputStream fos = new FileOutputStream(filePath.toFile());
-                ObjectOutputStream oos = new ObjectOutputStream(fos)
-        ) {
-
-            oos.writeObject(users);
+            try (
+                    FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                    ObjectOutputStream oos = new ObjectOutputStream(fos)
+            ) {
+                oos.writeObject(users);
+            }
 
         } catch (IOException e) {
             throw new RuntimeException(e);

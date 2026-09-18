@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.Controller;
 
 import com.sprint.mission.discodeit.dto.UserDto.LoginRequest;
-import com.sprint.mission.discodeit.dto.UserDto.UserFindRequest;
+import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -25,7 +25,7 @@ public class AuthController {
             path = "/login",
             method = RequestMethod.POST
     )
-    public UserFindRequest login(
+    public UserFindResponse login(
             @RequestBody LoginRequest request
     ) {
 

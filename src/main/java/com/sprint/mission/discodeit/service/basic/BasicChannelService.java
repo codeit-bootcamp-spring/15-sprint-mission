@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindRequest;
+import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindResponse;
 import com.sprint.mission.discodeit.dto.ChannelDto.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PublicChannelCreateRequest;
@@ -88,7 +88,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelFindRequest find(UUID id) {
+    public ChannelFindResponse find(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() ->
                         new IllegalArgumentException("채널이 없습니다."));
@@ -97,7 +97,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelFindRequest> findAllByUserId(UUID userId) {
+    public List<ChannelFindResponse> findAllByUserId(UUID userId) {
         if (userId == null) {
             throw new IllegalArgumentException("사용자 ID가 필요합니다.");
         }
@@ -144,7 +144,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(id);
     }
 
-    private ChannelFindRequest toDto(Channel channel) {
+    private ChannelFindResponse toDto(Channel channel) {
         Instant lastMessageAt = messageRepository
                 .findAllByChannelId(channel.getId())
                 .stream()
@@ -162,7 +162,7 @@ public class BasicChannelService implements ChannelService {
                         .toList()
                         : List.of();
 
-        return new ChannelFindRequest(
+        return new ChannelFindResponse(
                 channel.getId(),
                 channel.getOwnerId(),
                 channel.getChannelName(),

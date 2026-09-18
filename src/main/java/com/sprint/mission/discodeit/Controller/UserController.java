@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.Controller;
 
 import com.sprint.mission.discodeit.dto.BinaryContentRequest.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.UserDto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto.UserFindRequest;
+import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
 import com.sprint.mission.discodeit.dto.UserDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.UserStatusDto.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
@@ -30,7 +30,7 @@ public class UserController {
 
     // 사용자 등록
     @RequestMapping(method = RequestMethod.POST)
-    public UserFindRequest create(
+    public UserFindResponse create(
             @RequestBody UserCreateApiRequest request
     ) {
 
@@ -45,7 +45,7 @@ public class UserController {
 
     // 모든 사용자 조회
     @RequestMapping(method = RequestMethod.GET)
-    public List<UserFindRequest> findAll() {
+    public List<UserFindResponse> findAll() {
 
         return userService.findAll();
     }
@@ -56,7 +56,7 @@ public class UserController {
             path = "/{userId}",
             method = RequestMethod.PATCH
     )
-    public UserFindRequest update(
+    public UserFindResponse update(
             @PathVariable("userId") UUID userId,
             @RequestBody UserUpdateApiRequest request
     ) {
