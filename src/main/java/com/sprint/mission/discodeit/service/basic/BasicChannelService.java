@@ -119,6 +119,17 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
+    public List<ChannelFindResponse> findAllPublic() {
+        return channelRepository.findAll().stream()
+                .filter(channel ->
+                        channel.getType() == ChannelType.PUBLIC)
+                .map(this::toDto)
+                .toList();
+
+    }
+    
+
+    @Override
     public List<ChannelFindResponse> findAllByUserId(UUID userId) {
         if (userId == null) {
             throw new IllegalArgumentException("사용자 ID가 필요합니다.");

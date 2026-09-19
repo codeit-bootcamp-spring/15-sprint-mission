@@ -17,7 +17,7 @@ public interface ChannelService {
     // PRIVATE 채널 생성
     Channel createPrivate(PrivateChannelCreateRequest request);
 
-    // 채널 하나 조회
+    // 특정 userID채널 조회
     ChannelFindResponse find(UUID id);
 
     // 특정 유저가 볼 수 있는 채널 전체 조회
@@ -28,4 +28,7 @@ public interface ChannelService {
 
     // 채널 삭제
     void delete(UUID id);
+
+    // 채널 조회
+    List<ChannelFindResponse> findAllPublic();
 }

@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -50,13 +49,17 @@ public class ChannelController {
         return channelService.createPrivate(request);
     }
 
+    // 공개 채널 전체 조회
+    @RequestMapping
+    public List<ChannelFindResponse> findAllPublic() {
+        return channelService.findAllPublic();
+    }
 
-    // 특정 사용자가 볼 수 있는 채널 목록 조회
-    @RequestMapping(method = RequestMethod.GET)
+    // 특정 사용자가 볼 수 있는 채널 조회
+    @RequestMapping("/users/{userId}")
     public List<ChannelFindResponse> findAllByUserId(
-            @RequestParam("userId") UUID userId
+            @PathVariable UUID userId
     ) {
-
         return channelService.findAllByUserId(userId);
     }
 
