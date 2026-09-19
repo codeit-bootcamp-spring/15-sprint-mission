@@ -15,14 +15,13 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class ChannelResponse implements Serializable {
     private static final long serialVersionUID = 1L;
-    private UUID id;
+    private final UUID id;
     //
-    private ChannelType type;
-    private String name;
-    private String description;
+    private final ChannelType type;
+    private final String name;
+    private final  String description;
 
     public static ChannelResponse from(Channel channel) {
         return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(), channel.getDescription());

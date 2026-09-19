@@ -9,12 +9,11 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class BinaryContentResponse {
-    private String fileName;
-    private Long size;
-    private String contentType;
-    private byte[] bytes;
+    private final String fileName;
+    private final Long size;
+    private final String contentType;
+    private final byte[] bytes;
 
     public static BinaryContentResponse from(BinaryContent content) {
         return new BinaryContentResponse(content.getFileName(), content.getSize(), content.getContentType(), content.getBytes());

@@ -13,17 +13,16 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class MessageResponse {
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private final UUID id;
+    private final Instant createdAt;
+    private final Instant updatedAt;
     //
-    private String content;
+    private final String content;
     //
-    private UUID channelId;
-    private UUID authorId;
-    private List<UUID> attachmentIds;
+    private final UUID channelId;
+    private final UUID authorId;
+    private final List<UUID> attachmentIds;
 
     public static MessageResponse from(Message message) {
         return new MessageResponse(message.getId(), message.getCreatedAt(), message.getCreatedAt(),

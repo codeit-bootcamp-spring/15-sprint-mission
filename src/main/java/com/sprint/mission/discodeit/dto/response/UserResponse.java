@@ -13,15 +13,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
 public class UserResponse {
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
+    private final UUID id;
+    private final Instant createdAt;
+    private final Instant updatedAt;
     //
-    private String username;
-    private String email;
-    private UUID profileId;
+    private final String username;
+    private final String email;
+    private final UUID profileId;
 
     public static UserResponse from(User user) {
         return new UserResponse(user.getId(), user.getCreatedAt(), user.getUpdatedAt(),

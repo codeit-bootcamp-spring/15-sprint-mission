@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.ChannelResponse;
@@ -30,6 +31,14 @@ public class ChannelController {
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
             @Valid @ModelAttribute PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = channelService.create(publicChannelCreateRequest);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(ApiResponse.success(ChannelResponse.from(channel)));
+    }
+
+    @RequestMapping(method=RequestMethod.POST)
+    public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
+            @Valid @ModelAttribute PrivateChannelCreateRequest privateChannelCreateRequest) {
+        Channel channel = channelService.create(privateChannelCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(ChannelResponse.from(channel)));
     }
