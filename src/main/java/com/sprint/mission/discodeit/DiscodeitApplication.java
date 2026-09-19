@@ -18,7 +18,7 @@ public class DiscodeitApplication {
 	public static void main(String[] args) throws IOException {
 		ApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
 
-		UserService userService = context.getBean(UserService.class);
+		/*UserService userService = context.getBean(UserService.class);
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 		AuthService authService = context.getBean(AuthService.class);
@@ -102,6 +102,6 @@ public class DiscodeitApplication {
 		MessageUpdateRequest messageUpdateRequest = new MessageUpdateRequest(message3.getId(),"NONONO");
 		messageService.update(messageUpdateRequest);
 
-		messageService.delete(message3.getId());
+		messageService.delete(message3.getId());*/
 	}
 }

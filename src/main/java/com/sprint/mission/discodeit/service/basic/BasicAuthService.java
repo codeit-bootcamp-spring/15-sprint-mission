@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 @Service
 @RequiredArgsConstructor
@@ -21,6 +22,10 @@ public class BasicAuthService implements AuthService {
             throw new IllegalArgumentException("로그인 정보가 일치하지 않습니다.");
         }
         User user = result.get();
+        UserStatus userStatus = statuses.findByUserId(user.getId())
+                .orElseThrow(() -> new NoSuchElementException("접속 상태가 없습니다."));
+        userStatus.update(Instant.now());
+        statuses.save(userStatus);
         return toResponse(user);
     }
 

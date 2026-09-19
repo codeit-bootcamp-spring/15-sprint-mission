@@ -24,6 +24,7 @@ public class FileChannelRepository implements ChannelRepository {
     private Path path(UUID id) {
         return directory.resolve(id + ".ser");
     }
+
     @Override
     public Channel save(Channel entity) {
         Path file = path(entity.getId());
@@ -80,8 +81,17 @@ public class FileChannelRepository implements ChannelRepository {
             throw new UncheckedIOException(e);
         }
     }
+
     @Override
     public boolean existsById(UUID id) {
         return Files.exists(path(id));
+    }
+
+    @Override
+    public boolean existsUserByChannelId(UUID channelId, UUID userId) {
+        return findById(channelId)
+                .map(channel -> channel.getUserIds().stream()
+                        .anyMatch(user -> user.equals(userId)))
+                .orElse(false);
     }
 }

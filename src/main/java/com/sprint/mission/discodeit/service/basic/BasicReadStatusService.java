@@ -28,7 +28,9 @@ public class BasicReadStatusService implements ReadStatusService {
                 && !channel.getUserIds().contains(request.userId())) {
             throw new IllegalArgumentException("PRIVATE 채널의 참여자가 아닙니다.");
         }
-        if (reads.findByUserIdAndChannelId(request.userId(), request.channelId()).isPresent()) throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
+        if (reads.findByUserIdAndChannelId(request.userId(), request.channelId()).isPresent()) {
+            throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
+        }
         return reads.save(new ReadStatus(request.userId(), request.channelId(), request.lastReadAt()));
     }
 
@@ -41,15 +43,18 @@ public class BasicReadStatusService implements ReadStatusService {
         return reads.findAllByUserId(userId);
     }
 
+    @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return reads.findAllByChannelId(channelId);
+    }
+
     public ReadStatus update(ReadStatusUpdateRequest request) {
         ReadStatus status = find(request.id());
-
         status.update(request.lastReadAt());
         return reads.save(status);
     }
 
     public void delete(UUID id) {
-
         reads.deleteById(id);
     }
 }

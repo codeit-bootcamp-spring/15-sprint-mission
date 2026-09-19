@@ -1,10 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
+import com.sprint.mission.discodeit.common.ApiError;
+import com.sprint.mission.discodeit.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.*;
 @Service
@@ -22,6 +27,9 @@ public class BasicMessageService implements MessageService {
         }
         if(!userRepository.existsById(request.authorId())){
             throw new IllegalArgumentException("존재하지 않는 유저입니다. " + request.authorId());
+        }
+        if(!channelRepository.existsUserByChannelId(request.channelId(),request.authorId())){
+            throw new IllegalArgumentException("채널에 포함되지 않은 유저입니다. " + request.authorId());
         }
         List<UUID> attachmentIds = new ArrayList<>();
         if (attachments != null) {
@@ -54,4 +62,5 @@ public class BasicMessageService implements MessageService {
         }
         messages.deleteById(id);
     }
+
 }
