@@ -18,14 +18,13 @@ public class BasicChannelService implements ChannelService {
     private final BinaryContentRepository binaries;
 
     public ChannelResponse createPublic(PublicChannelCreateRequest request) {
-        return toResponse(channels.save(new Channel("PUBLIC", request.getName(), request.getDescription())));
+        return toResponse(channels.save(new Channel("PUBLIC", request.name(), request.description())));
     }
 
     public ChannelResponse createPrivate(PrivateChannelCreateRequest request) {
         List<UUID> ids = new ArrayList<>();
-        for (UUID id : request.getUserIds()) {
-            users.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
+        for (UUID id : request.userIds()) {
+            users.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
             if (!ids.contains(id)) {
                 ids.add(id);
             }
@@ -42,7 +41,7 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public void addUserToChannel(UUID channelId, UUID userId) {
+    public ChannelResponse addUserToChannel(UUID channelId, UUID userId) {
         Channel channel = channels.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
         if (!"PUBLIC".equals(channel.getType())) {
@@ -52,10 +51,11 @@ public class BasicChannelService implements ChannelService {
             throw new NoSuchElementException("존재하지 않는 User");
         }
         channel.addUser(userId);
-        channels.save(channel);
+        Channel channel1 = channels.save(channel);
         if (reads.findByUserIdAndChannelId(userId, channelId).isEmpty()) {
             reads.save(new ReadStatus(userId, channelId, Instant.now()));
         }
+        return toResponse(channel1);
     }
 
     public ChannelResponse find(UUID id) {
@@ -64,9 +64,16 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelResponse> findAllPublic() {
+    public List<ChannelResponse> findAllPublic(UUID id) {
         List<ChannelResponse> result = new ArrayList<>();
-        for (Channel channel : channels.findAll()) {
+        if(id == null){
+            for (Channel channel : channels.findAll()) {
+                if ("PUBLIC".equals(channel.getType())) {
+                    result.add(toResponse(channel));
+                }
+            }
+        }else {
+            Channel channel = channels.findById(id).orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
             if ("PUBLIC".equals(channel.getType())) {
                 result.add(toResponse(channel));
             }
@@ -87,9 +94,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     public ChannelResponse update(ChannelUpdateRequest request) {
-        Channel channel = channels.findById(request.getId())
+        Channel channel = channels.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
-        channel.update(request.getName(), request.getDescription());
+        channel.update(request.name(), request.description());
         return toResponse(channels.save(channel));
     }
 
@@ -144,4 +151,7 @@ public class BasicChannelService implements ChannelService {
         List<UUID> participants = channel.getUserIds();
         return new ChannelResponse(channel.getId(), channel.getType(), channel.getName(), channel.getDescription(), channel.getCreatedAt(), channel.getUpdatedAt(), last, participants);
     }
+
+
+
 }

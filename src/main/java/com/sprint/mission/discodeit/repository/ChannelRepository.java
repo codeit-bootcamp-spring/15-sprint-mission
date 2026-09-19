@@ -9,4 +9,5 @@ public interface ChannelRepository {
     List<Channel> findAll();
     void deleteById(UUID id);
     boolean existsById(UUID id);
+    boolean existsUserByChannelId(UUID channelId, UUID userId);
 }

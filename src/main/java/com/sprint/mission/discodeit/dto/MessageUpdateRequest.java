@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.dto;
-import lombok.Getter;
-import java.time.Instant;
-import java.util.List;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
 import java.util.UUID;
-@Getter
-public class MessageUpdateRequest {
-    private final UUID id;
-    private final String content;
-    public MessageUpdateRequest(UUID id, String content) {
-        this.id = id;
-        this.content = content;
-    }
+
+public record MessageUpdateRequest(
+
+        @NotNull
+        UUID id,
+
+        @NotBlank
+        String content) {
 }
