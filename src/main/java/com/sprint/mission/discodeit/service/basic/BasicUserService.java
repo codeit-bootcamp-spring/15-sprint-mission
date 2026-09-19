@@ -25,12 +25,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public User create(UserCreateRequest userCreateRequest) {
-        /*if (userRepository.findAll().stream().anyMatch(user -> user.getName().equals(userCreateRequest.name()))){
-            throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.name());
-        }
-        if (userRepository.findAll().stream().anyMatch(user -> user.getEmail().equals(userCreateRequest.email()))){
-            throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
-        }*/
+
         for (User user : userRepository.findAll()) {
             if (user.getName().equals(userCreateRequest.name())) {
                 throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.name());
