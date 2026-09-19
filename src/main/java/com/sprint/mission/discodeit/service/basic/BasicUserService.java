@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
 import com.sprint.mission.discodeit.dto.UserDto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.DuplicateUserException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -14,9 +16,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -39,11 +39,11 @@ public class BasicUserService implements UserService {
         for (User user : users) {
 
             if (user.getName().equals(userRequest.name())) {
-                throw new IllegalArgumentException("이미 사용 중인 이름입니다.");
+                throw new DuplicateUserException("이미 사용 중인 이름입니다.");
             }
 
             if (user.getEmail().equals(userRequest.email())) {
-                throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+                throw new DuplicateUserException("이미 사용 중인 이메일입니다.");
             }
         }
 
@@ -77,11 +77,12 @@ public class BasicUserService implements UserService {
     @Override
     public UserFindResponse find(UUID id) {
 
-        User user = userRepository.findById(id).orElse(null);
-
-        if (user == null) {
-            return null;
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "존재하지 않는 사용자입니다."
+                        )
+                );
 
         UserStatus status =
                 userStatusRepository.findByUserId(id).orElse(null);
@@ -102,13 +103,26 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserFindResponse> findAll() {
 
+        // 1. 사용자 전체 조회
         List<User> users = userRepository.findAll();
+
+        // 2. 사용자 상태 전체 조회
+        List<UserStatus> statuses = userStatusRepository.findAll();
+
+        // 3. userId를 기준으로 UserStatus를 Map에 저장
+        Map<UUID, UserStatus> statusMap = new HashMap<>();
+
+        for (UserStatus status : statuses) {
+            statusMap.put(status.getUserId(), status);
+        }
+
+        // 4. 반환할 DTO 목록 생성
         List<UserFindResponse> result = new ArrayList<>();
 
+        // 5. 사용자별 상태를 Map에서 찾아 DTO 생성
         for (User user : users) {
 
-            UserStatus status =
-                    userStatusRepository.findByUserId(user.getId()).orElse(null);
+            UserStatus status = statusMap.get(user.getId());
 
             boolean online = status != null && status.isOnline();
 
@@ -133,11 +147,12 @@ public class BasicUserService implements UserService {
             BinaryContentCreateRequest profileRequest
     ) {
 
-        User user = userRepository.findById(id).orElse(null);
-
-        if (user == null) {
-            return null;
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "수정할 사용자를 찾을 수 없습니다."
+                        )
+                );
 
         // 1. 먼저 중복 검사
         for (User other : userRepository.findAll()) {
@@ -148,12 +163,12 @@ public class BasicUserService implements UserService {
 
             if (userRequest.name() != null
                     && other.getName().equals(userRequest.name())) {
-                throw new IllegalArgumentException("이미 사용 중인 이름입니다.");
+                throw new DuplicateUserException("이미 사용 중인 이름입니다.");
             }
 
             if (userRequest.email() != null
                     && other.getEmail().equals(userRequest.email())) {
-                throw new IllegalArgumentException("이미 사용 중인 이메일입니다.");
+                throw new DuplicateUserException("이미 사용 중인 이메일입니다.");
             }
         }
 
@@ -197,11 +212,12 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID id) {
 
-        User user = userRepository.findById(id).orElse(null);
-
-        if (user == null) {
-            return;
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() ->
+                        new UserNotFoundException(
+                                "삭제할 사용자를 찾을 수 없습니다."
+                        )
+                );
 
         if (user.getProfileId() != null) {
             binaryContentRepository.deleteById(user.getProfileId());
