@@ -7,10 +7,12 @@ import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.basic.BasicReadStatusService;
 import jakarta.validation.Valid;
+import lombok.Locked;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -30,6 +32,16 @@ public class ReadStatusController {
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(ReadStatusResponse.from(readStatus)));
     }
 
+    // 조회
+    @RequestMapping(value="/v1/users/{user-id}/read-status", method= RequestMethod.GET)
+    public ResponseEntity<ApiResponse<List<ReadStatusResponse>>> getReadStatus(
+            @PathVariable("user-id") UUID userId) {
+        List<ReadStatusResponse> readStatus = readStatusService.findAllByUserId(userId)
+                .stream().map(ReadStatusResponse::from).toList();
+
+        return ResponseEntity.ok(ApiResponse.success(readStatus));
+    }
+
     // 수정
     @RequestMapping(value="/v1/channels/{channel-id}/read-status", method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ReadStatusResponse>> updateReadStatus(
@@ -37,7 +49,7 @@ public class ReadStatusController {
             @PathVariable("channel-id") UUID channelId,
             @RequestParam UUID readStatusId
     ) {
-        ReadStatus readStatus = readStatusService.update(readStatusId, request);
+        ReadStatus readStatus = readStatusService.update(readStatusId, channelId, request);
         return ResponseEntity.ok(ApiResponse.success(ReadStatusResponse.from(readStatus)));
     }
 }

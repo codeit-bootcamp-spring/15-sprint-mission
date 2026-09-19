@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -23,9 +24,8 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateRequest request) {
+    public ReadStatus create(ReadStatusCreateRequest request, UUID channelId) {
         UUID userId = request.userId();
-        UUID channelId = request.channelId();
 
         if (!userRepository.existsById(userId)) {
             throw new NoSuchElementException("User with id " + userId + " does not exist");
@@ -56,10 +56,14 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
+    public ReadStatus update(UUID channelId, UUID readStatusId, ReadStatusUpdateRequest request) {
+        // 특정 채널에 대한 조건이 들어가므로, 특정 채널이 맞는지 검증 로직 추가.
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+        if (!readStatus.getChannelId().equals(channelId)) {
+            throw new IllegalArgumentException("해당 채널의 수신 정보가 아닙니다.");
+        }
         readStatus.update(newLastReadAt);
         return readStatusRepository.save(readStatus);
     }
