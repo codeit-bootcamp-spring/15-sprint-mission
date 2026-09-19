@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.dto.response;
 
+import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,4 +18,9 @@ public class UserStatusResponse {
     //
     private final UUID userId;
     private final Instant lastActiveAt;
+
+    public static UserStatusResponse from(UserStatus userStatus) {
+        return new UserStatusResponse(userStatus.getId(), userStatus.getCreatedAt(), userStatus.getUpdatedAt(),
+                userStatus.getUserId(), userStatus.getLastActiveAt());
+    }
 }
