@@ -5,6 +5,9 @@ import com.sprint.mission.discodeit.dto.MessageDto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -33,11 +36,11 @@ public class BasicMessageService implements MessageService {
     ) {
 
         if (!channelRepository.existsById(request.channelId())) {
-            return null;
+            throw new ChannelNotFoundException("채널이 없습니다.");
         }
 
         if (!userRepository.existsById(request.authorId())) {
-            return null;
+            throw new UserNotFoundException("작성자가 없습니다.");
         }
 
         List<UUID> attachmentIds = new ArrayList<>();
@@ -76,24 +79,29 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message read(UUID id) {
 
-        return messageRepository.findById(id).orElse(null);
+        return messageRepository.findById(id)
+                .orElseThrow(() ->
+                        new MessageNotFoundException("메시지가 없습니다."));
     }
 
     // 특정 채널의 메시지만 조회
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
+
+        if (!channelRepository.existsById(channelId)) {
+            throw new ChannelNotFoundException("채널이 없습니다.");
+        }
+
         return messageRepository.findAllByChannelId(channelId);
     }
 
-    // DTO를 이용한 수정
+    // DTO를 이용한 메시지 수정
     @Override
     public Message update(UUID id, MessageUpdateRequest request) {
 
-        Message message = messageRepository.findById(id).orElse(null);
-
-        if (message == null) {
-            return null;
-        }
+        Message message = messageRepository.findById(id)
+                .orElseThrow(() ->
+                        new MessageNotFoundException("메시지가 없습니다."));
 
         message.setContent(request.content());
 
@@ -106,7 +114,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("메시지가 없습니다."));
+                        new MessageNotFoundException("메시지가 없습니다."));
 
         List<UUID> attachmentIds =
                 List.copyOf(message.getAttachmentIds());
