@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-public record UserFindResponse(
+public record UserResponse(
         UUID id,
         Instant createdAt,
         Instant updatedAt,

@@ -12,4 +12,5 @@ public class ApiError {
 
     public String getCode() { return code; }
     public String getMessage() { return message; }
+    public String getExceptionClass() { return exceptionClass; }
 }

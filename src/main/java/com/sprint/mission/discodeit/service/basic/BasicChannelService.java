@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Request.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.Response.ChannelFindResponse;
+import com.sprint.mission.discodeit.dto.Response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -51,14 +51,14 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelFindResponse find(UUID id) {
+    public ChannelResponse find(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
 
-        return toChannelFindResponse(channel);
+        return toChannelResponse(channel);
     }
 
-    public ChannelFindResponse toChannelFindResponse(Channel channel){
+    public ChannelResponse toChannelResponse(Channel channel){
         List<UUID> memberIds = readStatusRepository.findAllByChannelId(channel.getId())
                 .stream()
                 .map(ReadStatus::getUserId)
@@ -69,7 +69,7 @@ public class BasicChannelService implements ChannelService {
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo)
                 .orElse(null);
-        return new ChannelFindResponse(
+        return new ChannelResponse(
                 channel.getId(),
                 channel.getCreatedAt(),
                 channel.getUpdatedAt(),
@@ -82,12 +82,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<ChannelFindResponse> findAll() {
-        return channelRepository.findAll().stream().map(this::toChannelFindResponse).toList();
+    public List<ChannelResponse> findAll() {
+        return channelRepository.findAll().stream().map(this::toChannelResponse).toList();
     }
 
     @Override
-    public List<ChannelFindResponse> findAllByUserId(UUID userId) {
+    public List<ChannelResponse> findAllByUserId(UUID userId) {
         List<Channel> publicChannels = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
         List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannelId()).toList();
@@ -99,12 +99,12 @@ public class BasicChannelService implements ChannelService {
         }
 
         List<Channel> concatList = new ArrayList<>();
-        List<ChannelFindResponse> resultList;
+        List<ChannelResponse> resultList;
 
         concatList.addAll(publicChannels);
         concatList.addAll(PrivateChannels);
 
-        resultList = concatList.stream().map(this::toChannelFindResponse).toList();
+        resultList = concatList.stream().map(this::toChannelResponse).toList();
 
 
         return resultList;

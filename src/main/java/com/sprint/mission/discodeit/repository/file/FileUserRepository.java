@@ -82,10 +82,10 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public Optional<User> findByName(String name) {
+    public Optional<User> findByEmail(String email) {
         User user = null;
         for(User entry : findAll()){
-            if(entry.getName().equals(name)){
+            if(entry.getEmail().equals(email)){
                 user = entry;
                 break;
             }

@@ -18,7 +18,7 @@ public class BasicAuthService implements AuthService {
     @Override
     public User login(LoginRequest loginRequest) {
         User user;
-        user=userRepository.findByName(loginRequest.name()).orElseThrow(() -> new NoSuchElementException("로그인 오류. name이 일치하는 user 없음 : "+ loginRequest.name()));
+        user=userRepository.findByEmail(loginRequest.email()).orElseThrow(() -> new NoSuchElementException("로그인 오류. name이 일치하는 user 없음 : "+ loginRequest.email()));
         if(!user.getPassword().equals(loginRequest.password())){
             throw new IllegalArgumentException("비밀번호가 다름");
         }
