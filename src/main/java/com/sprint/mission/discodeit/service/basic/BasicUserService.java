@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -65,7 +66,7 @@ public class BasicUserService implements UserService {
     public UserDto find(UUID userId) {
         return userRepository.findById(userId)
                 .map(this::toDto)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     @Override
@@ -79,7 +80,7 @@ public class BasicUserService implements UserService {
     @Override
     public User update(UUID userId, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         String newUsername = userUpdateRequest.newUsername();
         String newEmail = userUpdateRequest.newEmail();
@@ -112,7 +113,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
+                .orElseThrow(() -> new UserNotFoundException(userId));
 
         Optional.ofNullable(user.getProfileId())
                         .ifPresent(binaryContentRepository::deleteById);

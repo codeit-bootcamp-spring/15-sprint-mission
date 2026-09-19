@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.ChannelNotFoundException;
 import com.sprint.mission.discodeit.dto.data.ChannelDto;
 import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
@@ -51,7 +52,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto find(UUID channelId) {
         return channelRepository.findById(channelId)
                 .map(this::toDto)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
     }
 
     @Override
@@ -74,7 +75,7 @@ public class BasicChannelService implements ChannelService {
         String newName = request.newName();
         String newDescription = request.newDescription();
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
         if (channel.getType().equals(ChannelType.PRIVATE)) {
             throw new IllegalArgumentException("Private channel cannot be updated");
         }
@@ -85,7 +86,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID channelId) {
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new NoSuchElementException("Channel with id " + channelId + " not found"));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));;
 
         messageRepository.deleteAllByChannelId(channel.getId());
         readStatusRepository.deleteAllByChannelId(channel.getId());

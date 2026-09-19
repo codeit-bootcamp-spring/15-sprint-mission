@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.ChannelNotFoundException;
+import com.sprint.mission.discodeit.common.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.common.UserNotFoundException;
 import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -28,10 +31,10 @@ public class BasicReadStatusService implements ReadStatusService {
         UUID userId = request.userId();
 
         if (!userRepository.existsById(userId)) {
-            throw new NoSuchElementException("User with id " + userId + " does not exist");
+            throw new UserNotFoundException(userId);
         }
         if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+            throw new ChannelNotFoundException(channelId);
         }
         if (readStatusRepository.findAllByUserId(userId).stream()
                 .anyMatch(readStatus -> readStatus.getChannelId().equals(channelId))) {
@@ -46,7 +49,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus find(UUID readStatusId) {
         return readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
     }
 
     @Override
@@ -60,7 +63,7 @@ public class BasicReadStatusService implements ReadStatusService {
         // 특정 채널에 대한 조건이 들어가므로, 특정 채널이 맞는지 검증 로직 추가.
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
-                .orElseThrow(() -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
+                .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
         if (!readStatus.getChannelId().equals(channelId)) {
             throw new IllegalArgumentException("해당 채널의 수신 정보가 아닙니다.");
         }
@@ -71,7 +74,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public void delete(UUID readStatusId) {
         if (!readStatusRepository.existsById(readStatusId)) {
-            throw new NoSuchElementException("ReadStatus with id " + readStatusId + " not found");
+            throw new ReadStatusNotFoundException(readStatusId);
         }
         readStatusRepository.deleteById(readStatusId);
     }

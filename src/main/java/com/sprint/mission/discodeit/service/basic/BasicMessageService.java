@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.common.MessageNotFoundException;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
@@ -32,10 +33,10 @@ public class BasicMessageService implements MessageService {
         UUID authorId = messageCreateRequest.authorId();
 
         if (!channelRepository.existsById(channelId)) {
-            throw new NoSuchElementException("Channel with id " + channelId + " does not exist");
+            throw new MessageNotFoundException(channelId);
         }
         if (!userRepository.existsById(authorId)) {
-            throw new NoSuchElementException("Author with id " + authorId + " does not exist");
+            throw new MessageNotFoundException(authorId);
         }
 
         List<UUID> attachmentIds = binaryContentCreateRequests.stream()
@@ -63,7 +64,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Message find(UUID messageId) {
         return messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
     }
 
     @Override
@@ -76,7 +77,7 @@ public class BasicMessageService implements MessageService {
     public Message update(UUID messageId, MessageUpdateRequest request) {
         String newContent = request.newContent();
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
         message.update(newContent);
         return messageRepository.save(message);
     }
@@ -84,7 +85,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public void delete(UUID messageId) {
         Message message = messageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+                .orElseThrow(() -> new MessageNotFoundException(messageId));
 
         message.getAttachmentIds()
                 .forEach(binaryContentRepository::deleteById);
