@@ -39,7 +39,7 @@ public class JCFUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return this.userStatuses.removeIf(x-> x.getId().equals(id));
+    public void delete(UUID id) {
+        this.userStatuses.removeIf(x-> x.getId().equals(id));
     }
 }

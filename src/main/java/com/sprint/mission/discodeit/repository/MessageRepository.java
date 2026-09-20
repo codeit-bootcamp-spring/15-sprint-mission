@@ -11,6 +11,6 @@ public interface MessageRepository {
     List<Message> findByChannelId(UUID id);
     List<Message> findByAuthorId(UUID id);
     List<Message> findAll();
-    boolean update(Message message);
-    boolean delete(UUID id);
+    Message update(Message message);
+    void delete(UUID id);
 }

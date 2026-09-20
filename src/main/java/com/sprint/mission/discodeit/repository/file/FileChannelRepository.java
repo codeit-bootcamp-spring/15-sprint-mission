@@ -50,12 +50,15 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
     @Override
     public Channel find(UUID id) {
-        List<Channel> channels = this.findAll();
-        for (Channel channel: channels) {
-            if (channel.getId().equals(id)) return channel;
+        Path filePath = path.resolve("channel-" + id + ".ser");
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (Channel) ois.readObject();
+        } catch (NoSuchFileException e) {
+            return null;
         }
-
-        return null;
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -85,7 +88,7 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
 
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new ArrayList<>();
+                return result;
             }
         }
 
@@ -109,10 +112,12 @@ public class FileChannelRepository implements ChannelRepository, Serializable {
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         Path filePath = path.resolve("channel-" + id + ".ser");
-
-        File file = new File(filePath.toUri());
-        return file.exists() && file.delete();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제 실패");
+        }
     }
 }

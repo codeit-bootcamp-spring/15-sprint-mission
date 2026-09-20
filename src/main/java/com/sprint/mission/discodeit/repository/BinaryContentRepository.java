@@ -9,5 +9,5 @@ public interface BinaryContentRepository {
     boolean save(BinaryContent binaryContent);
     BinaryContent find(UUID id);
     List<BinaryContent> findByIds(List<UUID> ids);
-    boolean delete(UUID id);
+    void delete(UUID id);
 }

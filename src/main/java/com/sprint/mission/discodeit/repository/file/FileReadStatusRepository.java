@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -71,27 +72,15 @@ public class FileReadStatusRepository implements ReadStatusRepository {
 
     @Override
     public ReadStatus find(UUID id) {
-        File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
-
-        if (files == null || files.length == 0) {
-            System.out.println("읽을 파일이 없습니다.");
-            return null;
+        Path filePath = path.resolve("readStatus-" + id + ".ser");
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (ReadStatus) ois.readObject();
+        } catch (NoSuchFileException e) {
+            throw new IllegalArgumentException("존재하지 않습니다.", e);
         }
-
-        for (File file : files) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                Object obj = ois.readObject();
-                ReadStatus temp = (ReadStatus) obj;
-                if (temp.getId().equals(id)) {
-                    return temp;
-                }
-
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("파일 역직렬화 실패: " + file.getName());
-            }
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     @Override
@@ -112,6 +101,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                 }
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
+                return result;
             }
         }
 
@@ -132,12 +122,13 @@ public class FileReadStatusRepository implements ReadStatusRepository {
             try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
                 Object obj = ois.readObject();
                 ReadStatus temp = (ReadStatus) obj;
+
                 if (temp.getChannelId().equals(channelId)) {
                     result.add(temp);
                 }
             } catch (IOException | ClassNotFoundException e) {
-                System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new ArrayList<>();
+                System.err.println("특정 파일 역직렬화 실패: " + file.getName());
+                return result;
             }
         }
 
@@ -145,9 +136,12 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         Path filePath = path.resolve("readStatus-" + id + ".ser");
-        File file = new File(filePath.toUri());
-        return file.exists() && file.delete();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제 실패");
+        }
     }
 }

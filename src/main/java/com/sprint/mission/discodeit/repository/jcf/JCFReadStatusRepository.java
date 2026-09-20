@@ -48,7 +48,7 @@ public class JCFReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return this.readStatuses.removeIf(x-> x.getId().equals(id));
+    public void delete(UUID id) {
+        this.readStatuses.removeIf(x-> x.getId().equals(id));
     }
 }

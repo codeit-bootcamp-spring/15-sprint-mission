@@ -34,12 +34,15 @@ public class FileMessageRepository implements MessageRepository, Serializable {
 
     @Override
     public Message find(UUID id) {
-        List<Message> messages = this.findAll();
-        for (Message message: messages) {
-            if (message.getId().equals(id)) return message;
+        Path filePath = path.resolve("message-" + id + ".ser");
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (Message) ois.readObject();
+        } catch (NoSuchFileException e) {
+            throw new IllegalArgumentException("존재하지 않는 메시지입니다.", e);
         }
-
-        return null;
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -111,7 +114,7 @@ public class FileMessageRepository implements MessageRepository, Serializable {
 
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new ArrayList<>();
+                return result;
             }
         }
 
@@ -122,9 +125,8 @@ public class FileMessageRepository implements MessageRepository, Serializable {
     public boolean create(Message message) {
         Path filePath = path.resolve("message-" + message.getId() + ".ser");
 
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(filePath.toFile())
-        )) {
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile())))
+        {
             oos.writeObject(message);
             System.out.println("메세지 저장 완료");
             return true;
@@ -135,24 +137,26 @@ public class FileMessageRepository implements MessageRepository, Serializable {
     }
 
     @Override
-    public boolean update(Message message) {
+    public Message update(Message message) {
         Path filePath = path.resolve("message-" + message.getId() + ".ser");
-        try (ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(filePath.toFile())))
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(filePath.toFile())))
         {
             oos.writeObject(message);
-            return true;
+            return message;
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return false;
+        throw new IllegalStateException("메시지 정상 저장 실패");
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         Path filePath = path.resolve("message-" + id + ".ser");
 
-        File file = new File(filePath.toUri());
-        return file.exists() && file.delete();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제 실패");
+        }
     }
 }

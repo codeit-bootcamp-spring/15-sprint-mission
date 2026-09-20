@@ -46,7 +46,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public boolean delete(UUID userId) {
-        return this.users.removeIf(x-> x.getId().equals(userId));
+    public void delete(UUID userId) {
+        this.users.removeIf(x-> x.getId().equals(userId));
     }
 }

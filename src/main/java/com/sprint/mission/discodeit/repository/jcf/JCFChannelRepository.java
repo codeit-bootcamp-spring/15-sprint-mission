@@ -49,7 +49,7 @@ public class JCFChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return this.channels.removeIf(x-> x.getId().equals(id));
+    public void delete(UUID id) {
+        this.channels.removeIf(x-> x.getId().equals(id));
     }
 }

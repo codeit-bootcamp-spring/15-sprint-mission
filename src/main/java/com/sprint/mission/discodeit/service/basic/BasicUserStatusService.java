@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -18,7 +19,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     public UserStatus create(UUID userId) {
-        if (userRepository.find(userId) == null) throw new IllegalArgumentException("user가 없음");
+        if (userRepository.find(userId) == null) throw new NotFoundException("user가 없음");
 
         UserStatus userStatus = new UserStatus(userId);
         // 중복 검사. 안찾아지는 경우에만 저장.
@@ -36,7 +37,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatus != null) {
             return userStatus;
         }
-        throw new IllegalArgumentException("찾을 수 없음");
+        throw new NotFoundException("userStatus를 찾을 수 없음");
     }
 
     @Override
@@ -48,7 +49,7 @@ public class BasicUserStatusService implements UserStatusService {
     public void update(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.find(userStatusId);
         if (userStatus == null) {
-            throw new IllegalArgumentException("찾을 수 없음");
+            throw new NotFoundException("userStatus를 찾을 수 없음");
         }
 
         userStatus.updateOnlineAt();
@@ -62,13 +63,12 @@ public class BasicUserStatusService implements UserStatusService {
     public void updateByUserId(UUID userId) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId);
         if (userStatus == null) {
-            throw new IllegalArgumentException("찾을 수 없음");
+            throw new NotFoundException("userStatus를 찾을 수 없음");
         }
 
         userStatus.updateOnlineAt();
         userStatus.autoSetUpdatedAt();
 
-        userStatusRepository.delete(userStatus.getId());
         userStatusRepository.save(userStatus);
     }
 
@@ -76,7 +76,7 @@ public class BasicUserStatusService implements UserStatusService {
     public void delete(UUID userStatusId) {
         UserStatus userStatus = userStatusRepository.find(userStatusId);
         if (userStatus == null) {
-            throw new IllegalArgumentException("찾을 수 없음");
+            throw new NotFoundException("userStatus를 찾을 수 없음");
         }
 
         userStatusRepository.delete(userStatusId);

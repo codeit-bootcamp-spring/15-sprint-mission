@@ -11,5 +11,5 @@ public interface UserRepository {
     User findByName(String name);
     Set<User> findAll();
     boolean update(User user);
-    boolean delete(UUID userId);
+    void delete(UUID userId);
 }

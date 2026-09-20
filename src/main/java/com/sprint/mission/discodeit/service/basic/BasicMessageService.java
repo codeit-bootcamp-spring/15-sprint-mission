@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.exception.NotFoundException;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
@@ -26,7 +27,7 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(MessageCreateRequest mcr, List<BinaryContentCreateRequest> bccr) throws IllegalArgumentException, IllegalStateException {
+    public Message create(MessageCreateRequest mcr, List<BinaryContentCreateRequest> bccr) {
         //일단 채널, 유저가 진짜 있는건지 확인하고.
         if (userRepository.find(mcr.authorId()) == null || channelRepository.find(mcr.channelId()) == null) {
             throw new IllegalArgumentException("저장할 수 없는 채널, 유저 정보가 주어졌습니다.");
@@ -44,9 +45,7 @@ public class BasicMessageService implements MessageService {
         }
 
         Message message = new Message(mcr.content(), mcr.channelId(), mcr.authorId(), attachments);
-        if (!messageRepository.create(message)) { //리포지토리에 저장하고.
-            throw new IllegalStateException("메시지가 정상적으로 저장되지 않았습니다.");
-        }
+        messageRepository.create(message);
 
         return message;
     }
@@ -57,16 +56,16 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public void update(MessageUpdateRequest mur) {
+    public Message update(MessageUpdateRequest mur) {
         Message message = messageRepository.find(mur.id());
         if (message == null) {
-            throw new IllegalArgumentException("메시지를 찾을 수 없습니다.");
+            throw new NotFoundException("메시지를 찾을 수 없습니다.");
         }
 
         message.setMessage(mur.content());
         message.autoSetUpdatedAt();
 
-        messageRepository.update(message);
+        return messageRepository.update(message);
     }
 
     @Override
@@ -74,19 +73,11 @@ public class BasicMessageService implements MessageService {
         // 삭제가 가능한 객체인지 조회
         Message message = messageRepository.find(messageId);
         if (message == null) {
-            throw new IllegalArgumentException("유저를 찾을 수 없습니다.");
-        }
-        List<BinaryContent> byIds = binaryContentRepository.findByIds(message.getAttachmentIds());
-        if (byIds == null) {
-            throw new IllegalArgumentException("첨부 파일을 찾을 수 없습니다.");
+            throw new NotFoundException("유저를 찾을 수 없습니다.");
         }
 
-        // 삭제 과정
-        for (BinaryContent b: byIds) {
-            if (!binaryContentRepository.delete(b.getId())) {
-                throw new IllegalStateException("삭제 도중 오류가 발생했습니다.");
-            }
-        }
+        List<BinaryContent> byIds = binaryContentRepository.findByIds(message.getAttachmentIds());
+        byIds.forEach(b -> binaryContentRepository.delete(b.getId()));
 
         messageRepository.delete(messageId);
     }

@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.exception.ConflictException;
+import com.sprint.mission.discodeit.dto.exception.NotFoundException;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.readStatus.ReadStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -10,6 +12,7 @@ import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,16 +26,14 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus create(ReadStatusCreateRequest rcr) {
         if (userRepository.find(rcr.userId()) == null || channelRepository.find(rcr.channelId()) == null) {
-            throw new IllegalArgumentException("채널이나 유저가 존재하지 않습니다.");
+            throw new NotFoundException("채널이나 유저가 존재하지 않습니다.");
         }
         if (readStatusRepository.isAlreadyExist(rcr.userId(), rcr.channelId()) != null) {
-            throw new IllegalArgumentException("이미 동일한 객체가 존재합니다.");
+            throw new ConflictException("이미 동일한 객체가 존재합니다.");
         }
 
         ReadStatus readStatus = new ReadStatus(rcr.userId(), rcr.channelId());
-        if (!readStatusRepository.save(readStatus)) {
-            throw new IllegalStateException("저장에 실패했습니다.");
-        }
+        readStatusRepository.save(readStatus);
 
         return readStatus;
     }
@@ -49,23 +50,27 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     public void update(ReadStatusUpdateRequest rur) {
-        ReadStatus readStatus = readStatusRepository.find(rur.id());
-        if (readStatus == null) {
-            throw new IllegalArgumentException("업데이트할 객체를 찾을 수 없습니다.");
+        List<ReadStatus> readStatuses = readStatusRepository.findAllByChannelId(rur.channelId());
+        if (readStatuses.isEmpty()) {
+            throw new NotFoundException("업데이트할 객체를 찾을 수 없습니다.");
         }
 
-        readStatus.setLastReadAt(rur.lastReadAt());
-        readStatus.autoSetUpdatedAt();
+        ReadStatus latestReadStatus = readStatuses.stream()
+                .filter(rs -> rs.getLastReadAt() != null)
+                .max(Comparator.comparing(ReadStatus::getLastReadAt))
+                .orElseThrow(() -> new NotFoundException("읽음 기록이 있는 사용자가 없습니다."));
 
-        readStatusRepository.delete(rur.id());
-        readStatusRepository.save(readStatus);
+
+        latestReadStatus.autoSetUpdatedAt();
+
+        readStatusRepository.save(latestReadStatus);
     }
 
     @Override
     public void delete(UUID id) {
         ReadStatus readStatus = readStatusRepository.find(id);
         if (readStatus == null) {
-            throw new IllegalArgumentException("삭제할 객체를 찾을 수 없습니다.");
+            throw new NotFoundException("삭제할 객체를 찾을 수 없습니다.");
         }
 
         readStatusRepository.delete(id);

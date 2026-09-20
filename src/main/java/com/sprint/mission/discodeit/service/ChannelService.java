@@ -4,18 +4,17 @@ import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.channel.ChannelResponse;
 import com.sprint.mission.discodeit.dto.channel.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
     Channel createPublicChannel(ChannelCreateRequest cr);
-    Channel createPrivateChannel(List<User> userIds);
-    ChannelResponse find(UUID id) throws IllegalArgumentException;
-    ChannelResponse findByChannelName(String channelName) throws IllegalArgumentException;
+    Channel createPrivateChannel(List<UUID> userIds);
+    ChannelResponse find(UUID id);
+    ChannelResponse findByChannelName(String channelName);
     List<ChannelResponse> findAllByUserId(UUID userId);
-    void update(ChannelUpdateRequest cu) throws IllegalArgumentException, IllegalStateException;
-    void delete(UUID id) throws IllegalArgumentException;
+    ChannelResponse update(ChannelUpdateRequest cu);
+    void delete(UUID id);
 }
 

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.binaryContent.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.exception.NotFoundException;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -37,7 +38,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public void delete(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.find(id);
         if (binaryContent == null) {
-            throw new IllegalArgumentException("찾을 수 없음");
+            throw new NotFoundException("찾을 수 없음");
         }
 
         binaryContentRepository.delete(id);

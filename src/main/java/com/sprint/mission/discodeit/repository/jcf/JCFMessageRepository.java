@@ -45,16 +45,16 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public boolean update(Message message) {
+    public Message update(Message message) {
         boolean isExist = this.messages.removeIf(x-> x.getId().equals(message.getId()));
-        if (!isExist) return false;
+        if (!isExist) throw new IllegalArgumentException("메시지를 찾지 못했습니다.");
 
         this.messages.add(message);
-        return true;
+        return message;
     }
 
     @Override
-    public boolean delete(UUID id) {
-        return this.messages.removeIf(x-> x.getId().equals(id));
+    public void delete(UUID id) {
+        this.messages.removeIf(x-> x.getId().equals(id));
     }
 }

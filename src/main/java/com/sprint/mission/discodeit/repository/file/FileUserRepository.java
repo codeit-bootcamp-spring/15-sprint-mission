@@ -50,12 +50,15 @@ public class FileUserRepository implements UserRepository, Serializable {
 
     @Override
     public User find(UUID userId) {
-        Set<User> users = this.findAll();
-        for (User user: users) {
-            if (user.getId().equals(userId)) return user;
+        Path filePath = path.resolve("user-" + userId + ".ser");
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (User) ois.readObject();
+        } catch (NoSuchFileException e) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.", e);
         }
-
-        return null; // Users 가 빈 배열인 경우.
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -85,7 +88,7 @@ public class FileUserRepository implements UserRepository, Serializable {
 
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new HashSet<>();
+                return result;
             }
         }
 
@@ -109,9 +112,12 @@ public class FileUserRepository implements UserRepository, Serializable {
     }
 
     @Override
-    public boolean delete(UUID userId) {
+    public void delete(UUID userId) {
         Path filePath = path.resolve("user-" + userId + ".ser");
-        File file = new File(filePath.toUri());
-        return file.exists() && file.delete();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제 실패");
+        }
     }
 }

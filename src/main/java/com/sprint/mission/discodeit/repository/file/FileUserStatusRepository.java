@@ -8,6 +8,7 @@ import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -37,37 +38,23 @@ public class FileUserStatusRepository implements UserStatusRepository {
                 new FileOutputStream(filePath.toFile())))
         {
             oos.writeObject(userStatus);
-
             return true;
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new IllegalStateException("못읽었서");
         }
-        return false;
     }
 
     @Override
     public UserStatus find(UUID id) {
-        File[] files = path.toFile().listFiles((dir, name) -> name.endsWith(".ser"));
-
-        if (files == null || files.length == 0) {
-            System.out.println("읽을 파일이 없습니다.");
+        Path filePath = path.resolve("userStatus-" + id + ".ser");
+        try (ObjectInputStream ois = new ObjectInputStream(Files.newInputStream(filePath))) {
+            return (UserStatus) ois.readObject();
+        } catch (NoSuchFileException e) {
             return null;
         }
-
-        for (File file : files) {
-            try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
-                Object obj = ois.readObject();
-                UserStatus temp = (UserStatus) obj;
-                if (temp.getId().equals(id)) {
-                    return temp;
-                }
-
-            } catch (IOException | ClassNotFoundException e) {
-                System.err.println("파일 역직렬화 실패: " + file.getName());
-            }
+        catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
         }
-
-        return null;
     }
 
     @Override
@@ -92,6 +79,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
             }
         }
 
+
         return null;
     }
 
@@ -112,7 +100,7 @@ public class FileUserStatusRepository implements UserStatusRepository {
 
             } catch (IOException | ClassNotFoundException e) {
                 System.err.println("파일 역직렬화 실패: " + file.getName());
-                return new ArrayList<>();
+                return result;
             }
         }
 
@@ -120,9 +108,12 @@ public class FileUserStatusRepository implements UserStatusRepository {
     }
 
     @Override
-    public boolean delete(UUID id) {
+    public void delete(UUID id) {
         Path filePath = path.resolve("userStatus-" + id + ".ser");
-        File file = new File(filePath.toUri());
-        return file.exists() && file.delete();
+        try {
+            Files.deleteIfExists(filePath);
+        } catch (IOException e) {
+            System.out.println("삭제 실패");
+        }
     }
 }
