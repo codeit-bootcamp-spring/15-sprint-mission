@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.Controller;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/binary-contents")
+@RequestMapping("/api/binarycontents")
 @RequiredArgsConstructor
 public class BinaryContentController {
 
@@ -22,16 +22,17 @@ public class BinaryContentController {
 
     // 바이너리 파일 1개 조회
     @RequestMapping(
-            path = "/{binaryContentId}",
+            path = "/find",
             method = RequestMethod.GET
     )
-    public BinaryContent find(
-            @PathVariable("binaryContentId") UUID binaryContentId
+    public ResponseEntity<BinaryContent> find(
+            @RequestParam("binaryContentId") UUID binaryContentId
     ) {
 
-        return binaryContentService.find(
-                binaryContentId
-        );
+        BinaryContent binaryContent =
+                binaryContentService.find(binaryContentId);
+
+        return ResponseEntity.ok(binaryContent);
     }
 
 
