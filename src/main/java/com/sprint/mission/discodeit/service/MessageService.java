@@ -13,6 +13,6 @@ public interface MessageService {
     Message find(UUID id);
     List<Message> findAllByChannelId(UUID channelId);
     List<Message> findAll();
-    Message update(MessageUpdateRequest messageUpdateRequest);
+    Message update(UUID id,MessageUpdateRequest messageUpdateRequest);
     void delete(UUID id);
 }
