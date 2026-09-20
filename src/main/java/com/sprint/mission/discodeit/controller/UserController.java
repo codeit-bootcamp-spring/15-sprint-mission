@@ -60,7 +60,7 @@ public class UserController {
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
             @Valid @RequestBody UserUpdateRequest userUpdateRequest,
-            @RequestParam Optional<BinaryContentCreateRequest> binaryContentCreateRequest
+            @RequestPart Optional<BinaryContentCreateRequest> binaryContentCreateRequest
 
     ) throws IOException {
         User update = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
