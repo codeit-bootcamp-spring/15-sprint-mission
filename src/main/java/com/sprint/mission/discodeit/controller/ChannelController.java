@@ -27,7 +27,7 @@ public class ChannelController {
     }
 
     // 등록
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(value="/public", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
             @Valid @ModelAttribute PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = channelService.create(publicChannelCreateRequest);
@@ -35,7 +35,7 @@ public class ChannelController {
                 .body(ApiResponse.success(ChannelResponse.from(channel)));
     }
 
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(value="/private", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
             @Valid @ModelAttribute PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = channelService.create(privateChannelCreateRequest);
