@@ -44,7 +44,10 @@ public class UserController {
 
 
     // 모든 사용자 조회
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(
+            path = "/findAll",
+            method = RequestMethod.GET
+    )
     public List<UserFindResponse> findAll() {
 
         return userService.findAll();
