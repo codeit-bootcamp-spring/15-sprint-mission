@@ -52,7 +52,7 @@ public class ChannelController {
         return ResponseEntity.ok(ApiResponse.success(ChannelResponse.from(channelDto)));
     }
 
-    @RequestMapping(value="/{user-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/user/{user-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<List<ChannelResponse>>> getChannels(
             @PathVariable("user-id") UUID userId
     ){
