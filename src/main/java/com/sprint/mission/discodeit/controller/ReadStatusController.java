@@ -17,7 +17,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
-    // todo: 특정 채널의 메시지 수신 정보를 생성할 수 있다.
+
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<ReadStatus> createReadStatus(
             @RequestParam("user-id") UUID userId,
@@ -29,7 +29,6 @@ public class ReadStatusController {
         return ResponseEntity.ok().body(readStatus);
     }
 
-    // todo:> 특정 채널의 메시지 수신 정보를 수정할 수 있다.
     @RequestMapping(method = RequestMethod.PATCH)
     public ResponseEntity<Void> updateReadStatus(
             @RequestParam("channel-id") UUID channelId)
@@ -41,7 +40,6 @@ public class ReadStatusController {
         return ResponseEntity.noContent().build();
     }
 
-    // todo: 특정 사용자의 메시지 수신 정보를 조회할 수 있다.
     @RequestMapping(path = "/{user-id}", method = RequestMethod.GET)
     public ResponseEntity<List<ReadStatus>> getReadStatus(@PathVariable("user-id") UUID userId) {
         return ResponseEntity.ok().body(readStatusService.findAllByUserId(userId));
