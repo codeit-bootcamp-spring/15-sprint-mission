@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>사용자 목록</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #f6f7f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 40px 20px;
+        }
+
+        h1 {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1f2328;
+            margin-bottom: 24px;
+        }
+
+        .card-container {
+            width: 100%;
+            max-width: 600px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e1e4e8;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            padding: 8px 24px;
+        }
+
+        .user-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 0;
+            border-bottom: 1px solid #edf0f3;
+        }
+
+        .user-row:last-child {
+            border-bottom: none;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        /* 프로필 이미지가 없을 때 보여줄 기본 원형 아바타 */
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: #e1e4e8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #57606a;
+            font-weight: 700;
+            font-size: 16px;
+            object-fit: cover;
+            flex-shrink: 0;
+        }
+
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .username {
+            font-size: 15px;
+            font-weight: 700;
+            color: #1f2328;
+        }
+
+        .email {
+            font-size: 13px;
+            color: #656d76;
+        }
+
+        .badge {
+            font-size: 12px;
+            font-weight: 600;
+            padding: 4px 12px;
+            border-radius: 14px;
+            display: inline-block;
+        }
+
+        .badge.online {
+            background-color: #2ea043;
+            color: #ffffff;
+        }
+
+        .badge.offline {
+            background-color: #8c959f;
+            color: #ffffff;
+        }
+
+        .status-text {
+            text-align: center;
+            padding: 30px;
+            color: #656d76;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<h1>사용자 목록</h1>
+
+<div class="card-container" id="userList">
+    <div class="status-text">사용자 목록을 불러오는 중...</div>
+</div>
+
+<script>
+    async function loadUsers() {
+        const container = document.getElementById('userList');
+
+        try {
+            const response = await fetch('/api/user/findAll');
+            if (!response.ok) {
+                throw new Error('API 응답 에러: ' + response.status);
+            }
+
+            const users = await response.json();
+
+            if (!users || users.length === 0) {
+                container.innerHTML = '<div class="status-text">등록된 사용자가 없습니다.</div>';
+                return;
+            }
+
+            container.innerHTML = '';
+
+            users.forEach(user => {
+                const isOnline = user.online === true;
+                // 첫 글자 추출 (아바타용)
+                const initial = user.username ? user.username.charAt(0).toUpperCase() : 'U';
+
+                const row = document.createElement('div');
+                row.className = 'user-row';
+
+                // profileId가 null이면 외부 이미지 호출을 아예 안 하고 SVG/이니셜 아바타 사용
+                const avatarHtml = user.profileId
+                    ? `<img class="avatar" src="/api/binaryContent/find?binaryContentId=${user.profileId}" alt="${user.username}" onerror="this.outerHTML='<div class=\\'avatar\\'>${initial}</div>'" />`
+                    : `<div class="avatar">${initial}</div>`;
+
+                row.innerHTML = `
+            <div class="user-profile">
+              ${avatarHtml}
+              <div class="user-meta">
+                <span class="username">${user.username}</span>
+                <span class="email">${user.email}</span>
+              </div>
+            </div>
+            <span class="badge ${isOnline ? 'online' : 'offline'}">
+              ${isOnline ? '온라인' : '오프라인'}
+            </span>
+          `;
+
+                container.appendChild(row);
+            });
+
+        } catch (err) {
+            console.error('데이터 로드 실패:', err);
+            container.innerHTML = '<div class="status-text">목록을 불러오지 못했습니다.</div>';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUsers);
+</script>
+</body>
+</html>
