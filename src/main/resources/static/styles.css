@@ -7,31 +7,34 @@
 body {
     font-family: Arial, sans-serif;
     background-color: #f5f5f5;
+    color: #333;
 }
 
 .container {
-    max-width: 800px;
+    width: 80%;
+    max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding-top: 60px;
 }
 
 h1 {
     text-align: center;
-    margin-bottom: 30px;
-    color: #333;
+    font-size: 42px;
+    margin-bottom: 50px;
 }
 
 .user-list {
     background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 .user-item {
     display: flex;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
+    padding: 28px 32px;
+    border-bottom: 1px solid #e5e5e5;
 }
 
 .user-item:last-child {
@@ -39,38 +42,39 @@ h1 {
 }
 
 .user-avatar {
-    width: 60px;
-    height: 60px;
+    width: 72px;
+    height: 72px;
     border-radius: 50%;
-    margin-right: 20px;
     object-fit: cover;
+    margin-right: 28px;
+    border: 1px solid #ddd;
 }
 
 .user-info {
-    flex-grow: 1;
+    flex: 1;
 }
 
 .user-name {
-    font-size: 18px;
+    font-size: 24px;
     font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
+    margin-bottom: 8px;
 }
 
 .user-email {
-    font-size: 14px;
+    font-size: 18px;
     color: #666;
 }
 
 .status-badge {
-    padding: 6px 12px;
+    padding: 10px 18px;
     border-radius: 20px;
-    font-size: 14px;
+    font-size: 18px;
     font-weight: bold;
+    white-space: nowrap;
 }
 
 .online {
-    background-color: #4CAF50;
+    background-color: #4caf50;
     color: white;
 }
 
