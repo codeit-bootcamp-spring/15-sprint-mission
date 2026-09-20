@@ -31,7 +31,7 @@ public class UserController {
     // 생성
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
-            @Valid @ModelAttribute UserCreateRequest userCreateRequest,
+            @Valid @RequestBody UserCreateRequest userCreateRequest,
             @RequestParam Optional<BinaryContentCreateRequest> binaryContentCreateRequest
             ) throws IOException {
         User user = userService.create(userCreateRequest, binaryContentCreateRequest);
