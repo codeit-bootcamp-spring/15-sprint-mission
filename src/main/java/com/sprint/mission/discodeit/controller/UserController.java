@@ -7,7 +7,9 @@ import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
+import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +25,6 @@ import java.util.UUID;
 public class UserController {
 
     private final BasicUserService userService;
-
     public UserController(BasicUserService userService){
         this.userService = userService;
     }
@@ -31,8 +32,8 @@ public class UserController {
     // 생성
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
-            @Valid @RequestBody UserCreateRequest userCreateRequest,
-            @RequestParam Optional<BinaryContentCreateRequest> binaryContentCreateRequest
+            @Valid @ModelAttribute UserCreateRequest userCreateRequest,
+            @RequestPart Optional<BinaryContentCreateRequest> binaryContentCreateRequest
             ) throws IOException {
         User user = userService.create(userCreateRequest, binaryContentCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
