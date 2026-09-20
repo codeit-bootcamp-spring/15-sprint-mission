@@ -48,7 +48,7 @@ public class MessageController {
         return ResponseEntity.ok(ApiResponse.success(MessageResponse.from(message)));
     }
 
-    @RequestMapping(value="/{channel-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/channel/{channel-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<List<MessageResponse>>> getMessages(
             @PathVariable ("channel-id") UUID channelId
     ) {
