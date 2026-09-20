@@ -22,7 +22,7 @@ public class AuthController {
 
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<LoginResponse>> createLogin(
-            @Valid @ModelAttribute LoginRequest loginRequest
+            @Valid @RequestBody LoginRequest loginRequest
             ) {
         User user = authService.login(loginRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(LoginResponse.from(user)));

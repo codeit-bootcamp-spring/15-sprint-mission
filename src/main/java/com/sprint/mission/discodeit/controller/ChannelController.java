@@ -29,7 +29,7 @@ public class ChannelController {
     // 등록
     @RequestMapping(value="/public", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
-            @Valid @ModelAttribute PublicChannelCreateRequest publicChannelCreateRequest) {
+            @Valid @RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = channelService.create(publicChannelCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(ChannelResponse.from(channel)));
@@ -37,7 +37,7 @@ public class ChannelController {
 
     @RequestMapping(value="/private", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
-            @Valid @ModelAttribute PrivateChannelCreateRequest privateChannelCreateRequest) {
+            @Valid @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = channelService.create(privateChannelCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(ChannelResponse.from(channel)));
@@ -65,7 +65,7 @@ public class ChannelController {
     @RequestMapping(value="/{channel-id}", method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ChannelResponse>> updateChannel(
             @PathVariable ("channel-id") UUID channelId,
-            @Valid @ModelAttribute PublicChannelUpdateRequest request
+            @Valid @RequestBody PublicChannelUpdateRequest request
             ) {
         Channel update = channelService.update(channelId, request);
         return ResponseEntity.ok(ApiResponse.success(ChannelResponse.from(update)));

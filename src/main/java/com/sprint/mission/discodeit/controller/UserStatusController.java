@@ -24,7 +24,7 @@ public class UserStatusController {
     @RequestMapping(value="/{user-id}/online" , method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
             @RequestParam UUID userId,
-            @Valid @ModelAttribute UserStatusUpdateRequest request
+            @Valid @RequestBody UserStatusUpdateRequest request
     ) {
        UserStatus status = userStatusService.update(userId, request);
        return ResponseEntity.ok(ApiResponse.success(UserStatusResponse.from(status)));

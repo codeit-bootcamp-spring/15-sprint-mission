@@ -26,7 +26,7 @@ public class ReadStatusController {
     // 생성
     @RequestMapping(value="/v1/channels/{channel-id}/read-status", method= RequestMethod.POST)
     public ResponseEntity<ApiResponse<ReadStatusResponse>> createReadStatus(
-            @Valid @ModelAttribute ReadStatusCreateRequest request,
+            @Valid @RequestBody ReadStatusCreateRequest request,
             @PathVariable("channel-id") UUID channelId) {
         ReadStatus readStatus = readStatusService.create(request, channelId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(ReadStatusResponse.from(readStatus)));
@@ -45,7 +45,7 @@ public class ReadStatusController {
     // 수정
     @RequestMapping(value="/v1/channels/{channel-id}/read-status", method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ReadStatusResponse>> updateReadStatus(
-            @Valid @ModelAttribute ReadStatusUpdateRequest request,
+            @Valid @RequestBody ReadStatusUpdateRequest request,
             @PathVariable("channel-id") UUID channelId,
             @RequestParam UUID readStatusId
     ) {

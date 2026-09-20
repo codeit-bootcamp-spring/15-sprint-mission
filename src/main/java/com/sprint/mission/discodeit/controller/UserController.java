@@ -58,7 +58,7 @@ public class UserController {
     @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
-            @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
+            @Valid @RequestBody UserUpdateRequest userUpdateRequest,
             @RequestParam Optional<BinaryContentCreateRequest> binaryContentCreateRequest
 
     ) throws IOException {

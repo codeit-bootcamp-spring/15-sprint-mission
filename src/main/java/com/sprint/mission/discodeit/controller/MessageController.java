@@ -59,7 +59,7 @@ public class MessageController {
     // 수정
     @RequestMapping(value="/{message-id}", method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<MessageResponse>> updateMessage(
-            @Valid @ModelAttribute MessageUpdateRequest request,
+            @Valid @RequestBody MessageUpdateRequest request,
             @PathVariable ("message-id") UUID messageId
     ) {
         Message update = messageService.update(messageId, request);
