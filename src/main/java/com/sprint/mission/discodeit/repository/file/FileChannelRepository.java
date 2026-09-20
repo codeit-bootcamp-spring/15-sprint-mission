@@ -1,90 +1,108 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
-import java.util.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.stream.Stream;
 
-public class FileChannelRepository implements ChannelRepository{
-    // 1.  .ser -> .json 변경
-    private final String FILE_PATH = "channel.json";
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
+@Repository
+public class FileChannelRepository implements ChannelRepository {
+    private final Path DIRECTORY;
+    private final String EXTENSION = ".ser";
 
-    // 2. ObjectMapper 선언 (.indentOutput()으로 JSON 정렬)
-    private final ObjectMapper objectMapper = new ObjectMapper()
-            .enable(SerializationFeature.INDENT_OUTPUT);
-
-    // 3. Json파일 읽기 (readAll)
-    private List<Channel> readAll(){
-        File file = new File(FILE_PATH);
-        if(!file.exists() || file.length() == 0) return new ArrayList<>();
-        try{
-            // Jackson에서 List<Channel> 제네릭 객체를 정확히 복원하기위해 타입레퍼런스 사용
-            return objectMapper.readValue(file, new TypeReference<List<Channel>>(){});
-        } catch (IOException e) {
-            e.printStackTrace();
-            return new ArrayList<>();
+    public FileChannelRepository(
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+    ) {
+        this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Channel.class.getSimpleName());
+        if (Files.notExists(DIRECTORY)) {
+            try {
+                Files.createDirectories(DIRECTORY);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 
-    // 4. Json파일 쓰기
-    private void writeAll(List<Channel> channels){
-        try{
-            objectMapper.writeValue(new File(FILE_PATH), channels);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+    private Path resolvePath(UUID id) {
+        return DIRECTORY.resolve(id + EXTENSION);
     }
 
     @Override
     public Channel save(Channel channel) {
-        List<Channel> channels = readAll();
-        channels.add(channel);
-        writeAll(channels);
+        Path path = resolvePath(channel.getId());
+        try (
+                FileOutputStream fos = new FileOutputStream(path.toFile());
+                ObjectOutputStream oos = new ObjectOutputStream(fos)
+        ) {
+            oos.writeObject(channel);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
         return channel;
     }
 
     @Override
-    public Channel findById(UUID id) {
-        return readAll().stream()
-                .filter(channel -> channel.getId().equals(id))
-                .findFirst()
-                .orElse(null);
+    public Optional<Channel> findById(UUID id) {
+        Channel channelNullable = null;
+        Path path = resolvePath(id);
+        if (Files.exists(path)) {
+            try (
+                    FileInputStream fis = new FileInputStream(path.toFile());
+                    ObjectInputStream ois = new ObjectInputStream(fis)
+            ) {
+                channelNullable = (Channel) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return Optional.ofNullable(channelNullable);
     }
 
     @Override
-    public List<Channel> findAll() { return readAll(); }
-
-    @Override
-    public Channel update(UUID id, String channelName) {
-        List<Channel> channels = readAll();
-        for(Channel c : channels){
-            if(c.getId().equals(id)){
-                c.updateChannelName(channelName);
-                writeAll(channels);
-                return c;
-            }
+    public List<Channel> findAll() {
+        try (Stream<Path> paths = Files.list(DIRECTORY)) {
+            return paths
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (Channel) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        return null;
     }
 
     @Override
-    public Channel delete(UUID id) {
-        List<Channel> channels = readAll();
-        Channel removed = null;
-        Iterator<Channel> it = channels.iterator();
-        while(it.hasNext()){
-            Channel channel = it.next();
-            if(channel.getId().equals(id)){
-                removed = channel;
-                it.remove();
-                writeAll(channels);
-            }
+    public boolean existsById(UUID id) {
+        Path path = resolvePath(id);
+        return Files.exists(path);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        Path path = resolvePath(id);
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
-        writeAll(channels);
-        return removed;
     }
 }
