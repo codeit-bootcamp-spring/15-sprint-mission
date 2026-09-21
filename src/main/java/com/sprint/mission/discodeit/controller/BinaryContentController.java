@@ -29,7 +29,7 @@ public class BinaryContentController {
     // 정적 리소스 서빙
     @RequestMapping(value="/api/binaryContent/find", method=RequestMethod.GET)
     public ResponseEntity<BinaryContent> getContent(
-            @RequestParam("profile-id") UUID contentId) {
+            @RequestParam("binaryContentId") UUID contentId) {
         BinaryContent content = basicBinaryContentService.find(contentId);
         return ResponseEntity.ok(content);
     }
