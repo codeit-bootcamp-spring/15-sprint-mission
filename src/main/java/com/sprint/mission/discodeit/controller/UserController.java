@@ -99,18 +99,18 @@ public class UserController {
     }
 
 
-    @RequestMapping(value="/v1/users", method=RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
-        List<UserResponse> users = userService.findAll().stream()
-                .map(UserResponse::from).toList();
-        return ResponseEntity.ok(ApiResponse.success(users));
-    }
-//    // 정적 리소스 서빙
-//    @RequestMapping(value="/api/user/findAll", method=RequestMethod.GET)
-//    public ResponseEntity<List<UserDto>> getUsers() {
-//        List<UserDto> users = userService.findAll();
-//        return ResponseEntity.ok(users);
+//    @RequestMapping(value="/v1/users", method=RequestMethod.GET)
+//    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
+//        List<UserResponse> users = userService.findAll().stream()
+//                .map(UserResponse::from).toList();
+//        return ResponseEntity.ok(ApiResponse.success(users));
 //    }
+    // 정적 리소스 서빙
+    @RequestMapping(value="/api/user/findAll", method=RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> getUsers() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity.ok(users);
+    }
     // 수정
     @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
