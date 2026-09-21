@@ -11,8 +11,12 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import jakarta.validation.Valid;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -25,7 +29,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/users")
 public class UserController {
 
     private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
@@ -56,7 +59,7 @@ public class UserController {
     }
 
     // 생성
-    @RequestMapping(method=RequestMethod.POST)
+    @RequestMapping(value= "/v1/users", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @Valid @ModelAttribute UserCreateRequest userCreateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
@@ -86,7 +89,7 @@ public class UserController {
                 .body(ApiResponse.success(UserResponse.from(user)));
     }
     // 조회
-    @RequestMapping(value="/{user-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/v1/users/{user-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<UserResponse>> getUser(
         @PathVariable("user-id") UUID userId) {
 
@@ -95,14 +98,20 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(userDto)));
     }
 
-    @RequestMapping(method=RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
-        List<UserResponse> users = userService.findAll().stream()
-                .map(UserResponse::from).toList();
-        return ResponseEntity.ok(ApiResponse.success(users));
+//    @RequestMapping(method=RequestMethod.GET)
+//    public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
+//        List<UserResponse> users = userService.findAll().stream()
+//                .map(UserResponse::from).toList();
+//        return ResponseEntity.ok(ApiResponse.success(users));
+//    }
+    // 정적 리소스 서빙
+    @RequestMapping(value="/api/user/findAll", method=RequestMethod.GET)
+    public ResponseEntity<List<UserDto>> getUsers() {
+        List<UserDto> users = userService.findAll();
+        return ResponseEntity.ok(users);
     }
     // 수정
-    @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
+    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
             @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
@@ -131,7 +140,7 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(update)));
     }
     // 삭제
-    @RequestMapping(value="/{user-id}",method=RequestMethod.DELETE)
+    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();

@@ -6,13 +6,13 @@ import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.basic.BasicBinaryContentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/content")
 public class BinaryContentController {
     private final BasicBinaryContentService basicBinaryContentService;
 
@@ -20,15 +20,22 @@ public class BinaryContentController {
         this.basicBinaryContentService = basicBinaryContentService;
     }
     // 바이너리 파일 단건 조회
-    @RequestMapping(value="/{content-id}", method=RequestMethod.GET)
-    public ResponseEntity<ApiResponse<BinaryContentResponse>> getContent(
-            @PathVariable("content-id") UUID contentId) {
+//    @RequestMapping(value="/{content-id}", method=RequestMethod.GET)
+//    public ResponseEntity<ApiResponse<BinaryContentResponse>> getContent(
+//            @PathVariable("content-id") UUID contentId) {
+//        BinaryContent content = basicBinaryContentService.find(contentId);
+//        return ResponseEntity.ok(ApiResponse.success(BinaryContentResponse.from(content)));
+//    }
+    // 정적 리소스 서빙
+    @RequestMapping(value="/api/binaryContent/find", method=RequestMethod.GET)
+    public ResponseEntity<BinaryContent> getContent(
+            @RequestParam("profile-id") UUID contentId) {
         BinaryContent content = basicBinaryContentService.find(contentId);
-        return ResponseEntity.ok(ApiResponse.success(BinaryContentResponse.from(content)));
+        return ResponseEntity.ok(content);
     }
 
     // 바이너리 파일 여러건 조회
-    @RequestMapping(method=RequestMethod.GET)
+    @RequestMapping(value="/v1/content", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<List<BinaryContentResponse>>> getContents(
             @RequestParam("binary content-ids") List<UUID> binaryContendIds
     ) {
