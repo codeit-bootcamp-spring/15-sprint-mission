@@ -30,7 +30,7 @@ import java.util.UUID;
 @RequestMapping("/v1/users")
 public class UserController {
 
-    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");;
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
     private final BasicUserService userService;
     public UserController(BasicUserService userService){
         this.userService = userService;
@@ -107,10 +107,28 @@ public class UserController {
     @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
-            @Valid @RequestBody UserUpdateRequest userUpdateRequest,
-            @RequestPart Optional<BinaryContentCreateRequest> binaryContentCreateRequest
+            @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
+            @RequestPart(value="image", required = false) MultipartFile file
 
     ) throws IOException {
+        // 파일 검증
+        validateImageFile(file);
+        // 파일명과 확장자 만들기
+        String originalFileName = file.getOriginalFilename();
+        String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
+        String savedFileName = UUID.randomUUID() + "." + extension;
+        // 디스크 저장
+        Path savePath = Paths.get("./uploads/" + savedFileName);
+        Files.createDirectories(savePath.getParent());
+        file.transferTo(savePath);
+        BinaryContentCreateRequest request = new BinaryContentCreateRequest(
+                file.getOriginalFilename(),
+                file.getContentType(),
+                file.getBytes()
+        );
+        Optional<BinaryContentCreateRequest> binaryContentCreateRequest
+                = Optional.of(request);
+
         User update = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(update)));
     }

@@ -13,15 +13,24 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @RestController
 @RequestMapping("/v1/messages")
 public class MessageController {
+
+    private static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
     private final BasicMessageService messageService;
 
     public MessageController(BasicMessageService messageService) {
@@ -32,9 +41,31 @@ public class MessageController {
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<MessageResponse>> createMessage(
             @Valid @ModelAttribute MessageCreateRequest request,
-            List<BinaryContentCreateRequest> binaryContentCreateRequest
-            ) {
-        Message message = messageService.create(request, binaryContentCreateRequest);
+            @RequestPart(value = "images", required = false) List<MultipartFile> files
+            ) throws IOException {
+        List<String> fileNames = new ArrayList<>();
+
+        List<BinaryContentCreateRequest> contentList = new ArrayList<>();
+
+        // 여러 장을 순회하며 한 장씩 저장
+        for (MultipartFile file : files) {
+            String fileName = file.getOriginalFilename();
+            Path savePath = Paths.get("./uploads/" + fileName);
+            Files.createDirectories(savePath.getParent());
+            file.transferTo(savePath);
+            fileNames.add(fileName);
+
+            BinaryContentCreateRequest binaryContentCreateRequest = new BinaryContentCreateRequest(
+                    file.getOriginalFilename(),
+                    file.getContentType(),
+                    file.getBytes()
+            );
+
+            contentList.add(binaryContentCreateRequest);
+        }
+
+
+        Message message = messageService.create(request, contentList);
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(MessageResponse.from(message)));

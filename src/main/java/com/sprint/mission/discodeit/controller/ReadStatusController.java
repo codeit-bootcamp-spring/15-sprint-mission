@@ -43,13 +43,15 @@ public class ReadStatusController {
     }
 
     // 수정
-    @RequestMapping(value="/v1/channels/{channel-id}/read-status", method= RequestMethod.PATCH)
+    @RequestMapping(value="/v1/channels/{channel-id}/read-status/{readstatus-id}", method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ReadStatusResponse>> updateReadStatus(
             @Valid @RequestBody ReadStatusUpdateRequest request,
             @PathVariable("channel-id") UUID channelId,
-            @RequestParam UUID readStatusId
+            @PathVariable("readstatus-id") UUID readStatusId
     ) {
-        ReadStatus readStatus = readStatusService.update(readStatusId, channelId, request);
+
+
+        ReadStatus readStatus = readStatusService.update(channelId, readStatusId, request);
         return ResponseEntity.ok(ApiResponse.success(ReadStatusResponse.from(readStatus)));
     }
 }

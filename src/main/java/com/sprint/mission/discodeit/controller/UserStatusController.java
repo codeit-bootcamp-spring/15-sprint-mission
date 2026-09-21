@@ -29,14 +29,6 @@ public class UserStatusController {
     public UserStatusController(BasicUserStatusService userStatusService) {
         this.userStatusService = userStatusService;
     }
-//    @RequestMapping(method=RequestMethod.POST)
-//    public ResponseEntity<ApiResponse<UserStatusResponse>> createUserStatus(
-//            @Valid @RequestBody UserStatusCreateRequest userStatusCreateRequest
-//    ){
-//        UserStatus status = userStatusService.create(userStatusCreateRequest);
-//        return ResponseEntity.status(HttpStatus.CREATED)
-//                .body(ApiResponse.success(UserStatusResponse.from(status)));
-//    }
 
     @RequestMapping(value="/{user-id}/online" , method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
