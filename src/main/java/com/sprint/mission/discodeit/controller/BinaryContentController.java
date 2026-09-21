@@ -15,7 +15,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/binary-content")
+@RequestMapping("/api/binaryContent")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
@@ -36,9 +36,9 @@ public class BinaryContentController {
     }
 
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<BinaryContent>> getBinaryContent(@PathVariable("id") UUID id){
-        BinaryContent binaryContent = binaryContentService.find(id);
+    @GetMapping("/find")
+    public ResponseEntity<ApiResponse<BinaryContent>> getBinaryContent(@RequestParam("binaryContentId") UUID binaryContentId){
+        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
         return ResponseEntity.ok(ApiResponse.success(binaryContent));
     }

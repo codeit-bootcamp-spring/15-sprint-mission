@@ -19,7 +19,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/api/user")
 public class UserController {
     private final UserService userService;
     //유저 생성
@@ -79,7 +79,7 @@ public class UserController {
     }
 
     //전체 조회
-    @GetMapping
+    @GetMapping("/findAll")
     public ResponseEntity<ApiResponse<List<UserResponse>>> getUsers() {
         List<UserResponse> users = userService.findAll();
         return ResponseEntity.ok(ApiResponse.success(users));
