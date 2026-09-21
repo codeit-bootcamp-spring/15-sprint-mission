@@ -1,16 +1,16 @@
 package com.sprint.mission.discodeit.entity;
 
 public enum ChannelType {
-    PUBLIC(true),
-    PRIVATE(false);
+  PUBLIC(true),
+  PRIVATE(false);
 
-    private final boolean isPublic;
+  private final boolean isPublic;
 
-    ChannelType(boolean b) {
-        this.isPublic = b;
-    }
+  ChannelType(boolean b) {
+    this.isPublic = b;
+  }
 
-    public boolean isPublic() {
-        return isPublic;
-    }
+  public boolean isPublic() {
+    return isPublic;
+  }
 }

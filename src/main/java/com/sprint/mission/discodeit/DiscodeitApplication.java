@@ -37,8 +37,8 @@ public class DiscodeitApplication {
                 .forEach(m -> System.out.println(m.getContent()));
     }*/
 
-    public static void main(String[] args) {
-        SpringApplication.run(DiscodeitApplication.class, args);
-    }
+  public static void main(String[] args) {
+    SpringApplication.run(DiscodeitApplication.class, args);
+  }
 
 }

@@ -6,9 +6,14 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusRepository {
-    boolean save(UserStatus userStatus);
-    UserStatus find(UUID id);
-    UserStatus findByUserId(UUID userid);
-    List<UserStatus> findAll();
-    void delete(UUID id);
+
+  boolean save(UserStatus userStatus);
+
+  UserStatus find(UUID id);
+
+  UserStatus findByUserId(UUID userid);
+
+  List<UserStatus> findAll();
+
+  void delete(UUID id);
 }

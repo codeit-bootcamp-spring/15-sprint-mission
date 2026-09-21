@@ -6,15 +6,16 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Channel extends Common {
-    ChannelType type;
-    String name;
-    String description;
+
+  ChannelType type;
+  String name;
+  String description;
 
 
-    public Channel(ChannelType type, String name, String description) {
-        super();
-        this.type = type;
-        this.name = name;
-        this.description = description;
-    }
+  public Channel(ChannelType type, String name, String description) {
+    super();
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 }

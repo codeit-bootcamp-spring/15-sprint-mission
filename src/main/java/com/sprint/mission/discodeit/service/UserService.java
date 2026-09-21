@@ -11,10 +11,17 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserService {
-    User create(UserCreateRequest cr, BinaryContentCreateRequest br);
-    UserResponse find(UUID userId);
-    UserResponse findByName(String name);
-    List<UserResponse> findAll();
-    UserResponse update(UserUpdateRequest updateRequest, BinaryContentUpdateRequest bcur); // 수정할 객체 id , 수정할 내용
-    void delete(UUID id);
+
+  User create(UserCreateRequest cr, BinaryContentCreateRequest br);
+
+  UserResponse find(UUID userId);
+
+  UserResponse findByName(String name);
+
+  List<UserResponse> findAll();
+
+  User update(UserUpdateRequest updateRequest,
+      BinaryContentUpdateRequest bcur); // 수정할 객체 id , 수정할 내용
+
+  void delete(UUID id);
 }
