@@ -1,0 +1,210 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: Arial, "Apple SD Gothic Neo", sans-serif;
+    background: linear-gradient(180deg, #fffaf5 0%, #f6f3ff 100%);
+    color: #2f2f38;
+    min-height: 100vh;
+}
+
+/* 상단 영역 */
+.header {
+    text-align: center;
+    padding: 42px 20px 32px;
+    background: rgba(255, 255, 255, 0.85);
+    border-bottom: 1px solid #eee8f5;
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    font-size: 25px;
+    font-weight: 800;
+}
+
+.logo-icon {
+    font-size: 30px;
+}
+
+.header-description {
+    margin-top: 10px;
+    color: #88838f;
+    font-size: 14px;
+}
+
+/* 전체 콘텐츠 */
+.container {
+    width: min(1100px, calc(100% - 40px));
+    margin: 0 auto;
+    padding: 55px 0 70px;
+}
+
+/* 제목 */
+.title-section {
+    text-align: center;
+    margin-bottom: 42px;
+}
+
+.small-title {
+    color: #9b86d9;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 10px;
+}
+
+.title-section h1 {
+    font-size: 32px;
+    margin-bottom: 12px;
+}
+
+.title-section > p:last-child {
+    color: #8a8691;
+    font-size: 15px;
+}
+
+/* 사용자 카드 영역 */
+.user-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+}
+
+/* 개별 사용자 카드 */
+.user-card {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 24px;
+    padding: 25px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    min-height: 160px;
+    border: 1px solid #f0ebf5;
+    box-shadow: 0 12px 30px rgba(75, 63, 105, 0.08);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+}
+
+.user-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 38px rgba(75, 63, 105, 0.14);
+}
+
+/* 카드 장식 */
+.user-card::after {
+    content: "🐾";
+    position: absolute;
+    right: 16px;
+    bottom: 8px;
+    font-size: 50px;
+    opacity: 0.06;
+    transform: rotate(-15deg);
+}
+
+/* 프로필 이미지 */
+.profile-image {
+    width: 105px;
+    height: 105px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid #f5efff;
+    background: #f2eff5;
+}
+
+/* 사용자 정보 */
+.user-info {
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 21px;
+    font-weight: 800;
+    margin-bottom: 7px;
+}
+
+.user-email {
+    color: #88838f;
+    font-size: 14px;
+    margin-bottom: 13px;
+    word-break: break-all;
+}
+
+/* 상태 */
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.status::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+}
+
+.status.online {
+    color: #28834a;
+    background: #e9f8ee;
+}
+
+.status.online::before {
+    background: #38b766;
+}
+
+.status.offline {
+    color: #85818b;
+    background: #f0eef2;
+}
+
+.status.offline::before {
+    background: #aaa6ae;
+}
+
+/* 하단 */
+.footer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    padding: 25px;
+    color: #aaa4af;
+    font-size: 13px;
+}
+
+/* 모바일 */
+@media (max-width: 700px) {
+    .container {
+        width: min(92%, 550px);
+        padding-top: 40px;
+    }
+
+    .user-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .title-section h1 {
+        font-size: 26px;
+    }
+
+    .user-card {
+        padding: 20px;
+    }
+
+    .profile-image {
+        width: 85px;
+        height: 85px;
+    }
+}
