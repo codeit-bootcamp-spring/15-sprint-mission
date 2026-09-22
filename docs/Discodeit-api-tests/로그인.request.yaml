@@ -1,0 +1,12 @@
+$kind: http-request
+url: "  http://localhost:8080/api/auth/login"
+method: POST
+body:
+  type: json
+  content: |2-
+      {
+          "userName": "민영",
+          "password": "3333a"
+      }
+examples: .resources/로그인.resources/examples
+order: 4456751589826384

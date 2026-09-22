@@ -1,0 +1,19 @@
+$kind: http-request
+url: http://localhost:8080/api/messages
+method: POST
+body:
+  type: formdata
+  content:
+    - type: text
+      key: messageCreateRequest
+      value: '     {"contents":"사진 첨부해봅니다.","channelId":"40c6b700-e7f9-43d4-b072-f5d2e1520bbc","authorId":"d12e0c39-6e91-4dc2-91f5-0c7e69765705","attachmentIds":[]}'
+      description: ""
+      disabled: false
+    - type: file
+      key: attachments
+      src:
+        - /Users/seongmin-yeong/Desktop/탱이2.png
+      description: ""
+      disabled: false
+examples: .resources/메시지 전송.resources/examples
+order: 4503464386241317

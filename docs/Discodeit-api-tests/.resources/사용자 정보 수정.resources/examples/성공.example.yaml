@@ -1,0 +1,34 @@
+$kind: http-example
+request:
+  url: "   http://localhost:8080/api/users/d12e0c39-6e91-4dc2-91f5-0c7e69765705"
+  method: PATCH
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: userUpdateRequest
+        value: '     {"userName":"가짜 민영","email":"minyeong@naver.com","password":"1234a"}'
+        description: ""
+        disabled: false
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 06:27:26 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "userName": "가짜 민영",
+        "email": "minyeong@naver.com",
+        "profileId": null,
+        "online": false,
+        "createdAt": "2026-09-18T05:08:04.657081Z",
+        "updatedAt": "2026-09-18T06:27:26.016489Z"
+      }
+order: 1789712867708

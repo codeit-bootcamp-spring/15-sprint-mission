@@ -1,0 +1,30 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/channels/9d738c8d-464f-4e70-97a1-aaab8e0637d4
+  method: PATCH
+  body:
+    type: json
+    content: |2-
+        {
+            "channelName": "여행게시판(수정)",
+            "description": "여행 기록을 남기는 공간입니다"
+        }
+response:
+  statusCode: 409
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:59:07 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "timestamp": "2026-09-18T05:59:07.185311Z",
+        "status": 409,
+        "error": "Conflict",
+        "message": "수정할 수 없는 채널"
+      }
+order: 2529267545882267

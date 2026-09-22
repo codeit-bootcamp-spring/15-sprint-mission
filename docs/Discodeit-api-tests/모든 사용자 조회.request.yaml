@@ -1,0 +1,5 @@
+$kind: http-request
+url: "  http://localhost:8080/api/users"
+method: GET
+examples: .resources/모든 사용자 조회.resources/examples
+order: 965960681458376

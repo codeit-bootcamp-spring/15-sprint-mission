@@ -1,0 +1,5 @@
+$kind: http-request
+url: "   http://localhost:8080/api/messages/0a9c208f-61ac-41b6-9e0c-726988f18df7"
+method: DELETE
+examples: .resources/메시지 삭제.resources/examples
+order: 4503599627354641

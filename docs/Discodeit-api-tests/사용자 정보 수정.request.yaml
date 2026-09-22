@@ -1,0 +1,13 @@
+$kind: http-request
+url: "   http://localhost:8080/api/users/d12e0c39-6e91-4dc2-91f5-0c7e69765705"
+method: PATCH
+body:
+  type: formdata
+  content:
+    - type: text
+      key: userUpdateRequest
+      value: '     {"userName":"가짜 민영","email":"minyeong@naver.com","password":"1234a"}'
+      description: ""
+      disabled: false
+examples: .resources/사용자 정보 수정.resources/examples
+order: 4503599627368857

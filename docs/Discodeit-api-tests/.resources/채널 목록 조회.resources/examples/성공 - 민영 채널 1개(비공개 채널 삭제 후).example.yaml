@@ -1,0 +1,31 @@
+$kind: http-example
+request:
+  url: "  http://localhost:8080/api/channels?userId=d12e0c39-6e91-4dc2-91f5-0c7e69765705"
+  method: GET
+  queryParams:
+    userId: d12e0c39-6e91-4dc2-91f5-0c7e69765705
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 06:22:34 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+          "channelName": "여행게시판(수정)",
+          "description": "여행 기록을 남기는 공간입니다",
+          "channelType": "PUBLIC",
+          "lastMessageAt": "2026-09-18T05:48:57.739251Z",
+          "participantIds": null,
+          "createdAt": "2026-09-18T05:18:57.582038Z",
+          "updatedAt": "2026-09-18T05:58:09.696086Z"
+        }
+      ]
+order: 2303230814252429

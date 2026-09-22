@@ -1,0 +1,11 @@
+$kind: http-request
+url: "   http://localhost:8080/api/users/d12e0c39-6e91-4dc2-91f5-0c7e69765705/userStatus"
+method: PATCH
+body:
+  type: json
+  content: |2-
+       {
+           "lastAccessedAt": "2026-09-18T06:20:00Z"
+       }
+examples: .resources/온라인 상태 업데이트.resources/examples
+order: 4503599624109982

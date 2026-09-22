@@ -1,0 +1,30 @@
+$kind: http-example
+request:
+  url: "   http://localhost:8080/api/users/d12e0c39-6e91-4dc2-91f5-0c7e69765705/userStatus"
+  method: PATCH
+  body:
+    type: json
+    content: |2-
+         {
+             "lastAccessedAt": "2026-09-18T06:20:00Z"
+         }
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 06:16:29 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "userId": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+        "lastAccessedAt": "2026-09-18T06:20:00Z",
+        "createdAt": "2026-09-18T05:08:04.658607Z",
+        "id": "501a1736-46da-49c5-8837-a3c8e835cfcf",
+        "updatedAt": "2026-09-18T06:16:29.031288Z"
+      }
+order: 1789712334788

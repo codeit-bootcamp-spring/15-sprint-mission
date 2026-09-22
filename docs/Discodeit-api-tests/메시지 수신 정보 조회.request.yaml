@@ -1,0 +1,7 @@
+$kind: http-request
+url: "   http://localhost:8080/api/readStatuses?userId=10f6d460-b539-4d40-88f9-73f162d09767"
+method: GET
+queryParams:
+  userId: 10f6d460-b539-4d40-88f9-73f162d09767
+examples: .resources/메시지 수신 정보 조회.resources/examples
+order: 4503599623989131

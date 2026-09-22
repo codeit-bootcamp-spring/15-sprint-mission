@@ -1,0 +1,41 @@
+$kind: http-example
+request:
+  url: "   http://localhost:8080/api/messages?channelId=40c6b700-e7f9-43d4-b072-f5d2e1520bbc"
+  method: GET
+  queryParams:
+    channelId: 40c6b700-e7f9-43d4-b072-f5d2e1520bbc
+response:
+  statusCode: 200
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:53:36 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      [
+        {
+          "id": "ff14a25e-ace5-4fe8-8405-83122a56b18e",
+          "contents": "안녕하세요! 반갑습니다.",
+          "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+          "authorId": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+          "attachmentIds": null,
+          "createdAt": "2026-09-18T05:48:57.739251Z",
+          "updatedAt": null
+        },
+        {
+          "id": "0a9c208f-61ac-41b6-9e0c-726988f18df7",
+          "contents": "사진 첨부해봅니다.",
+          "channelId": "40c6b700-e7f9-43d4-b072-f5d2e1520bbc",
+          "authorId": "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+          "attachmentIds": [
+            "0eda3ceb-bbca-4556-ba79-030f594f1163"
+          ],
+          "createdAt": "2026-09-18T05:51:52.159099Z",
+          "updatedAt": null
+        }
+      ]
+order: 1789710842316

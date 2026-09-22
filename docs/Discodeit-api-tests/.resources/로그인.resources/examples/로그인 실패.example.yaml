@@ -1,0 +1,30 @@
+$kind: http-example
+request:
+  url: "  http://localhost:8080/api/auth/login"
+  method: POST
+  body:
+    type: json
+    content: |2-
+        {
+            "userName": "민영",
+            "password": "3333a"
+        }
+response:
+  statusCode: 404
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:16:50 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "timestamp": "2026-09-18T05:16:50.841340Z",
+        "status": 404,
+        "error": "Not Found",
+        "message": "일치하는 유저 없음"
+      }
+order: 2880396136230201

@@ -1,0 +1,130 @@
+:root {
+    --bg: #f4f5f7;
+    --card: #ffffff;
+    --border: #e9eaee;
+    --text-primary: #1c2027;
+    --text-secondary: #767c88;
+    --accent: #4f46e5;
+    --online: #22c55e;
+    --offline: #c7cbd4;
+    --shadow: 0 1px 2px rgba(16, 24, 40, 0.04), 0 1px 3px rgba(16, 24, 40, 0.06);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+        "Pretendard", "Noto Sans KR", "Segoe UI", sans-serif;
+    background-color: var(--bg);
+    color: var(--text-primary);
+}
+
+.page {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: 64px 24px 80px;
+}
+
+.page-header {
+    margin-bottom: 32px;
+}
+
+.page-header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin-bottom: 6px;
+}
+
+.user-count {
+    font-size: 14px;
+    color: var(--text-secondary);
+}
+
+.user-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    background-color: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow);
+}
+
+.user-avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+    background-color: #eef0f3;
+}
+
+.user-info {
+    flex-grow: 1;
+    min-width: 0;
+}
+
+.user-name {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 3px;
+}
+
+.user-email {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    margin-bottom: 2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.user-joined {
+    font-size: 12.5px;
+    color: #a2a8b4;
+}
+
+.status {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-shrink: 0;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding-left: 8px;
+}
+
+.status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: var(--offline);
+}
+
+.status.is-online .status-dot {
+    background-color: var(--online);
+}
+
+.status.is-online {
+    color: #16803c;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 60px 0;
+    color: var(--text-secondary);
+    font-size: 14px;
+}

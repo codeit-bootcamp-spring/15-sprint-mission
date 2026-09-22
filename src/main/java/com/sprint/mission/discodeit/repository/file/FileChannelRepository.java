@@ -1,9 +1,7 @@
 package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -19,12 +17,9 @@ import java.util.UUID;
 public class FileChannelRepository implements ChannelRepository {
 
     private final String dataFile;
-    private final ReadStatusRepository readStatusRepository;
 
-    public FileChannelRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory,
-                                 ReadStatusRepository readStatusRepository) {
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
         this.dataFile = fileDirectory + "/channel.ser";
-        this.readStatusRepository = readStatusRepository;
 
         File file = new File(dataFile);
         File parentDir = file.getParentFile();
@@ -71,20 +66,6 @@ public class FileChannelRepository implements ChannelRepository {
     public List<Channel> readAll() {
         Map<UUID, Channel> data = loadFromFile();
         return data.values().stream().toList();
-    }
-
-    @Override
-    public List<Channel> readAllByUserId(UUID userId) {
-        Map<UUID, Channel> data = loadFromFile();
-        return data.values().stream()
-                .filter(channel -> {
-                    if (channel.getChannelType() == ChannelType.PUBLIC) {
-                        return true;
-                    }
-                    return readStatusRepository.readAllByChannelId(channel.getId()).stream()
-                            .anyMatch(readStatus -> readStatus.getUserId().equals(userId));
-                })
-                .toList();
     }
 
     @Override

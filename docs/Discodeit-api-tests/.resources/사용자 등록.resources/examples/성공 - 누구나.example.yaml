@@ -1,0 +1,40 @@
+$kind: http-example
+request:
+  url: http://localhost:8080/api/users
+  method: POST
+  body:
+    type: formdata
+    content:
+      - type: text
+        key: userCreateRequest
+        value: '  {"userName":"누구나","email":"anyone@naver.com","password":"777"}'
+        description: ""
+        disabled: false
+      - type: file
+        key: profile
+        src:
+          - /Users/seongmin-yeong/Desktop/탱이.png
+        description: ""
+        disabled: false
+response:
+  statusCode: 201
+  statusText: ""
+  headers:
+    content-type: application/json
+    transfer-encoding: chunked
+    date: Fri, 18 Sep 2026 05:28:47 GMT
+    keep-alive: timeout=60
+    connection: keep-alive
+  body:
+    type: json
+    content: |-
+      {
+        "id": "ab3fea62-66d0-4dd2-ac53-c4c2b7c12f97",
+        "userName": "누구나",
+        "email": "anyone@naver.com",
+        "profileId": "97a10245-4598-4266-9d29-059d6b632238",
+        "online": true,
+        "createdAt": "2026-09-18T05:28:47.272096Z",
+        "updatedAt": null
+      }
+order: 4254180838426380

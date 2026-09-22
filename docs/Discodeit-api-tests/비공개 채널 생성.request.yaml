@@ -1,0 +1,14 @@
+$kind: http-request
+url: http://localhost:8080/api/channels/private
+method: POST
+body:
+  type: json
+  content: |2-
+       {
+           "participantIds": [
+               "d12e0c39-6e91-4dc2-91f5-0c7e69765705",
+               "10f6d460-b539-4d40-88f9-73f162d09767"
+           ]
+       }
+examples: .resources/비공개 채널 생성.resources/examples
+order: 4503331684208032

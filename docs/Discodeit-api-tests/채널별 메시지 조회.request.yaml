@@ -1,0 +1,7 @@
+$kind: http-request
+url: "   http://localhost:8080/api/messages?channelId=40c6b700-e7f9-43d4-b072-f5d2e1520bbc"
+method: GET
+queryParams:
+  channelId: 40c6b700-e7f9-43d4-b072-f5d2e1520bbc
+examples: .resources/채널별 메시지 조회.resources/examples
+order: 4503588463557914
