@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -21,10 +22,14 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserService implements UserService {
 
-    private UserRepository userRepository;
-    private UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+    private final UserStatusRepository userStatusRepository;
 
 
+    @Override
+    public User create(String username, String email, String password) throws IOException {
+        return null;
+    }
 
     //User 저장해라 -> Repository에 요청
     @Override
@@ -95,7 +100,22 @@ public class BasicUserService implements UserService {
 
     @Override
     public void delete(UUID id) {
+        userRepository.delete(id);
 
+        userStatusRepository.findByUserId(id).ifPresent(status -> userStatusRepository.delete(
+                status.getId()
+        ));
+
+
+    }
+
+    @Override
+    public void updateStatus(UUID userId) {
+        UserStatus status = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
+
+        status.updateLastSeenAt();
+        userStatusRepository.save(status);
 
     }
 }

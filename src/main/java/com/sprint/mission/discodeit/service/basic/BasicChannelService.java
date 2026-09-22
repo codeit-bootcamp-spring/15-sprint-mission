@@ -1,8 +1,12 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.ChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.ChannelDto;
+import com.sprint.mission.discodeit.dto.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,54 +19,60 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
 
-    private final FileChannelRepository channelRepository;
+    private final ChannelRepository channelRepository;
+
+
+
 
     @Override
-    public Channel create(Channel channel) {
-        return channelRepository.save(channel);
-    }
+    public ChannelDto create(ChannelCreateRequest request) {
 
-    @Override
-    public Channel create(ChannelType type, String name, String description) {
-        Channel channel = new Channel(type, name, description);
-        return channelRepository.save(channel);
-    }
-
-    @Override
-    public Optional<Channel> findById(UUID id) {
-        return channelRepository.findById(id);
-    }
-
-    @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
-    }
-
-    @Override
-    public Channel update(UUID id, String name, ChannelType type) {
-        Optional<Channel> optionalChannel =
-                channelRepository.findById(id);
-
-        if (optionalChannel.isEmpty()) {
-            return null;
-        }
-
-        Channel channel = optionalChannel.get();
-        channel.update(name, type);
+        Channel channel = new Channel(
+                request.getType(),
+                request.getName(),
+                request.getDescription()
+        );
 
         channelRepository.save(channel);
 
-        return channel;
+        return new ChannelDto(channel.getId(),channel.getName());
     }
 
     @Override
-    public Channel findByid(UUID id) {
-        return channelRepository.findById(id).orElse(null);
+    public Optional<ChannelDto> findById(UUID id) {
+        return channelRepository.findById(id).map(channel ->  new ChannelDto(
+                channel.getId(), channel.getName()
+        ));
     }
+
+    @Override
+    public List<ChannelDto> findAll() {
+        return channelRepository.findAll().stream().map(channel -> new ChannelDto(
+                channel.getId(), channel.getName()
+        )).toList();
+    }
+
+    @Override
+    public Optional<ChannelDto> update(ChannelUpdateRequest request) {
+        return channelRepository.findById(request.getId()).map(channel -> {
+
+            channel.update(request.getName(),request.getType());
+
+            channelRepository.save(channel);
+
+            return new ChannelDto(
+                    channel.getId(), channel.getName()
+            );
+        });
+    }
+
+
 
     @Override
     public void delete(UUID id) {
         channelRepository.delete(id);
+
     }
+
 }
 

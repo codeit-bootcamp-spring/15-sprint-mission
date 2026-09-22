@@ -1,6 +1,5 @@
 package com.sprint.mission.discodeit.entity;
 
-import org.springframework.stereotype.Repository;
 
 import java.io.Serializable;
 import java.time.Instant;
@@ -43,6 +42,7 @@ public class ReadStatus implements Serializable {
     }
 
     public Instant getUpdatedAt() {
+        this.updatedAt = Instant.now();
         return updatedAt;
     }
 
