@@ -51,10 +51,34 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
+    public List<ReadStatus> findAllByChannelId(UUID channelId) {
+        return readStatusRepository.findAllByChannelId(channelId);
+    }
+
+    @Override
     public ReadStatus update(UUID id) {
         ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("ReadStatus id 없음 : " + id));
         readStatus.update();
         return readStatusRepository.save(readStatus);
+    }
+
+    @Override
+    public List<ReadStatus> updateAllByUserId(UUID userId) {
+
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
+        for(ReadStatus entry : readStatusList){
+            update(entry.getId());
+        }
+        return readStatusList;
+    }
+
+    @Override
+    public List<ReadStatus> updateAllByChannelId(UUID channelId) {
+        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
+        for(ReadStatus entry : readStatusList){
+            update(entry.getId());
+        }
+        return readStatusList;
     }
 
     @Override
