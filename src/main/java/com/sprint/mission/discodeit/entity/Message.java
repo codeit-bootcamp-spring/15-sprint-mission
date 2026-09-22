@@ -7,11 +7,11 @@ import java.util.Set;
 import java.util.UUID;
 
 public class Message implements Serializable {
-    private static final long seriaVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
     private UUID id;
     private UUID userid;
-    private UUID ChannelId;
+    private UUID channelId;
     private String content;
     private Instant createdAt;
     private Instant  updateAt;
@@ -26,7 +26,7 @@ public class Message implements Serializable {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now();
         this.userid = userid;
-        this.ChannelId = channelId;
+        this.channelId = channelId;
         this.content = content;
     }
 
@@ -39,7 +39,7 @@ public class Message implements Serializable {
     }
 
     public UUID getChannelId() {
-        return ChannelId;
+        return channelId;
     }
 
     public String getContent() {
@@ -56,8 +56,13 @@ public class Message implements Serializable {
     }
 
     public void update(String content) {
+        this.content = content;
+        this.updateAt = Instant.now();
+
     }
 
     public void setContent(String content) {
+        this.content = content;
+        this.updateAt = Instant.now();
     }
 }

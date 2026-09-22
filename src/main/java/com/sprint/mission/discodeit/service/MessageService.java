@@ -12,7 +12,7 @@ public interface MessageService {
 
 
 
-    Message create(String content, UUID channelId, UUID autorId);
+    Message create(String content, UUID channelId, UUID authorId);
 
     Optional<Message> findById(UUID id);
 
