@@ -11,7 +11,9 @@ import java.util.stream.Stream;
 @Repository
 @ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 public class FileBinaryContentRepository implements BinaryContentRepository {
+
     private final Path directory;
+
     public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String root) {
         this.directory = Path.of(root).resolve("binarycontent");
         try {
@@ -24,6 +26,7 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     private Path path(UUID id) {
         return directory.resolve(id + ".ser");
     }
+
     // 같은 ID의 파일이 있으면 기존 내용을 수정된 객체로 덮어씁니다.
     @Override
     public BinaryContent save(BinaryContent entity) {

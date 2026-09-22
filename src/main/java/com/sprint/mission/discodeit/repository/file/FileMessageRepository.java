@@ -82,6 +82,7 @@ public class FileMessageRepository implements MessageRepository {
             throw new UncheckedIOException(e);
         }
     }
+
     @Override
     public boolean existsById(UUID id) {
         return Files.exists(path(id));
@@ -95,4 +96,6 @@ public class FileMessageRepository implements MessageRepository {
         }
         return result;
     }
+
+
 }

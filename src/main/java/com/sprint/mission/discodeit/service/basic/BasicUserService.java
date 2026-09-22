@@ -16,10 +16,10 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository statuses;
 
     public UserResponse create(UserCreateRequest request, BinaryContentCreateRequest profile) {
-        checkUnique(null, request.getUsername(), request.getEmail());
+        checkUnique(null, request.username(), request.email());
         BinaryContent image = profile == null ? null : new BinaryContent(profile.getFileName(), profile.getContentType(), profile.getBytes());
         if (image != null) binaries.save(image);
-        User user = new User(request.getNickname(), request.getUsername(), request.getEmail(), request.getPassword(), image == null ? null : image.getId());
+        User user = new User(request.nickname(), request.username(), request.email(), request.password(), image == null ? null : image.getId());
         users.save(user);
         statuses.save(new UserStatus(user.getId(), Instant.now()));
         return toResponse(user);
@@ -40,14 +40,14 @@ public class BasicUserService implements UserService {
 
     public UserResponse update(UserUpdateRequest request, BinaryContentCreateRequest profile) {
         // 1. DTO의 ID로 기존 사용자를 조회합니다.
-        User user = users.findById(request.getId())
+        User user = users.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
-        checkUnique(user.getId(), request.getUsername(), request.getEmail());
+        checkUnique(user.getId(), request.username(), request.email());
         BinaryContent image = profile == null ? null : new BinaryContent(profile.getFileName(), profile.getContentType(), profile.getBytes());
         UUID previous = user.getProfileId();
         if (image != null) binaries.save(image);
         // 2. DTO의 새 값을 기존 User에 반영합니다.
-        user.update(request.getNickname(), request.getUsername(), request.getEmail(), request.getPassword());
+        user.update(request.nickname(), request.username(), request.email(), request.password());
         if (image != null) {
             user.replaceProfile(image.getId());
         }

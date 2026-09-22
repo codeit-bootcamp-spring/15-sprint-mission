@@ -86,6 +86,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     public boolean existsById(UUID id) {
         return Files.exists(path(id));
     }
+
     public List<ReadStatus> findAllByUserId(UUID userId) {
         List<ReadStatus> result = new ArrayList<>();
         for (ReadStatus status : findAll()) {
