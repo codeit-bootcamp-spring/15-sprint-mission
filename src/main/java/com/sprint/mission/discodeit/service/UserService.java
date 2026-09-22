@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service;
 
+import com.sprint.mission.discodeit.dto.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.UserDto;
+import com.sprint.mission.discodeit.dto.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
-
 
 import java.io.IOException;
 import java.util.List;
@@ -11,21 +13,19 @@ import java.util.UUID;
 
 public interface UserService {
 
-    User create(User user);
 
     User create(String username, String email, String password) throws IOException;
 
-    Optional<User> findById(UUID id);
+    UserDto create(UserCreateRequest request);
 
-    List<User> findAll();
+    Optional<UserDto> findById(UUID id);
 
-    Optional<User> update(UUID id, String name);
+    List<UserDto> findAll();
 
-    User create(String 길춘배);
+    Optional<UserDto> update(UserUpdateRequest request);
 
-    List<User> findall();
+    void delete(UUID id);
 
-    void delete(UUID id) throws IOException;
-
+    void updateStatus(UUID userId);
 }
 

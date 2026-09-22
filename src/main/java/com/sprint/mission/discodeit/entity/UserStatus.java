@@ -16,7 +16,7 @@ public class UserStatus implements Serializable {
 
     public UserStatus(UUID userid) {
         this.id =UUID.randomUUID();
-        this.userId  = userid;
+        this.userId  = userId;
         this.createdAt =Instant.now();
         this.lastSeenAt = Instant.now();
     }
@@ -34,6 +34,7 @@ public class UserStatus implements Serializable {
     }
 
     public Instant getUpdatedAt() {
+        this.updatedAt = Instant.now();
         return updatedAt;
     }
 
@@ -49,5 +50,7 @@ public class UserStatus implements Serializable {
     }
 
 
-
+    public void updateLastSeenAt() {
+        this.lastSeenAt = Instant.now();
+    }
 }
