@@ -2,14 +2,21 @@ package com.sprint.mission.discodeit.dto.user;
 
 import java.time.Instant;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-public record UserResponse(
-        UUID id,
-        String username,
-        String email,
-        UUID profileId,
-        Instant createdAt,
-        Instant updateAt,
-        boolean online
-) {
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserResponse {
+
+  private UUID id;
+  private String username;
+  private String email;
+  private UUID profileId;
+  private Instant createdAt;
+  private Instant updatedAt;
+  private boolean online;
 }
+

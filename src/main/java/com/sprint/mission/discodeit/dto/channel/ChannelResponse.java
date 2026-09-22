@@ -10,7 +10,9 @@ public record ChannelResponse( // find/findAll에 최근 메시지 시각과 PRI
                                UUID id,
                                ChannelType type,
                                String name,
+                               String description,
                                Instant lastMessageAt,
-                               List<UUID> userIds
+                               List<UUID> participantIds
 ) {
+
 }

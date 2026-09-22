@@ -1,25 +1,11 @@
 package com.sprint.mission.discodeit;
 
-import com.sprint.mission.discodeit.dto.channel.ChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.service.ChannelService;
-import com.sprint.mission.discodeit.service.MessageService;
-import com.sprint.mission.discodeit.service.UserService;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.ConfigurableApplicationContext;
-
-import javax.management.InstanceNotFoundException;
-import javax.security.auth.login.AccountException;
-import java.util.List;
 
 @SpringBootApplication
 public class DiscodeitApplication {
-    public static void main(String[] args) throws AccountException, InstanceNotFoundException {
+/*    public static void main(String[] args) throws AccountException, InstanceNotFoundException {
         ConfigurableApplicationContext context = SpringApplication.run(DiscodeitApplication.class, args);
         UserService userService = context.getBean(UserService.class);
         ChannelService channelService = context.getBean(ChannelService.class);
@@ -49,6 +35,10 @@ public class DiscodeitApplication {
 
         messageService.findAllByChannelId(channel.getId())
                 .forEach(m -> System.out.println(m.getContent()));
-    }
+    }*/
+
+  public static void main(String[] args) {
+    SpringApplication.run(DiscodeitApplication.class, args);
+  }
 
 }
