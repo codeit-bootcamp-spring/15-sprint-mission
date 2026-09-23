@@ -1,7 +1,7 @@
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/user/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
+    USERS: `${API_BASE_URL}/users`,
+    BINARY_CONTENT: `${API_BASE_URL}/binaryContents`
 };
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -23,7 +23,7 @@ async function fetchAndRenderUsers() {
 
 async function fetchUserProfile(profileId) {
     try {
-        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${profileId}`);
+        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}/${profileId}`);
         if (!response.ok) throw new Error('Failed to fetch profile');
         const profile = await response.json();
         return `data:${profile.fileType};base64,${profile.bytes}`;
@@ -71,9 +71,9 @@ async function renderUserList(users) {
         const statusLabel = user.online ? '온라인' : '오프라인';
 
         card.innerHTML = `
-            <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
+            <img src="${profileUrl}" alt="${user.userName}" class="user-avatar">
             <div class="user-info">
-                <div class="user-name">${user.username}</div>
+                <div class="user-name">${user.userName}</div>
                 <div class="user-email">${user.email}</div>
                 <div class="user-joined">${formatJoinedDate(user.createdAt)}</div>
             </div>

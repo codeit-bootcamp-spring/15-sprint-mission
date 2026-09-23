@@ -7,7 +7,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class Common implements Serializable {
+public abstract class Common implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

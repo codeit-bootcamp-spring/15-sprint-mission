@@ -1,12 +1,12 @@
 package com.sprint.mission.discodeit.controller;
 
+import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentResponse;
 import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.message.MessageResponse;
 import com.sprint.mission.discodeit.dto.message.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
@@ -80,7 +80,7 @@ public class MessageController {
                 .filter(file -> !file.isEmpty())
                 .map(this::toBinaryContentCreateRequest)
                 .map(binaryContentService::create)
-                .map(BinaryContent::getId)
+                .map(BinaryContentResponse::id)
                 .toList();
     }
 

@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.bind.annotation.PutMapping;
 
 import java.io.*;
 import java.util.HashMap;
@@ -79,6 +80,15 @@ public class FileUserRepository implements UserRepository {
     public boolean existsByUserName(String userName) {
         Map<UUID, User> data = loadFromFile();
         return data.values().stream().anyMatch(user -> user.getUserName().equals(userName));
+    }
+
+    @Override
+    public User readByUserName(String userName) {
+        Map<UUID, User> data = loadFromFile();
+        return data.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst()
+                .orElse(null);
     }
 
     @Override
