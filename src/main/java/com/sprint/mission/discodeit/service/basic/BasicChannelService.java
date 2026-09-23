@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindRequest;
+import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindResponse;
 import com.sprint.mission.discodeit.dto.ChannelDto.ChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.ChannelDto.PublicChannelCreateRequest;
@@ -8,6 +8,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -59,8 +61,14 @@ public class BasicChannelService implements ChannelService {
 
         // 3. 실제 존재하는 사용자 검사
         for (UUID userId : userIds) {
-            if (userId == null || !userRepository.existsById(userId)) {
+
+            if (userId == null) {
                 throw new IllegalArgumentException(
+                        "참여 사용자 ID는 null일 수 없습니다.");
+            }
+
+            if (!userRepository.existsById(userId)) {
+                throw new UserNotFoundException(
                         "존재하지 않는 참여 사용자입니다.");
             }
         }
@@ -73,31 +81,56 @@ public class BasicChannelService implements ChannelService {
                 ChannelType.PRIVATE
         );
 
-        channelRepository.save(channel);
+        try {
 
-        // 5. 검증된 사용자만 ReadStatus 생성
-        for (UUID userId : userIds) {
-            ReadStatus readStatus = new ReadStatus(channel.getId(), userId
-                    // 기존 생성자에 맞게
-            );
+            // 5. 채널 저장
+            channelRepository.save(channel);
 
-            readStatusRepository.save(readStatus);
+            // 6. 검증된 사용자만 ReadStatus 생성
+            for (UUID userId : userIds) {
+                ReadStatus readStatus = new ReadStatus(
+                        channel.getId(),
+                        userId
+                );
+
+                readStatusRepository.save(readStatus);
+            }
+
+            return channel;
+
+        } catch (RuntimeException e) {
+
+            // 7. 저장 중 오류가 발생하면 생성된 데이터 되돌리기
+            readStatusRepository.deleteByChannelId(channel.getId());
+            channelRepository.deleteById(channel.getId());
+
+            // 8. 발생했던 예외 다시 전달
+            throw e;
         }
-
-        return channel;
     }
 
     @Override
-    public ChannelFindRequest find(UUID id) {
+    public ChannelFindResponse find(UUID id) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("채널이 없습니다."));
+                        new ChannelNotFoundException("채널이 없습니다."));
 
         return toDto(channel);
     }
 
     @Override
-    public List<ChannelFindRequest> findAllByUserId(UUID userId) {
+    public List<ChannelFindResponse> findAllPublic() {
+        return channelRepository.findAll().stream()
+                .filter(channel ->
+                        channel.getType() == ChannelType.PUBLIC)
+                .map(this::toDto)
+                .toList();
+
+    }
+    
+
+    @Override
+    public List<ChannelFindResponse> findAllByUserId(UUID userId) {
         if (userId == null) {
             throw new IllegalArgumentException("사용자 ID가 필요합니다.");
         }
@@ -118,7 +151,7 @@ public class BasicChannelService implements ChannelService {
     public Channel update(UUID id, ChannelUpdateRequest request) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() ->
-                        new IllegalArgumentException("채널이 없습니다."));
+                        new ChannelNotFoundException("채널이 없습니다."));
 
         if (channel.getType() == ChannelType.PRIVATE) {
             throw new IllegalArgumentException(
@@ -136,7 +169,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void delete(UUID id) {
         if (!channelRepository.existsById(id)) {
-            throw new IllegalArgumentException("채널이 없습니다.");
+            throw new ChannelNotFoundException("채널이 없습니다.");
         }
 
         messageRepository.deleteByChannelId(id);
@@ -144,7 +177,7 @@ public class BasicChannelService implements ChannelService {
         channelRepository.deleteById(id);
     }
 
-    private ChannelFindRequest toDto(Channel channel) {
+    private ChannelFindResponse toDto(Channel channel) {
         Instant lastMessageAt = messageRepository
                 .findAllByChannelId(channel.getId())
                 .stream()
@@ -162,7 +195,7 @@ public class BasicChannelService implements ChannelService {
                         .toList()
                         : List.of();
 
-        return new ChannelFindRequest(
+        return new ChannelFindResponse(
                 channel.getId(),
                 channel.getOwnerId(),
                 channel.getChannelName(),

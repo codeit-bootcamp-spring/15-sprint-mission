@@ -41,13 +41,9 @@ public class FileMessageRepository implements MessageRepository {
             Files.createDirectories(filePath.getParent());
 
             try (
-                    FileOutputStream fos =
-                            new FileOutputStream(filePath.toFile());
-
-                    ObjectOutputStream oos =
-                            new ObjectOutputStream(fos)
+                    FileOutputStream fos = new FileOutputStream(filePath.toFile());
+                    ObjectOutputStream oos = new ObjectOutputStream(fos)
             ) {
-
                 oos.writeObject(messages);
             }
 
