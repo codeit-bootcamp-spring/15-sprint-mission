@@ -1,6 +1,4 @@
 package com.sprint.mission.discodeit.controller;
-
-import com.sprint.mission.discodeit.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.data.UserDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
@@ -10,13 +8,11 @@ import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
-import jakarta.validation.Valid;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.io.Resource;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,7 +23,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+@Tag(name="User", description = "User API")
+@RequestMapping("/api/users")
 @RestController
 public class UserController {
 
@@ -40,7 +37,7 @@ public class UserController {
 
     private void validateImageFile(MultipartFile file) {
         // 1차 방어: 파일 선택 없이 폼만 제출한 경우
-        if (file.isEmpty()) {
+        if (file == null || file.isEmpty()) {
             throw new IllegalArgumentException("파일이 비어 있습니다.");
         }
 
@@ -59,10 +56,15 @@ public class UserController {
     }
 
     // 생성
-    @RequestMapping(value= "/v1/users", method=RequestMethod.POST)
-    public ResponseEntity<ApiResponse<UserResponse>> createUser(
-            @Valid @ModelAttribute UserCreateRequest userCreateRequest,
-            @RequestPart(value="image", required = false) MultipartFile file
+    @Operation(summary = "User 등록", operationId = "create")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User가 성공적으로 생성됨")
+    })
+    @RequestMapping(method=RequestMethod.POST)
+    public ResponseEntity<UserResponse> createUser(
+            // ModelAttribute -> RequestPart
+            @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+            @RequestPart(value="profile", required = false) MultipartFile file
             ) throws IOException {
         // 파일 검증
         validateImageFile(file);
@@ -86,30 +88,41 @@ public class UserController {
 
         User user = userService.create(userCreateRequest, binaryContentCreateRequest);
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(UserResponse.from(user)));
+                .body(UserResponse.from(user));
     }
     // 조회
-    @RequestMapping(value="/v1/users/{user-id}", method=RequestMethod.GET)
-    public ResponseEntity<ApiResponse<UserResponse>> getUser(
+    @Operation(summary = "User 조회", operationId = "")
+    @RequestMapping(value="/{user-id}", method=RequestMethod.GET)
+    public ResponseEntity<UserResponse> getUser(
         @PathVariable("user-id") UUID userId) {
 
         UserDto userDto = userService.find(userId);
 
-        return ResponseEntity.ok(ApiResponse.success(UserResponse.from(userDto)));
+        return ResponseEntity.ok(UserResponse.from(userDto));
     }
 
 
     // 정적 리소스 서빙
-    @RequestMapping(value="/api/user/findAll", method=RequestMethod.GET)
+    @Operation(summary = "전체 User 목록 조회", operationId = "findAll")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 목록 조회 성공")
+    })
+    @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<List<UserDto>> getUsers() {
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
     // 수정
-    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.PATCH)
-    public ResponseEntity<ApiResponse<UserResponse>> updateUser(
+    @Operation(summary = "User 정보 수정", operationId = "update")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User를 찾을 수 없음"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
+    })
+    @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
+    public ResponseEntity<UserResponse> updateUser(
             @PathVariable("user-id") UUID userId,
-            @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
 
     ) throws IOException {
@@ -132,11 +145,16 @@ public class UserController {
                 = Optional.of(request);
 
         User update = userService.update(userId, userUpdateRequest, binaryContentCreateRequest);
-        return ResponseEntity.ok(ApiResponse.success(UserResponse.from(update)));
+        return ResponseEntity.ok(UserResponse.from(update));
     }
     // 삭제
-    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.DELETE)
-    public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID userId) {
+    @Operation(summary = "User 삭제", operationId = "delete")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "User가 성공적으로 삭제됨"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User를 찾을 수 없음")
+    })
+    @RequestMapping(value="/{userId}",method=RequestMethod.DELETE)
+    public ResponseEntity<Void> deleteUser(@PathVariable("userId") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
     }
