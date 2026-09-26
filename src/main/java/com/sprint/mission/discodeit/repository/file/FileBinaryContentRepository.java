@@ -22,14 +22,16 @@ import java.util.stream.Stream;
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private FileLockProvider fileLockProvider;
+    private final FileLockProvider fileLockProvider;
 
 
     public FileBinaryContentRepository(
-            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory,
+        FileLockProvider fileLockProvider
     ) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, BinaryContent.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
+      this.fileLockProvider = fileLockProvider;
+      if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
             } catch (IOException e) {

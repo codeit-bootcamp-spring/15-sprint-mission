@@ -22,13 +22,15 @@ import java.util.stream.Stream;
 public class FileMessageRepository implements MessageRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private FileLockProvider fileLockProvider;
+    private final FileLockProvider fileLockProvider;
 
     public FileMessageRepository(
-            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory,
+        FileLockProvider fileLockProvider
     ) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, Message.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
+      this.fileLockProvider = fileLockProvider;
+      if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
             } catch (IOException e) {

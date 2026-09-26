@@ -22,13 +22,15 @@ import java.util.stream.Stream;
 public class FileReadStatusRepository implements ReadStatusRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
-    private FileLockProvider fileLockProvider;
+    private final FileLockProvider fileLockProvider;
 
     public FileReadStatusRepository(
-            @Value("${discodeit.repository.file-directory:data}") String fileDirectory
+            @Value("${discodeit.repository.file-directory:data}") String fileDirectory,
+        FileLockProvider fileLockProvider
     ) {
         this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory, ReadStatus.class.getSimpleName());
-        if (Files.notExists(DIRECTORY)) {
+      this.fileLockProvider = fileLockProvider;
+      if (Files.notExists(DIRECTORY)) {
             try {
                 Files.createDirectories(DIRECTORY);
             } catch (IOException e) {
