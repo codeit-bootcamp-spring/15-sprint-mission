@@ -16,6 +16,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/users")
+
 public class UserStatusController {
     private final BasicUserStatusService userStatusService;
 
@@ -28,13 +29,13 @@ public class UserStatusController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨")
     })
-    @RequestMapping(value="/{user-id}/userStatus" , method= RequestMethod.PATCH)
-    public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
-            @PathVariable("user-id") UUID userId,
-            @RequestPart("userStatusUpdateRequest") UserStatusUpdateRequest request
+    @RequestMapping(value="/{userId}/userStatus" , method= RequestMethod.PATCH)
+    public ResponseEntity<UserStatusResponse> updateUserStatus(
+            @PathVariable("userId") UUID userId,
+            @Valid @RequestBody UserStatusUpdateRequest request
     ) {
        UserStatus status = userStatusService.updateByUserId(userId, request);
-       return ResponseEntity.ok(ApiResponse.success(UserStatusResponse.from(status)));
+       return ResponseEntity.ok(UserStatusResponse.from(status));
     }
 
 

@@ -33,10 +33,10 @@ public class ReadStatusController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "이미 읽음 상태가 존재함")
     })
     @RequestMapping(method= RequestMethod.POST)
-    public ResponseEntity<ApiResponse<ReadStatusResponse>> createReadStatus(
+    public ResponseEntity<ReadStatusResponse> createReadStatus(
             @Valid @RequestBody ReadStatusCreateRequest request) {
         ReadStatus readStatus = readStatusService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(ReadStatusResponse.from(readStatus)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ReadStatusResponse.from(readStatus));
     }
 
     // 조회
@@ -45,12 +45,12 @@ public class ReadStatusController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Message 읽음 상태 목록 조회 성공")
     })
     @RequestMapping(method= RequestMethod.GET)
-    public ResponseEntity<ApiResponse<List<ReadStatusResponse>>> getReadStatus(
-            @PathVariable("user-id") UUID userId) {
+    public ResponseEntity<List<ReadStatusResponse>> getReadStatus(
+            @RequestParam("userId") UUID userId) {
         List<ReadStatusResponse> readStatus = readStatusService.findAllByUserId(userId)
                 .stream().map(ReadStatusResponse::from).toList();
 
-        return ResponseEntity.ok(ApiResponse.success(readStatus));
+        return ResponseEntity.ok(readStatus);
     }
 
     // 수정
@@ -59,13 +59,13 @@ public class ReadStatusController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Message 읽음 상태가 성공적으로 수정됨"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "Message 읽음 상태를 찾을 수 없음"),
     })
-    @RequestMapping(value="/{readstatus-id}", method= RequestMethod.PATCH)
-    public ResponseEntity<ApiResponse<ReadStatusResponse>> updateReadStatus(
+    @RequestMapping(method= RequestMethod.PATCH)
+    public ResponseEntity<ReadStatusResponse> updateReadStatus(
             @RequestPart("readStatusUpdateRequest") ReadStatusUpdateRequest request,
             @RequestParam("readstatus-id") UUID readStatusId
     ) {
 
         ReadStatus readStatus = readStatusService.update(readStatusId, request);
-        return ResponseEntity.ok(ApiResponse.success(ReadStatusResponse.from(readStatus)));
+        return ResponseEntity.ok(ReadStatusResponse.from(readStatus));
     }
 }

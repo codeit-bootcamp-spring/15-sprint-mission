@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 @Tag(name="Auth", description = "인증 API")
 @RestController
-@RequestMapping("/api/auth/login")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final BasicAuthService authService;
 
@@ -30,12 +30,12 @@ public class AuthController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "사용자를 찾을 수 없음"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "비밀번호가 일치하지 않음")
     })
-    @RequestMapping(method=RequestMethod.POST)
-    public ResponseEntity<ApiResponse<LoginResponse>> createLogin(
+    @RequestMapping(value="/login", method=RequestMethod.POST)
+    public ResponseEntity<LoginResponse> createLogin(
             @Valid @RequestBody LoginRequest loginRequest
             ) {
         User user = authService.login(loginRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(LoginResponse.from(user)));
+        return ResponseEntity.ok().body(LoginResponse.from(user));
     }
 
 }
