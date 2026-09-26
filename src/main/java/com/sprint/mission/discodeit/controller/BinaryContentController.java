@@ -23,13 +23,7 @@ public class BinaryContentController {
     public BinaryContentController(BasicBinaryContentService basicBinaryContentService) {
         this.basicBinaryContentService = basicBinaryContentService;
     }
-    // 바이너리 파일 단건 조회
-//    @RequestMapping(value="/{content-id}", method=RequestMethod.GET)
-//    public ResponseEntity<ApiResponse<BinaryContentResponse>> getContent(
-//            @PathVariable("content-id") UUID contentId) {
-//        BinaryContent content = basicBinaryContentService.find(contentId);
-//        return ResponseEntity.ok(ApiResponse.success(BinaryContentResponse.from(content)));
-//    }
+
     // 정적 리소스 서빙
     @Operation(summary = "첨부 파일 조회", operationId = "find")
     @ApiResponses({
@@ -42,6 +36,7 @@ public class BinaryContentController {
         BinaryContent content = basicBinaryContentService.find(contentId);
         return ResponseEntity.ok(content);
     }
+
     @Operation(summary = "여러 첨부 파일 조회", operationId = "findAllByIdIn")
     @ApiResponses({
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "첨부 파일 목록 조회 성공"),

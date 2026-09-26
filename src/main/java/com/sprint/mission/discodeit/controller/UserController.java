@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.core.io.ClassPathResource;
@@ -63,6 +64,9 @@ public class UserController {
 
     // 생성
     @Operation(summary = "User 등록", operationId = "create")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "201", description = "User가 성공적으로 생성됨")
+    })
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @Valid @ModelAttribute UserCreateRequest userCreateRequest,
@@ -106,6 +110,9 @@ public class UserController {
 
     // 정적 리소스 서빙
     @Operation(summary = "전체 User 목록 조회", operationId = "findAll")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 목록 조회 성공")
+    })
     @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<List<UserDto>> getUsers() {
         List<UserDto> users = userService.findAll();
@@ -113,6 +120,11 @@ public class UserController {
     }
     // 수정
     @Operation(summary = "User 정보 수정", operationId = "update")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User를 찾을 수 없음"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
+    })
     @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
@@ -143,6 +155,10 @@ public class UserController {
     }
     // 삭제
     @Operation(summary = "User 삭제", operationId = "delete")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "204", description = "User가 성공적으로 삭제됨"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "User를 찾을 수 없음")
+    })
     @RequestMapping(value="/{user-id}",method=RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID userId) {
         userService.delete(userId);

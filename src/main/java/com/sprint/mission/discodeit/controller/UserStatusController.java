@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,10 @@ public class UserStatusController {
     }
 
     @Operation(summary = "User 온라인 상태 업데이트", operationId = "updateUserStatusByUserId")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "404", description = "해당 User의 UserStatus를 찾을 수 없음"),
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 온라인 상태가 성공적으로 업데이트됨")
+    })
     @RequestMapping(value="/{user-id}/userStatus" , method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
             @PathVariable("user-id") UUID userId,
