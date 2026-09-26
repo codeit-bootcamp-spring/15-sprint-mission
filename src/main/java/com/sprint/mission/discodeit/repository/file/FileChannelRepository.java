@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.FileLockProvider;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,7 @@ import java.util.stream.Stream;
 public class FileChannelRepository implements ChannelRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
+    private FileLockProvider fileLockProvider;
 
     public FileChannelRepository(
             @Value("${discodeit.repository.file-directory:data}") String fileDirectory
@@ -41,6 +44,8 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public Channel save(Channel channel) {
         Path path = resolvePath(channel.getId());
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -48,6 +53,8 @@ public class FileChannelRepository implements ChannelRepository {
             oos.writeObject(channel);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
         }
         return channel;
     }
@@ -56,6 +63,8 @@ public class FileChannelRepository implements ChannelRepository {
     public Optional<Channel> findById(UUID id) {
         Channel channelNullable = null;
         Path path = resolvePath(id);
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -64,6 +73,8 @@ public class FileChannelRepository implements ChannelRepository {
                 channelNullable = (Channel) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
+            } finally {
+                lock.unlock();
             }
         }
         return Optional.ofNullable(channelNullable);
@@ -75,6 +86,8 @@ public class FileChannelRepository implements ChannelRepository {
             return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
+                        ReentrantLock lock = fileLockProvider.getLock(path);
+                        lock.lock();
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
@@ -82,6 +95,8 @@ public class FileChannelRepository implements ChannelRepository {
                             return (Channel) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
+                        } finally {
+                            lock.unlock();
                         }
                     })
                     .toList();
@@ -99,10 +114,14 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteById(UUID id) {
         Path path = resolvePath(id);
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         try {
             Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }  finally {
+            lock.unlock();
         }
     }
 }

@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.repository.file;
 
+import com.sprint.mission.discodeit.common.FileLockProvider;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import java.util.concurrent.locks.ReentrantLock;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
@@ -20,6 +22,8 @@ import java.util.stream.Stream;
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path DIRECTORY;
     private final String EXTENSION = ".ser";
+    private FileLockProvider fileLockProvider;
+
 
     public FileBinaryContentRepository(
             @Value("${discodeit.repository.file-directory:data}") String fileDirectory
@@ -41,6 +45,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public BinaryContent save(BinaryContent binaryContent) {
         Path path = resolvePath(binaryContent.getId());
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         try (
                 FileOutputStream fos = new FileOutputStream(path.toFile());
                 ObjectOutputStream oos = new ObjectOutputStream(fos)
@@ -48,6 +54,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
             oos.writeObject(binaryContent);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
         }
         return binaryContent;
     }
@@ -56,6 +64,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     public Optional<BinaryContent> findById(UUID id) {
         BinaryContent binaryContentNullable = null;
         Path path = resolvePath(id);
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         if (Files.exists(path)) {
             try (
                     FileInputStream fis = new FileInputStream(path.toFile());
@@ -64,6 +74,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                 binaryContentNullable = (BinaryContent) ois.readObject();
             } catch (IOException | ClassNotFoundException e) {
                 throw new RuntimeException(e);
+            } finally {
+                lock.unlock();
             }
         }
         return Optional.ofNullable(binaryContentNullable);
@@ -75,6 +87,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
             return paths
                     .filter(path -> path.toString().endsWith(EXTENSION))
                     .map(path -> {
+                        ReentrantLock lock = fileLockProvider.getLock(path);
+                        lock.lock();
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
@@ -82,6 +96,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
                             return (BinaryContent) ois.readObject();
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
+                        } finally {
+                            lock.unlock();
                         }
                     })
                     .filter(content -> ids.contains(content.getId()))
@@ -100,10 +116,14 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     @Override
     public void deleteById(UUID id) {
         Path path = resolvePath(id);
+        ReentrantLock lock = fileLockProvider.getLock(path);
+        lock.lock();
         try {
             Files.delete(path);
         } catch (IOException e) {
             throw new RuntimeException(e);
+        } finally {
+            lock.unlock();
         }
     }
 }
