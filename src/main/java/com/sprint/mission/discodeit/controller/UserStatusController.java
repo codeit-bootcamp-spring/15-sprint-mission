@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.basic.BasicUserStatusService;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -13,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/v1/users")
+@RequestMapping("/api/users")
 public class UserStatusController {
     private final BasicUserStatusService userStatusService;
 
@@ -21,7 +22,8 @@ public class UserStatusController {
         this.userStatusService = userStatusService;
     }
 
-    @RequestMapping(value="/{user-id}/online" , method= RequestMethod.PATCH)
+    @Operation(summary = "User 온라인 상태 업데이트", operationId = "updateUserStatusByUserId")
+    @RequestMapping(value="/{user-id}/userStatus" , method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
             @PathVariable("user-id") UUID userId,
             @Valid @RequestBody UserStatusUpdateRequest request

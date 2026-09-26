@@ -9,6 +9,8 @@ import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "Channel", description = "Channel API")
 @RestController
-@RequestMapping("/v1/channels")
+@RequestMapping("/api/channels")
 public class ChannelController {
     private final BasicChannelService channelService;
 
@@ -27,6 +30,7 @@ public class ChannelController {
     }
 
     // 등록
+    @Operation(summary = "Public Channel 생성", operationId = "create_3")
     @RequestMapping(value="/public", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
             @Valid @RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
@@ -34,7 +38,7 @@ public class ChannelController {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(ApiResponse.success(ChannelResponse.from(channel)));
     }
-
+    @Operation(summary = "Private Channel 생성", operationId = "create_4")
     @RequestMapping(value="/private", method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<ChannelResponse>> createChannel(
             @Valid @RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
@@ -44,6 +48,7 @@ public class ChannelController {
     }
 
     // 조회
+    @Operation(summary = "Channel 조회")
     @RequestMapping(value="/{channel-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<ChannelResponse>> getChannel(
             @PathVariable("channel-id") UUID channelId
@@ -52,9 +57,10 @@ public class ChannelController {
         return ResponseEntity.ok(ApiResponse.success(ChannelResponse.from(channelDto)));
     }
 
-    @RequestMapping(value="/user/{user-id}", method=RequestMethod.GET)
+    @Operation(summary = "User가 참여 중인 Channel 목록 조회", operationId = "findAll_1")
+    @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<List<ChannelResponse>>> getChannels(
-            @PathVariable("user-id") UUID userId
+            @RequestParam("user-id") UUID userId
     ){
         List<ChannelResponse> channels = channelService.findAllByUserId(userId)
                 .stream().map(ChannelResponse::from).toList();
@@ -62,6 +68,7 @@ public class ChannelController {
     }
 
     // 수정
+    @Operation(summary = "Channel 정보 수정", operationId = "update_3")
     @RequestMapping(value="/{channel-id}", method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ChannelResponse>> updateChannel(
             @PathVariable ("channel-id") UUID channelId,
@@ -71,6 +78,7 @@ public class ChannelController {
         return ResponseEntity.ok(ApiResponse.success(ChannelResponse.from(update)));
     }
     // 삭제
+    @Operation(summary = "Channel 삭제", operationId = "delete_2")
     @RequestMapping(value="/{channel-id}", method=RequestMethod.DELETE)
     public ResponseEntity<Void> deleteChannel(
             @PathVariable ("channel-id") UUID channelId

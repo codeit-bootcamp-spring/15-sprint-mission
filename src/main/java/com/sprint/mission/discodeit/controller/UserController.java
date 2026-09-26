@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.entity.User;
 
 import com.sprint.mission.discodeit.service.basic.BasicUserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
@@ -27,7 +29,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
+@Tag(name="User", description = "User API")
+@RequestMapping("/api/users")
 @RestController
 public class UserController {
 
@@ -59,7 +62,8 @@ public class UserController {
     }
 
     // 생성
-    @RequestMapping(value= "/v1/users", method=RequestMethod.POST)
+    @Operation(summary = "User 등록", operationId = "create")
+    @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
             @Valid @ModelAttribute UserCreateRequest userCreateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
@@ -89,7 +93,8 @@ public class UserController {
                 .body(ApiResponse.success(UserResponse.from(user)));
     }
     // 조회
-    @RequestMapping(value="/v1/users/{user-id}", method=RequestMethod.GET)
+    @Operation(summary = "User 조회", operationId = "")
+    @RequestMapping(value="/{user-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<UserResponse>> getUser(
         @PathVariable("user-id") UUID userId) {
 
@@ -100,13 +105,15 @@ public class UserController {
 
 
     // 정적 리소스 서빙
-    @RequestMapping(value="/api/user/findAll", method=RequestMethod.GET)
+    @Operation(summary = "전체 User 목록 조회", operationId = "findAll")
+    @RequestMapping(method=RequestMethod.GET)
     public ResponseEntity<List<UserDto>> getUsers() {
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
     // 수정
-    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.PATCH)
+    @Operation(summary = "User 정보 수정", operationId = "update")
+    @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
             @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
@@ -135,7 +142,8 @@ public class UserController {
         return ResponseEntity.ok(ApiResponse.success(UserResponse.from(update)));
     }
     // 삭제
-    @RequestMapping(value="/v1/users/{user-id}",method=RequestMethod.DELETE)
+    @Operation(summary = "User 삭제", operationId = "delete")
+    @RequestMapping(value="/{user-id}",method=RequestMethod.DELETE)
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID userId) {
         userService.delete(userId);
         return ResponseEntity.noContent().build();
