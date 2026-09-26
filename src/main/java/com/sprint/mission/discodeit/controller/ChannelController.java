@@ -56,6 +56,9 @@ public class ChannelController {
 
     // 조회
     @Operation(summary = "Channel 조회")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Channel 조회 성공"),
+    })
     @RequestMapping(value="/{channel-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<ChannelResponse>> getChannel(
             @PathVariable("channel-id") UUID channelId

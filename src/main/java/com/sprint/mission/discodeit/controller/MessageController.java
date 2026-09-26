@@ -77,6 +77,9 @@ public class MessageController {
     }
     // 조회
     @Operation(summary = "Message 내용 조회", operationId = "")
+    @ApiResponses({
+        @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "Message 조회 성공")
+    })
     @RequestMapping(value="/{message-id}", method=RequestMethod.GET)
     public ResponseEntity<ApiResponse<MessageResponse>> getMessage(
             @PathVariable ("message-id") UUID messageId
