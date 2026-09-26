@@ -31,7 +31,7 @@ public class UserStatusController {
     @RequestMapping(value="/{user-id}/userStatus" , method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserStatusResponse>> updateUserStatus(
             @PathVariable("user-id") UUID userId,
-            @Valid @RequestBody UserStatusUpdateRequest request
+            @RequestPart("userStatusUpdateRequest") UserStatusUpdateRequest request
     ) {
        UserStatus status = userStatusService.updateByUserId(userId, request);
        return ResponseEntity.ok(ApiResponse.success(UserStatusResponse.from(status)));

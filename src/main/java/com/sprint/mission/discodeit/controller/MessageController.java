@@ -45,7 +45,8 @@ public class MessageController {
     })
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<MessageResponse>> createMessage(
-            @Valid @ModelAttribute MessageCreateRequest request,
+            // ModelAttribute -> RequestPart
+            @RequestPart("messageCreateRequest") MessageCreateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> files
             ) throws IOException {
         List<String> fileNames = new ArrayList<>();

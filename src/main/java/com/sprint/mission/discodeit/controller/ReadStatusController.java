@@ -61,7 +61,7 @@ public class ReadStatusController {
     })
     @RequestMapping(value="/{readstatus-id}", method= RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<ReadStatusResponse>> updateReadStatus(
-            @Valid @RequestBody ReadStatusUpdateRequest request,
+            @RequestPart("readStatusUpdateRequest") ReadStatusUpdateRequest request,
             @RequestParam("readstatus-id") UUID readStatusId
     ) {
 

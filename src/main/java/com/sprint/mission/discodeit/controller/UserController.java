@@ -69,7 +69,8 @@ public class UserController {
     })
     @RequestMapping(method=RequestMethod.POST)
     public ResponseEntity<ApiResponse<UserResponse>> createUser(
-            @Valid @ModelAttribute UserCreateRequest userCreateRequest,
+            // ModelAttribute -> RequestPart
+            @RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
             ) throws IOException {
         // 파일 검증
@@ -128,7 +129,7 @@ public class UserController {
     @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
     public ResponseEntity<ApiResponse<UserResponse>> updateUser(
             @PathVariable("user-id") UUID userId,
-            @Valid @ModelAttribute UserUpdateRequest userUpdateRequest,
+            @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
 
     ) throws IOException {
