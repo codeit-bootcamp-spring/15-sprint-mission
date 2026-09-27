@@ -3,9 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.UserResponse;
+import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.entity.NitroLevel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -51,7 +50,7 @@ public class BasicUserService implements UserService {
                 })
                 .orElse(null);
 
-        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),userCreateRequest.nitroLevel(),profileId);
+        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),profileId);
         UserStatus userStatus = new UserStatus(user.getId());
         userRepository.save(user);
         userStatusRepository.save(userStatus);
@@ -60,18 +59,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse find(UUID id) {
+    public UserDto find(UUID id) {
         return userRepository.findById(id).map(this::toUserResponse)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
     }
 
     @Override
-    public List<UserResponse> findAll() {
+    public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(this::toUserResponse).toList();
     }
 
     @Override
     public User update(UUID id, UserUpdateRequest userUpdateRequest) {
+
+        if (userUpdateRequest == null) {
+            return userRepository.findById(id)
+                    .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
 
@@ -80,20 +85,21 @@ public class BasicUserService implements UserService {
         for (User entry : userRepository.findAll()) {
             if (entry.getId().equals(id)) continue;
 
-            if (entry.getUsername().equals(userUpdateRequest.name())) {
+            if (userUpdateRequest.name() != null
+                    && entry.getUsername().equals(userUpdateRequest.name())) {
 
                 throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
 
             }
-            if (entry.getEmail().equals(userUpdateRequest.email())) {
+            if (userUpdateRequest.email() != null
+            && entry.getEmail().equals(userUpdateRequest.email())) {
                 throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.email());
             }
         }
-        validateEmail(userUpdateRequest.email());
+
         String email;
         String password;
         String name;
-        NitroLevel nitroLevel;
 
 
         if(userUpdateRequest.email() != null) {
@@ -101,6 +107,8 @@ public class BasicUserService implements UserService {
         }else {
             email = user.getEmail();
         }
+        validateEmail(email);
+
 
         if (userUpdateRequest.password() != null) {
             password = userUpdateRequest.password();
@@ -114,18 +122,10 @@ public class BasicUserService implements UserService {
             name = user.getUsername();
         }
 
-        if(userUpdateRequest.nitroLevel() != null) {
-            nitroLevel = userUpdateRequest.nitroLevel();
-        }else {
-            nitroLevel = user.getNitroLevel();
-        }
-
-
-
 
 
         UUID profileId = userUpdateRequest.profileId().orElse(user.getProfileId());
-        user.update(email, password, name, nitroLevel, profileId);
+        user.update(email, password, name, profileId);
         return userRepository.save(user);
 
     }
@@ -144,20 +144,19 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(id);
     }
 
-    public UserResponse toUserResponse(User user) {
+    public UserDto toUserResponse(User user) {
         UserStatus userStatus = userStatusRepository
                 .findByUserId(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저의 스테이터스가 없습니다."));
         boolean online = userStatus.isOnline();
 
         //UUID testId= Optional.ofNullable(user.getProfileId()).orElse(null);
 
-        return new UserResponse(
+        return new UserDto(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getEmail(),
                 user.getUsername(),
-                user.getNitroLevel(),
                 Optional.ofNullable(user.getProfileId()),
                 online
         );

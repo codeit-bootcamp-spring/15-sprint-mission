@@ -14,11 +14,11 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    @PostMapping
+    /*@PostMapping
     public ResponseEntity<BinaryContent> create(
             @RequestParam("file") MultipartFile file) throws IOException {
 
@@ -32,11 +32,11 @@ public class BinaryContentController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(binaryContent);
-    }
+    }*/
 
 
-    @GetMapping("/find")
-    public ResponseEntity<BinaryContent> getBinaryContent(@RequestParam("binaryContentId") UUID binaryContentId){
+    @GetMapping("/{binaryContentId}")
+    public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId){
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
         return ResponseEntity.status(HttpStatus.OK)
@@ -44,9 +44,9 @@ public class BinaryContentController {
     }
 
 
-    @GetMapping("/ids")
-    public ResponseEntity<List<BinaryContent>> getBinaryContentList(@RequestParam List<UUID> ids){
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIds(ids);
+    @GetMapping
+    public ResponseEntity<List<BinaryContent>> getBinaryContentList(@RequestParam("binaryContentIds") List<UUID> binaryContentIds){
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIds(binaryContentIds);
 
         return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
     }

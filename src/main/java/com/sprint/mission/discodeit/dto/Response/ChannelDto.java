@@ -1,19 +1,19 @@
 package com.sprint.mission.discodeit.dto.Response;
 
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record ChannelResponse(
+public record ChannelDto(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
         String name,
-        ChannelType channelType,
-        List<UUID> membersId,
+        String description,
+        ChannelType type,
+        List<UUID> participantIds,
         Instant lastMessageAt
 
 ) {
