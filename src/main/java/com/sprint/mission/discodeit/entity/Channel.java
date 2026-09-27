@@ -9,7 +9,7 @@ public class Channel extends BaseClass {
 
     private String name;
     private String description;
-    private final ChannelType channelType;
+    private final ChannelType type;
     ///////////////////////////////////////////
 
 
@@ -18,13 +18,13 @@ public class Channel extends BaseClass {
         super();
         this.name = name;
         this.description = description;
-        this.channelType=channelType;
+        this.type =channelType;
     }
 
     public void update(String name, String description){
         this.name = name;
         this.description = description;
-        //this.channelType = channelType;
+        //this.type = type;
         setUpdatedAt();
     }
 

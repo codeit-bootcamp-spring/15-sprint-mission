@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,7 +37,21 @@ public class BinaryContentController {
                 .body(binaryContent);
     }*/
 
+    @Operation(
+            summary = "첨부 파일 조회",
+            operationId = "find"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "파일 조회 성공"
+            ),
 
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "파일을 찾을 수 없음"
+            )
+    })
     @GetMapping("/{binaryContentId}")
     public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId){
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
@@ -44,6 +61,12 @@ public class BinaryContentController {
     }
 
 
+
+
+    @Operation(
+            summary = "여러 첨부 파일 조회",
+            operationId = "findAllByIdIn"
+    )
     @GetMapping
     public ResponseEntity<List<BinaryContent>> getBinaryContentList(@RequestParam("binaryContentIds") List<UUID> binaryContentIds){
         List<BinaryContent> binaryContents = binaryContentService.findAllByIds(binaryContentIds);

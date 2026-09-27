@@ -37,7 +37,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public Channel create(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = new Channel(null,null,ChannelType.PRIVATE);
-        List<UUID> membersId = privateChannelCreateRequest.membersId();
+        List<UUID> membersId = privateChannelCreateRequest.participantIds();
         ReadStatus readStatus;
         channelRepository.save(channel);
         for (UUID entry : membersId){
@@ -69,11 +69,9 @@ public class BasicChannelService implements ChannelService {
                 .orElse(null);
         return new ChannelDto(
                 channel.getId(),
-                channel.getCreatedAt(),
-                channel.getUpdatedAt(),
                 channel.getName(),
                 channel.getDescription(),
-                channel.getChannelType(),
+                channel.getType(),
                 memberIds,
                 latestMessageAt
 
@@ -87,7 +85,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<Channel> publicChannels = channelRepository.findAll().stream().filter(channel -> channel.getChannelType()==ChannelType.PUBLIC).toList();
+        List<Channel> publicChannels = channelRepository.findAll().stream().filter(channel -> channel.getType()==ChannelType.PUBLIC).toList();
         List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
                 .map(readStatus -> readStatus.getChannelId()).toList();
         List<Channel> privateChannels = new ArrayList<>();
@@ -97,7 +95,7 @@ public class BasicChannelService implements ChannelService {
             }
         }
 
-        privateChannels= privateChannels.stream().filter(channel -> channel.getChannelType()==ChannelType.PRIVATE).toList();
+        privateChannels= privateChannels.stream().filter(channel -> channel.getType()==ChannelType.PRIVATE).toList();
 
         List<Channel> concatList = new ArrayList<>();
         List<ChannelDto> resultList;
@@ -116,7 +114,7 @@ public class BasicChannelService implements ChannelService {
     public Channel update(UUID id,ChannelUpdateRequest channelUpdateRequest) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
-        if(channel.getChannelType()==ChannelType.PRIVATE){
+        if(channel.getType()==ChannelType.PRIVATE){
             throw new IllegalArgumentException("private채널은 업데이트할 수 없습니다.");
         }
         channel.update(channelUpdateRequest.name(),channelUpdateRequest.description());

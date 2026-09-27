@@ -70,7 +70,7 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public User update(UUID id, UserUpdateRequest userUpdateRequest) {
+    public User update(UUID id, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
         if (userUpdateRequest == null) {
             return userRepository.findById(id)
@@ -85,15 +85,15 @@ public class BasicUserService implements UserService {
         for (User entry : userRepository.findAll()) {
             if (entry.getId().equals(id)) continue;
 
-            if (userUpdateRequest.name() != null
-                    && entry.getUsername().equals(userUpdateRequest.name())) {
+            if (userUpdateRequest.newUsername() != null
+                    && entry.getUsername().equals(userUpdateRequest.newUsername())) {
 
-                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
+                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.newUsername());
 
             }
-            if (userUpdateRequest.email() != null
-            && entry.getEmail().equals(userUpdateRequest.email())) {
-                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.email());
+            if (userUpdateRequest.newEmail() != null
+            && entry.getEmail().equals(userUpdateRequest.newEmail())) {
+                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.newEmail());
             }
         }
 
@@ -102,29 +102,37 @@ public class BasicUserService implements UserService {
         String name;
 
 
-        if(userUpdateRequest.email() != null) {
-            email = userUpdateRequest.email();
+        if(userUpdateRequest.newEmail() != null) {
+            email = userUpdateRequest.newEmail();
         }else {
             email = user.getEmail();
         }
         validateEmail(email);
 
 
-        if (userUpdateRequest.password() != null) {
-            password = userUpdateRequest.password();
+        if (userUpdateRequest.newPassword() != null) {
+            password = userUpdateRequest.newPassword();
         } else {
             password = user.getPassword();
         }
 
-        if(userUpdateRequest.name() != null) {
-            name = userUpdateRequest.name();
+        if(userUpdateRequest.newUsername() != null) {
+            name = userUpdateRequest.newUsername();
         }else {
             name = user.getUsername();
         }
 
+        UUID profileId = binaryContentCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
 
 
-        UUID profileId = userUpdateRequest.profileId().orElse(user.getProfileId());
         user.update(email, password, name, profileId);
         return userRepository.save(user);
 

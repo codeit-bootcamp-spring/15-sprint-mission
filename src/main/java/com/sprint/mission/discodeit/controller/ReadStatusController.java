@@ -3,7 +3,9 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,10 +21,25 @@ public class ReadStatusController {
 
     private final ReadStatusService readStatusService;
 
-    @ApiResponse(
-            responseCode = "201",
-            description = "ReadStatus 등록 성공"
+
+    @Operation(
+            summary = "Message 읽음 상태 생성",
+            operationId = "create_1"
     )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "201",
+                    description = "ReadStatus 등록 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "400",
+                    description = "리드스테이터스 이미 존재함"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "채널 또는 유저를 찾을 수 없음"
+            )
+    })
     @PostMapping
     public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
         ReadStatus readStatus = readStatusService.create(readStatusCreateRequest);
@@ -31,6 +48,20 @@ public class ReadStatusController {
                 .body(readStatus);
     }
 
+    @Operation(
+            summary = "Message 읽음 상태 수정",
+            operationId = "update_1"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "리드스테이터스 수정 성공"
+            ),
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "리드스테이터스 찾을 수 없음"
+            )
+    })
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatus> patchReadStatus(@PathVariable("readStatusId") UUID readStatusId){
         ReadStatus readStatus = readStatusService.update(readStatusId);
@@ -53,6 +84,10 @@ public class ReadStatusController {
         return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
     }*/
 
+    @Operation(
+            summary = "User의 Message 읽음 상태 목록 조회",
+            operationId = "findAllByUserId"
+    )
     @GetMapping
     public ResponseEntity<List<ReadStatus>> getReadStatusByUserId( @RequestParam("userId") UUID userId){
         List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);

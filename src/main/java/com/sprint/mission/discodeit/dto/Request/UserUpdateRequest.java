@@ -5,9 +5,8 @@ import java.util.Optional;
 import java.util.UUID;
 
 public record UserUpdateRequest(
-        String email,
-        String password,
-        String name,
-        Optional<UUID> profileId
+        String newEmail,
+        String newPassword,
+        String newUsername
 ) {
 }
