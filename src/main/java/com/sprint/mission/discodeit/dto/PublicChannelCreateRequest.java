@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.dto;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 public record PublicChannelCreateRequest(
 
-        @NotBlank
-        String name,
+    @NotBlank
+    @Schema(description = "공개 채널 이름")
+    String name,
 
-        String description) {
+    @Schema(description = "공개 채널 소개")
+    String description) {
+
 }
