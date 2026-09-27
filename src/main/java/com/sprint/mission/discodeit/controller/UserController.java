@@ -91,9 +91,9 @@ public class UserController {
     }
     // 조회
     @Operation(summary = "User 조회", operationId = "")
-    @RequestMapping(value="/{user-id}", method=RequestMethod.GET)
+    @RequestMapping(value="/{userId}", method=RequestMethod.GET)
     public ResponseEntity<UserResponse> getUser(
-        @PathVariable("user-id") UUID userId) {
+        @PathVariable("userId") UUID userId) {
 
         UserDto userDto = userService.find(userId);
 
@@ -122,7 +122,7 @@ public class UserController {
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable("userId") UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
-            @RequestPart(value="image", required = false) MultipartFile file
+            @RequestPart(value="profile", required = false) MultipartFile file
 
     ) throws IOException {
         // 파일 검증
