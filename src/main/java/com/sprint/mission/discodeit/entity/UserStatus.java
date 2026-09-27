@@ -2,55 +2,45 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus implements java.io.Serializable {
+public class UserStatus implements Serializable {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private UUID userId;
-    private Instant lastActiveAt;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private UUID userId;
+  private Instant lastActiveAt;
 
-    public UserStatus(UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.userId = userId;
-        this.lastActiveAt = Instant.now();
+  public UserStatus(UUID userId, Instant lastActiveAt) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.userId = userId;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void update(Instant lastActiveAt) {
+    boolean anyValueUpdated = false;
+    if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+      this.lastActiveAt = lastActiveAt;
+      anyValueUpdated = true;
     }
 
-    public void updateLastActiveAt() {
-        Instant now = Instant.now();
-
-        this.lastActiveAt = now;
-        this.updatedAt = now;
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 
-    public boolean isOnline() {
-        if (this.lastActiveAt == null) {
-            return false;
-        }
-        Instant now = Instant.now();
+  public Boolean isOnline() {
+    Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
 
-        // 현재 시간과 마지막 접속 시간 사이의 차이 계산
-        Duration duration = Duration.between(this.lastActiveAt, now);
-
-        // 시간 차이가 0분 이상이고 5분 이하인지 확인
-        return !duration.isNegative()
-                && duration.compareTo(Duration.ofMinutes(5)) <= 0;
-    }
-
-    public void updateLastActiveAt(Instant lastActiveAt) {
-
-        if (lastActiveAt == null) {
-            throw new IllegalArgumentException("마지막 활동 시간이 기록이 없습니다.");
-        }
-
-        this.lastActiveAt = lastActiveAt;
-        this.updatedAt = Instant.now();
-    }
+    return lastActiveAt.isAfter(instantFiveMinutesAgo);
+  }
 }

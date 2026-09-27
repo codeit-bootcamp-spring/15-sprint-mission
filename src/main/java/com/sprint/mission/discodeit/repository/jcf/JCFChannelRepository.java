@@ -7,49 +7,39 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(
-        prefix = "discodeit.repository",
-        name = "type",
-        havingValue = "jcf",
-        matchIfMissing = true
-)
 public class JCFChannelRepository implements ChannelRepository {
 
-    private final Map<UUID, Channel> data;
+  private final Map<UUID, Channel> data;
 
-    public JCFChannelRepository() {
-        this.data = new HashMap<>();
-    }
+  public JCFChannelRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public Channel save(Channel channel) {
+  @Override
+  public Channel save(Channel channel) {
+    this.data.put(channel.getId(), channel);
+    return channel;
+  }
 
-        data.put(channel.getId(), channel);
+  @Override
+  public Optional<Channel> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-        return channel;
-    }
+  @Override
+  public List<Channel> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-    @Override
-    public Optional<Channel> findById(UUID id) {
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-        return Optional.ofNullable(data.get(id));
-    }
-
-    @Override
-    public List<Channel> findAll() {
-
-        return List.copyOf(data.values());
-    }
-
-    @Override
-    public boolean existsById(UUID id) {
-        return data.containsKey(id);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-
-        data.remove(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 }

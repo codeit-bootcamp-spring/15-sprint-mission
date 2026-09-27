@@ -1,34 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelFindResponse;
-import com.sprint.mission.discodeit.dto.ChannelDto.ChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.ChannelDto.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.ChannelDto.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.data.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 
 import java.util.List;
 import java.util.UUID;
 
 public interface ChannelService {
 
-    // PUBLIC 채널 생성
-    Channel createPublic(PublicChannelCreateRequest request);
+  Channel create(PublicChannelCreateRequest request);
 
-    // PRIVATE 채널 생성
-    Channel createPrivate(PrivateChannelCreateRequest request);
+  Channel create(PrivateChannelCreateRequest request);
 
-    // 특정 userID채널 조회
-    ChannelFindResponse find(UUID id);
+  ChannelDto find(UUID channelId);
 
-    // 특정 유저가 볼 수 있는 채널 전체 조회
-    List<ChannelFindResponse> findAllByUserId(UUID userId);
+  List<ChannelDto> findAllByUserId(UUID userId);
 
-    // 채널 수정
-    Channel update(UUID id, ChannelUpdateRequest request);
+  Channel update(UUID channelId, PublicChannelUpdateRequest request);
 
-    // 채널 삭제
-    void delete(UUID id);
-
-    // 채널 조회
-    List<ChannelFindResponse> findAllPublic();
+  void delete(UUID channelId);
 }

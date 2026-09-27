@@ -7,55 +7,56 @@ import org.springframework.stereotype.Repository;
 
 import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(
-        prefix = "discodeit.repository",
-        name = "type",
-        havingValue = "jcf",
-        matchIfMissing = true
-)
 public class JCFUserRepository implements UserRepository {
 
-    private final Map<UUID, User> data;
+  private final Map<UUID, User> data;
 
-    public JCFUserRepository() {
-        this.data = new HashMap<>();
-    }
+  public JCFUserRepository() {
+    this.data = new HashMap<>();
+  }
 
-    @Override
-    public User save(User user) {
+  @Override
+  public User save(User user) {
+    this.data.put(user.getId(), user);
+    return user;
+  }
 
-        data.put(user.getId(), user);
+  @Override
+  public Optional<User> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-        return user;
-    }
+  @Override
+  public Optional<User> findByUsername(String username) {
+    return this.findAll().stream()
+        .filter(user -> user.getUsername().equals(username))
+        .findFirst();
+  }
 
-    @Override
-    public Optional<User> findById(UUID id) {
+  @Override
+  public List<User> findAll() {
+    return this.data.values().stream().toList();
+  }
 
-        return Optional.ofNullable(data.get(id));
-    }
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-    @Override
-    public List<User> findAll() {
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 
-        return List.copyOf(data.values());
-    }
+  @Override
+  public boolean existsByEmail(String email) {
+    return this.findAll().stream().anyMatch(user -> user.getEmail().equals(email));
+  }
 
-    @Override
-    public boolean existsById(UUID id) {
-        return data.containsKey(id);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        data.remove(id);
-    }
-
-    @Override
-    public Optional<User> findByName(String username) {
-        return findAll().stream()
-                .filter(user -> user.getName().equals(username))
-                .findFirst();
-    }
+  @Override
+  public boolean existsByUsername(String username) {
+    return this.findAll().stream().anyMatch(user -> user.getUsername().equals(username));
+  }
 }

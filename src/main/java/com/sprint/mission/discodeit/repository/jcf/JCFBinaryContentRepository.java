@@ -5,65 +5,43 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.*;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "jcf", matchIfMissing = true)
 @Repository
-@ConditionalOnProperty(
-        prefix = "discodeit.repository",
-        name = "type",
-        havingValue = "jcf",
-        matchIfMissing = true)
 public class JCFBinaryContentRepository implements BinaryContentRepository {
 
-    private final Map<UUID, BinaryContent> binaryContents
-            = new ConcurrentHashMap<>();
+  private final Map<UUID, BinaryContent> data;
 
-    // 저장
-    @Override
-    public void save(BinaryContent binaryContent) {
+  public JCFBinaryContentRepository() {
+    this.data = new HashMap<>();
+  }
 
-        binaryContents.put(
-                binaryContent.getId(),
-                binaryContent
-        );
-    }
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    this.data.put(binaryContent.getId(), binaryContent);
+    return binaryContent;
+  }
 
-    // id로 하나 조회
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    return Optional.ofNullable(this.data.get(id));
+  }
 
-        return Optional.ofNullable(
-                binaryContents.get(id)
-        );
-    }
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    return this.data.values().stream()
+        .filter(content -> ids.contains(content.getId()))
+        .toList();
+  }
 
-    // 여러 id로 조회
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+  @Override
+  public boolean existsById(UUID id) {
+    return this.data.containsKey(id);
+  }
 
-        List<BinaryContent> result = new ArrayList<>();
-
-        for (UUID id : ids) {
-
-            BinaryContent binaryContent = binaryContents.get(id);
-
-            if (binaryContent != null) {
-                result.add(binaryContent);
-            }
-        }
-
-        return result;
-    }
-
-    // id로 삭제
-    @Override
-    public void deleteById(UUID id) {
-
-        binaryContents.remove(id);
-    }
+  @Override
+  public void deleteById(UUID id) {
+    this.data.remove(id);
+  }
 }

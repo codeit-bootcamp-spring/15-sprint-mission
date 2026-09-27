@@ -10,31 +10,37 @@ import java.util.UUID;
 @Getter
 public class Message implements Serializable {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private UUID channelId;
-    private UUID authorId;
-    private String content;
-    private List<UUID> attachmentIds;
+  private static final long serialVersionUID = 1L;
 
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private String content;
+  //
+  private UUID channelId;
+  private UUID authorId;
+  private List<UUID> attachmentIds;
 
-    public Message(UUID channelId, UUID authorId, String content, List<UUID> attachmentIds) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.content = content;
+  public Message(String content, UUID channelId, UUID authorId, List<UUID> attachmentIds) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.content = content;
+    this.channelId = channelId;
+    this.authorId = authorId;
+    this.attachmentIds = attachmentIds;
+  }
 
-        this.attachmentIds =
-                attachmentIds == null
-                        ? List.of()
-                        : List.copyOf(attachmentIds);
+  public void update(String newContent) {
+    boolean anyValueUpdated = false;
+    if (newContent != null && !newContent.equals(this.content)) {
+      this.content = newContent;
+      anyValueUpdated = true;
     }
 
-    public void setContent(String content) {
-        this.content = content;
-        this.updatedAt = Instant.now();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 }

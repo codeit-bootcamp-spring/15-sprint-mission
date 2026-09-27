@@ -1,37 +1,30 @@
-package com.sprint.mission.discodeit.Controller;
+package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.UserDto.LoginRequest;
-import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
-@RestController
-@RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Controller
+@ResponseBody
+@RequestMapping("/api/auth")
 public class AuthController {
 
-    private final AuthService authService;
-    private final UserService userService;
+  private final AuthService authService;
 
-
-    // 로그인
-    @RequestMapping(
-            path = "/login",
-            method = RequestMethod.POST
-    )
-    public UserFindResponse login(
-            @RequestBody LoginRequest request
-    ) {
-
-        User user = authService.login(request);
-
-        // 비밀번호를 응답하지 않기 위해 UserFindRequest로 변환
-        return userService.find(user.getId());
-    }
+  @PostMapping("/login")
+  public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
+    User user = authService.login(loginRequest);
+    return ResponseEntity
+        .status(HttpStatus.OK)
+        .body(user);
+  }
 }

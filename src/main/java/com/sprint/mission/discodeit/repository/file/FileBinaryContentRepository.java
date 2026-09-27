@@ -9,144 +9,120 @@ import org.springframework.stereotype.Repository;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.*;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
+import java.util.concurrent.locks.ReentrantLock;
+import java.util.stream.Stream;
 
+@ConditionalOnProperty(name = "discodeit.repository.type", havingValue = "file")
 @Repository
-@ConditionalOnProperty(
-        prefix = "discodeit.repository",
-        name = "type",
-        havingValue = "file"
-)
 public class FileBinaryContentRepository implements BinaryContentRepository {
 
-    private final Path filePath;
+  private final Path DIRECTORY;
+  private final String EXTENSION = ".ser";
+  private final FileLockProvider fileLockProvider;
 
-    public FileBinaryContentRepository(
-            @Value("${discodeit.repository.file-directory:.discodeit}")
-            String fileDirectory
+  public FileBinaryContentRepository(
+      @Value("${discodeit.repository.file-directory:data}") String fileDirectory,
+      FileLockProvider fileLockProvider
+  ) {
+    this.DIRECTORY = Paths.get(System.getProperty("user.dir"), fileDirectory,
+        BinaryContent.class.getSimpleName());
+    if (Files.notExists(DIRECTORY)) {
+      try {
+        Files.createDirectories(DIRECTORY);
+      } catch (IOException e) {
+        throw new RuntimeException(e);
+      }
+    }
+    this.fileLockProvider = fileLockProvider;
+  }
+
+  private Path resolvePath(UUID id) {
+    return DIRECTORY.resolve(id + EXTENSION);
+  }
+
+  @Override
+  public BinaryContent save(BinaryContent binaryContent) {
+    Path path = resolvePath(binaryContent.getId());
+    ReentrantLock lock = fileLockProvider.getLock(path);
+    lock.lock();
+
+    try (
+        FileOutputStream fos = new FileOutputStream(path.toFile());
+        ObjectOutputStream oos = new ObjectOutputStream(fos)
     ) {
-        this.filePath = Path.of(
-                fileDirectory,
-                "binaryContents.ser"
-        );
+      oos.writeObject(binaryContent);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    } finally {
+      lock.unlock();
     }
+    return binaryContent;
+  }
 
-
-    // 저장
-    @Override
-    public void save(BinaryContent binaryContent) {
-
-        Map<UUID, BinaryContent> binaryContents = load();
-
-        binaryContents.put(
-                binaryContent.getId(),
-                binaryContent
-        );
-
-        saveAll(binaryContents);
+  @Override
+  public Optional<BinaryContent> findById(UUID id) {
+    BinaryContent binaryContentNullable = null;
+    Path path = resolvePath(id);
+    ReentrantLock lock = fileLockProvider.getLock(path);
+    lock.lock();
+    if (Files.exists(path)) {
+      try (
+          FileInputStream fis = new FileInputStream(path.toFile());
+          ObjectInputStream ois = new ObjectInputStream(fis)
+      ) {
+        binaryContentNullable = (BinaryContent) ois.readObject();
+      } catch (IOException | ClassNotFoundException e) {
+        throw new RuntimeException(e);
+      } finally {
+        lock.unlock();
+      }
     }
+    return Optional.ofNullable(binaryContentNullable);
+  }
 
-
-    // id로 하나 조회
-    @Override
-    public Optional<BinaryContent> findById(UUID id) {
-
-        Map<UUID, BinaryContent> binaryContents = load();
-
-        return Optional.ofNullable(
-                binaryContents.get(id)
-        );
-    }
-
-
-    // 여러 id로 조회
-    @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-
-        Map<UUID, BinaryContent> binaryContents = load();
-
-        List<BinaryContent> result = new ArrayList<>();
-
-        for (UUID id : ids) {
-
-            BinaryContent binaryContent = binaryContents.get(id);
-
-            if (binaryContent != null) {
-                result.add(binaryContent);
-            }
-        }
-
-        return result;
-    }
-
-
-    // id로 삭제
-    @Override
-    public void deleteById(UUID id) {
-
-        Map<UUID, BinaryContent> binaryContents = load();
-
-        binaryContents.remove(id);
-
-        saveAll(binaryContents);
-    }
-
-
-    // 전체 데이터를 파일에 저장
-    private void saveAll(Map<UUID, BinaryContent> binaryContents) {
-
-        try {
-
-            // application.yaml에서 지정한 폴더가 없으면 생성
-            Files.createDirectories(filePath.getParent());
-
+  @Override
+  public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    try (Stream<Path> paths = Files.list(DIRECTORY)) {
+      return paths
+          .filter(path -> path.toString().endsWith(EXTENSION))
+          .map(path -> {
+            ReentrantLock lock = fileLockProvider.getLock(path);
+            lock.lock();
             try (
-                    ObjectOutputStream outputStream =
-                            new ObjectOutputStream(
-                                    new FileOutputStream(filePath.toFile())
-                            )
+                FileInputStream fis = new FileInputStream(path.toFile());
+                ObjectInputStream ois = new ObjectInputStream(fis)
             ) {
-
-                outputStream.writeObject(binaryContents);
+              return (BinaryContent) ois.readObject();
+            } catch (IOException | ClassNotFoundException e) {
+              throw new RuntimeException(e);
+            } finally {
+              lock.unlock();
             }
-
-        } catch (IOException e) {
-
-            throw new RuntimeException(
-                    "BinaryContent 저장 중 오류가 발생했습니다.",
-                    e
-            );
-        }
+          })
+          .filter(content -> ids.contains(content.getId()))
+          .toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 
+  @Override
+  public boolean existsById(UUID id) {
+    Path path = resolvePath(id);
+    return Files.exists(path);
+  }
 
-    // 파일에서 전체 데이터 읽기
-    @SuppressWarnings("unchecked")
-    private Map<UUID, BinaryContent> load() {
-
-        File file = filePath.toFile();
-
-        // 아직 파일이 없으면 빈 Map 반환
-        if (!file.exists()) {
-            return new HashMap<>();
-        }
-
-        try (
-                ObjectInputStream inputStream =
-                        new ObjectInputStream(
-                                new FileInputStream(file)
-                        )
-        ) {
-
-            return (Map<UUID, BinaryContent>)
-                    inputStream.readObject();
-
-        } catch (IOException | ClassNotFoundException e) {
-
-            throw new RuntimeException(
-                    "BinaryContent 조회 중 오류가 발생했습니다.",
-                    e
-            );
-        }
+  @Override
+  public void deleteById(UUID id) {
+    Path path = resolvePath(id);
+    try {
+      Files.delete(path);
+    } catch (IOException e) {
+      throw new RuntimeException(e);
     }
+  }
 }

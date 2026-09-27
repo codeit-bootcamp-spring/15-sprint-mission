@@ -8,22 +8,17 @@ import java.util.UUID;
 
 public interface ReadStatusRepository {
 
-    ReadStatus save(ReadStatus readStatus);
+  ReadStatus save(ReadStatus readStatus);
 
-    List<ReadStatus> findAll();
+  Optional<ReadStatus> findById(UUID id);
 
-    void deleteByChannelId(UUID channelId);
+  List<ReadStatus> findAllByUserId(UUID userId);
 
-    List<ReadStatus> findAllByChannelId(UUID channelId);
+  List<ReadStatus> findAllByChannelId(UUID channelId);
 
-    Optional<ReadStatus> findById(UUID id);
+  boolean existsById(UUID id);
 
-    Optional<ReadStatus> findByChannelIdAndUserId(
-            UUID channelId,
-            UUID userId
-    );
+  void deleteById(UUID id);
 
-    List<ReadStatus> findAllByUserId(UUID userId);
-
-    void deleteById(UUID id);
+  void deleteAllByChannelId(UUID channelId);
 }

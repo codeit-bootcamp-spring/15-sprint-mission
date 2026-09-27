@@ -9,43 +9,37 @@ import java.util.UUID;
 @Getter
 public class Channel implements Serializable {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private String channelName;
-    private String channelDescription;
-    private ChannelType type;
-    private UUID ownerId;
+  private static final long serialVersionUID = 1L;
+  private UUID id;
+  private Instant createdAt;
+  private Instant updatedAt;
+  //
+  private ChannelType type;
+  private String name;
+  private String description;
 
+  public Channel(ChannelType type, String name, String description) {
+    this.id = UUID.randomUUID();
+    this.createdAt = Instant.now();
+    //
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
 
-    public Channel(
-            UUID ownerId,
-            String channelName,
-            String channelDescription,
-            ChannelType type
-    ) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.ownerId = ownerId;
-        this.channelName = channelName;
-        this.channelDescription = channelDescription;
-        this.type = type;
+  public void update(String newName, String newDescription) {
+    boolean anyValueUpdated = false;
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
+      anyValueUpdated = true;
+    }
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
+      anyValueUpdated = true;
     }
 
-    public void update(
-            String channelName,
-            String channelDescription
-    ) {
-
-        if (channelName != null) {
-            this.channelName = channelName;
-        }
-
-        if (channelDescription != null) {
-            this.channelDescription = channelDescription;
-        }
-
-        this.updatedAt = Instant.now();
+    if (anyValueUpdated) {
+      this.updatedAt = Instant.now();
     }
+  }
 }

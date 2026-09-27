@@ -1,33 +1,26 @@
 package com.sprint.mission.discodeit.service;
 
-import com.sprint.mission.discodeit.dto.BinaryContentRequest.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.UserDto.UserFindResponse;
-import com.sprint.mission.discodeit.dto.UserDto.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.data.UserDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.entity.User;
+
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface UserService {
 
-    //유저 생성기능
-    User create(
-            UserCreateRequest userRequest,
-            BinaryContentCreateRequest profileRequest
-    );
+  User create(UserCreateRequest userCreateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    //유저의 id로 조회하는 기능
-    UserFindResponse find(UUID id);
+  UserDto find(UUID userId);
 
-    //등록된 모든 유저를 조회하는 기능
-    List<UserFindResponse> findAll();
+  List<UserDto> findAll();
 
-    //등록된 유저의 정보를 수정하는 기능
-    User update( UUID id,
-                 UserUpdateRequest userRequest,
-                 BinaryContentCreateRequest profileRequest);
+  User update(UUID userId, UserUpdateRequest userUpdateRequest,
+      Optional<BinaryContentCreateRequest> profileCreateRequest);
 
-    //등록된 유저의 id로 유저의 정보를 삭제하는 기능
-    void delete(UUID id);
-
+  void delete(UUID userId);
 }
