@@ -77,7 +77,6 @@ public class UserController {
         Files.createDirectories(savePath.getParent());
         file.transferTo(savePath);
 
-
         BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                 file.getOriginalFilename(),
                 file.getContentType(),
@@ -119,9 +118,9 @@ public class UserController {
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "400", description = "같은 email 또는 username를 사용하는 User가 이미 존재함"),
         @io.swagger.v3.oas.annotations.responses.ApiResponse(responseCode = "200", description = "User 정보가 성공적으로 수정됨")
     })
-    @RequestMapping(value="/{user-id}",method=RequestMethod.PATCH)
+    @RequestMapping(value="/{userId}",method=RequestMethod.PATCH)
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable("user-id") UUID userId,
+            @PathVariable("userId") UUID userId,
             @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value="image", required = false) MultipartFile file
 
