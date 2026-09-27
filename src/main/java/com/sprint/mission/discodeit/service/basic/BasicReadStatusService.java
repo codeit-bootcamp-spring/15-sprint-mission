@@ -66,7 +66,7 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(ReadStatusUpdateRequest request) {
+    public ReadStatus update(UUID id, ReadStatusUpdateRequest request) {
         ReadStatus readStatus = readStatusRepository.findById(request.id())
                 .orElseThrow(() -> new NoSuchElementException("수정할 ReadStatus가 존재하지 않습니다: " + request.id()));
 

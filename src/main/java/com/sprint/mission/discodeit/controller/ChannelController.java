@@ -59,7 +59,7 @@ public class ChannelController {
             @PathVariable("id") UUID id,
             @RequestBody ChannelUpdateDto dto) {
         // ChannelUpdateDto 안에 id 필드가 포함되어야 한다면 주입 (예: dto.setId(id))
-        ChannelResponseDto response = channelService.update(dto);
+        ChannelResponseDto response = channelService.update(id, dto);
         return ResponseEntity.ok(response);
     }
 

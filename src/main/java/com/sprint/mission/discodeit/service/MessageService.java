@@ -13,6 +13,6 @@ public interface MessageService {
     Message find(UUID id);
     List<Message> findAllByChannelId(UUID channelId);
     // update(UUID, String) 대신 DTO를 받는 형태로 수정
-    Message update(MessageUpdateDto dto);
+    Message update(UUID id,MessageUpdateDto dto);
     void delete(UUID id);
 }

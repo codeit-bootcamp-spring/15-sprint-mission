@@ -63,7 +63,7 @@ public class UserController {
     public ResponseEntity<UserResponseDto> update(
             @PathVariable("id") UUID id,
             @RequestBody UserUpdateDto dto) {
-        UserResponseDto response = userService.update(dto);
+        UserResponseDto response = userService.update(id, dto);
         return ResponseEntity.ok(response);
     }
 

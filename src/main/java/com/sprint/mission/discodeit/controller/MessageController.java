@@ -51,7 +51,7 @@ public class MessageController {
             @PathVariable("id") UUID id,
             @RequestBody MessageUpdateDto dto) {
         // MessageUpdateDto에 id 필드가 포함되는 구조라면 세팅 (예: dto.setId(id))
-        Message response = messageService.update(dto);
+        Message response = messageService.update(id, dto);
         return ResponseEntity.ok(response);
     }
 

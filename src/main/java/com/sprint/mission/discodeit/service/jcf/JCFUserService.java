@@ -75,10 +75,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto dto) {
-        User user = userData.get(dto.id());
+    public UserResponseDto update(UUID id, UserUpdateDto dto) {
+        User user = userData.get(id);
         if (user == null) {
-            throw new NoSuchElementException("유저를 찾을 수 없습니다: " + dto.id());
+            throw new NoSuchElementException("유저를 찾을 수 없습니다: " + id);
         }
 
         UUID profileImageId = user.getProfileImageId();

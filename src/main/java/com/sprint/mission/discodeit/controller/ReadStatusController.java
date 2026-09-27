@@ -51,7 +51,7 @@ public class ReadStatusController {
             @PathVariable("id") UUID id,
             @RequestBody ReadStatusUpdateRequest request) {
         // ReadStatusUpdateRequest에 id 설정이 필요하다면 주입 (예: request.setId(id))
-        ReadStatus response = readStatusService.update(request);
+        ReadStatus response = readStatusService.update(id, request);
         return ResponseEntity.ok(response);
     }
 

@@ -40,7 +40,7 @@ public class BasicUserService implements UserService {
         // 2. 선택적 프로필 이미지 저장
         UUID profileImageId = null;
         if (dto.profileImage() != null) {
-            BinaryContentCreateDto imgDto = dto.profileImage(); // <-- 여기서 꺼냄
+            BinaryContentCreateDto imgDto = dto.profileImage();
 
             BinaryContent profile = new BinaryContent(
                     imgDto.fileName(),
@@ -78,9 +78,10 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponseDto update(UserUpdateDto dto) {
-        User user = userRepository.findById(dto.id())
-                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + dto.id()));
+    public UserResponseDto update(UUID id, UserUpdateDto dto) {
+        // dto.id() 대신 URL 파라미터로 넘어온 id 사용
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
 
         UUID profileImageId = user.getProfileImageId();
 
