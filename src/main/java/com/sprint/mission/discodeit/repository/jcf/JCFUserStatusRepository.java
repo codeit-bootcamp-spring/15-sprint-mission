@@ -54,10 +54,10 @@ public class JCFUserStatusRepository implements UserStatusRepository {
 
         deleteById(userStatus.getId());
 
-        /*if(!existsByUserId(userId)){
-            throw new NoSuchElementException("userId의 스테이터스가 없습니다 : "+userId);
+        /*if(!existsByUserId(authorId)){
+            throw new NoSuchElementException("userId의 스테이터스가 없습니다 : "+authorId);
         }
-        deleteById(findByUserId(userId).get().getId());*/
+        deleteById(findByUserId(authorId).get().getId());*/
     }
 
     @Override

@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.UserResponse;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.NitroLevel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -25,23 +27,31 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
         for (User user : userRepository.findAll()) {
-            if (user.getUsername().equals(userCreateRequest.name())) {
-                throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.name());
+            if (user.getUsername().equals(userCreateRequest.username())) {
+                throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.username());
             }
 
             if (user.getEmail().equals(userCreateRequest.email())) {
                 throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
             }
         }
-
         validateEmail(userCreateRequest.email());
 
-        UUID profileId = userCreateRequest.profileId().orElse(null);
+        //바이너리
+        UUID profileId = binaryContentCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
 
-        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.name(),userCreateRequest.nitroLevel(),profileId);
+        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),userCreateRequest.nitroLevel(),profileId);
         UserStatus userStatus = new UserStatus(user.getId());
         userRepository.save(user);
         userStatusRepository.save(userStatus);

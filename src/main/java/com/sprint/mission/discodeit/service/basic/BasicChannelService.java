@@ -132,8 +132,8 @@ public class BasicChannelService implements ChannelService {
         List<UUID> readStatus = readStatusRepository.findAllByChannelId(id).stream().map(r -> r.getId()).toList();
 
         for(Message message : messages){
-            if(message.getBinaryIds()!=null){
-                for(UUID entry : message.getBinaryIds()){
+            if(message.getAttachmentIds()!=null){
+                for(UUID entry : message.getAttachmentIds()){
                     if (binaryContentRepository.existsById(entry)) {
                         binaryContentRepository.deleteById(entry);
                     }

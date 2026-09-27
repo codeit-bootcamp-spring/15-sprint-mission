@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.*;
 
@@ -12,9 +11,9 @@ import java.util.*;
 @Getter
 public class Message extends BaseClass  {
     private final UUID channelId;
-    private final UUID userId;
-    private String message;
-    private List<UUID> binaryIds;
+    private final UUID authorId;
+    private String content;
+    private List<UUID> attachmentIds;
 
 
     //////////////////////////////////
@@ -25,22 +24,26 @@ public class Message extends BaseClass  {
             @JsonProperty("createdAt") Instant createdAt,
             @JsonProperty("updatedAt") Instant updatedAt,
             @JsonProperty("channelId") UUID channelId,
-            @JsonProperty("userId") UUID userId,
-            @JsonProperty("message") String message,
-            @JsonProperty("binaryIds") List<UUID> binaryIds
+            @JsonProperty("authorId") UUID userId,
+            @JsonProperty("content") String content,
+            @JsonProperty("attachmentIds") List<UUID> attachmentIds
     ) {
         super(id, createdAt, updatedAt);
         this.channelId = channelId;
-        this.userId = userId;
-        this.message = message;
-        this.binaryIds=binaryIds;
+        this.authorId = userId;
+        this.content = content;
+        this.attachmentIds = attachmentIds == null
+                ? new ArrayList<>()
+                : new ArrayList<>(attachmentIds);
     }
 
-    public Message(UUID channelId, UUID userId , String message, List<UUID> binaryIds){
+    public Message(UUID channelId, UUID userId , String content, List<UUID> attachmentIds){
         this.channelId=channelId;
-        this.userId=userId;
-        this.message=message;
-        this.binaryIds=binaryIds;
+        this.authorId =userId;
+        this.content = content;
+        this.attachmentIds = attachmentIds == null
+                ? new ArrayList<>()
+                : new ArrayList<>(attachmentIds);
     }
 
 
@@ -48,8 +51,8 @@ public class Message extends BaseClass  {
 
 
     public void update(String message){
-        this.message=message;
-        //this.binaryIds=binaryIds;
+        this.content =message;
+        //this.attachmentIds=attachmentIds;
         setUpdatedAt();
     }
 

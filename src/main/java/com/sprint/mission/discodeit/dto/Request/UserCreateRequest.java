@@ -8,8 +8,7 @@ import java.util.UUID;
 public record UserCreateRequest(
         String email,
         String password,
-        String name,
-        NitroLevel nitroLevel,
-        Optional<UUID> profileId
+        String username,
+        NitroLevel nitroLevel
 ) {
 }
