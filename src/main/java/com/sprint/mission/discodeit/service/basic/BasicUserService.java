@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.UserResponse;
+import com.sprint.mission.discodeit.entity.NitroLevel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -27,7 +28,7 @@ public class BasicUserService implements UserService {
     public User create(UserCreateRequest userCreateRequest) {
 
         for (User user : userRepository.findAll()) {
-            if (user.getName().equals(userCreateRequest.name())) {
+            if (user.getUsername().equals(userCreateRequest.name())) {
                 throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.name());
             }
 
@@ -69,7 +70,7 @@ public class BasicUserService implements UserService {
         for (User entry : userRepository.findAll()) {
             if (entry.getId().equals(id)) continue;
 
-            if (entry.getName().equals(userUpdateRequest.name())) {
+            if (entry.getUsername().equals(userUpdateRequest.name())) {
 
                 throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
 
@@ -79,15 +80,42 @@ public class BasicUserService implements UserService {
             }
         }
         validateEmail(userUpdateRequest.email());
+        String email;
         String password;
+        String name;
+        NitroLevel nitroLevel;
+
+
+        if(userUpdateRequest.email() != null) {
+            email = userUpdateRequest.email();
+        }else {
+            email = user.getEmail();
+        }
+
         if (userUpdateRequest.password() != null) {
             password = userUpdateRequest.password();
         } else {
             password = user.getPassword();
         }
 
+        if(userUpdateRequest.name() != null) {
+            name = userUpdateRequest.name();
+        }else {
+            name = user.getUsername();
+        }
+
+        if(userUpdateRequest.nitroLevel() != null) {
+            nitroLevel = userUpdateRequest.nitroLevel();
+        }else {
+            nitroLevel = user.getNitroLevel();
+        }
+
+
+
+
+
         UUID profileId = userUpdateRequest.profileId().orElse(user.getProfileId());
-        user.update(userUpdateRequest.email(), password, userUpdateRequest.name(), userUpdateRequest.nitroLevel(),profileId);
+        user.update(email, password, name, nitroLevel, profileId);
         return userRepository.save(user);
 
     }
@@ -118,7 +146,7 @@ public class BasicUserService implements UserService {
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getEmail(),
-                user.getName(),
+                user.getUsername(),
                 user.getNitroLevel(),
                 Optional.ofNullable(user.getProfileId()),
                 online

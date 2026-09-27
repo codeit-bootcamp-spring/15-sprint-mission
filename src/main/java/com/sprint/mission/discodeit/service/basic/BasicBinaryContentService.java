@@ -19,7 +19,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public BinaryContent create(BinaryContentCreateRequest binaryContentCreateRequest) {
-        BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequest.fileName(), binaryContentCreateRequest.file());
+        BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequest.fileName(),
+                (long) binaryContentCreateRequest.bytes().length,
+                binaryContentCreateRequest.contentType(),
+                binaryContentCreateRequest.bytes());
         return binaryContentRepository.save(binaryContent);
     }
 

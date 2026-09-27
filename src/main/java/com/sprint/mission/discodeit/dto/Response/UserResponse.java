@@ -11,10 +11,10 @@ public record UserResponse(
         Instant createdAt,
         Instant updatedAt,
         String email,
-        String name,
+        String username,
         NitroLevel nitroLevel,
         Optional<UUID> profileId,
-        boolean isOnline
+        boolean online
 ) {
 
 }

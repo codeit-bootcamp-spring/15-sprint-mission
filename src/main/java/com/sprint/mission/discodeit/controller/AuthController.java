@@ -3,10 +3,10 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Request.LoginRequest;
 import com.sprint.mission.discodeit.dto.Response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.global.ApiResponse;
 import com.sprint.mission.discodeit.service.AuthService;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,10 +18,11 @@ public class AuthController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<UserResponse>> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UserResponse> login(@RequestBody LoginRequest loginRequest) {
         User user=authService.login(loginRequest);
         UserResponse userResponse = userService.toUserResponse(user);
-        return ResponseEntity.ok(ApiResponse.success(userResponse));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(userResponse);
     }
 
 

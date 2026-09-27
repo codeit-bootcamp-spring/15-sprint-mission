@@ -12,7 +12,6 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import tools.jackson.databind.cfg.MapperBuilder;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -27,7 +26,6 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
-    private final MapperBuilder mapperBuilder;
 
 
     @Override
@@ -98,8 +96,6 @@ public class BasicChannelService implements ChannelService {
             }
         }
 
-        //1차적으로 메서드 구현 시생성 시 public채널은 리드스테이터스가 없고, private는 리드스테이터스가 함께 생성됨을 이용했지만,
-        //이후 public에 리드스테이터스를 달아주는 경우가 생기면 public채널이 중복으로 list에 들어가는 경우가 생겨 한줄 추가했습니다.
         PrivateChannels= PrivateChannels.stream().filter(channel -> channel.getChannelType()==ChannelType.PRIVATE).toList();
 
         List<Channel> concatList = new ArrayList<>();

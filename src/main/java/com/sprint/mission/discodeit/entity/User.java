@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,7 +14,7 @@ import java.util.UUID;
 public class User extends BaseClass {
     private String email;
     private String password;
-    private String name;
+    private String username;
     private NitroLevel nitroLevel;
     private UUID profileId;
 
@@ -26,7 +25,7 @@ public class User extends BaseClass {
             @JsonProperty("updatedAt") Instant updatedAt,
             @JsonProperty("email") String email,
             @JsonProperty("password") String password,
-            @JsonProperty("name") String name,
+            @JsonProperty("username") String username,
             @JsonProperty("nitroLevel") NitroLevel nitroLevel,
             @JsonProperty("profileId") UUID profileId
 
@@ -34,15 +33,15 @@ public class User extends BaseClass {
         super(id, createdAt, updatedAt);
         this.email=email;
         this.password=password;
-        this.name=name;
+        this.username = username;
         this.nitroLevel=nitroLevel;
         this.profileId=profileId;
     }
-    public User(String email, String password, String name, NitroLevel nitroLevel, UUID profileId) {
+    public User(String email, String password, String username, NitroLevel nitroLevel, UUID profileId) {
         super();
         this.email=email;
         this.password=password;
-        this.name=name;
+        this.username = username;
         this.nitroLevel=nitroLevel;
         this.profileId=profileId;
     }
@@ -53,7 +52,7 @@ public class User extends BaseClass {
 
         this.email=email;
         this.password=password;
-        this.name=name;
+        this.username =name;
         this.nitroLevel=nitroLevel;
         this.profileId=profileId;
         setUpdatedAt();

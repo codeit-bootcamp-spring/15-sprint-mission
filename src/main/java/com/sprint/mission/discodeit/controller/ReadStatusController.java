@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.Request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.global.ApiResponse;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,32 +19,32 @@ public class ReadStatusController {
     private final ReadStatusService readStatusService;
 
     @PostMapping
-    public ResponseEntity<ApiResponse<ReadStatus>> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+    public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
         ReadStatus readStatus = readStatusService.create(readStatusCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(readStatus));
+                .body(readStatus);
     }
 
     @PatchMapping("/by-user-id/{user-id}")
-    public ResponseEntity<ApiResponse<List<ReadStatus>>> patchReadStatusByUserId(@PathVariable("user-id") UUID userId){
+    public ResponseEntity<List<ReadStatus>> patchReadStatusByUserId(@PathVariable("user-id") UUID userId){
         List<ReadStatus> readStatusList = readStatusService.updateAllByUserId(userId);
 
-        return ResponseEntity.ok(ApiResponse.success(readStatusList));
+        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
     }
 
     @PatchMapping("/by-channel-id/{channel-id}")
-    public ResponseEntity<ApiResponse<List<ReadStatus>>> patchReadStatusByChannelId(@PathVariable("channel-id") UUID channelId){
+    public ResponseEntity<List<ReadStatus>> patchReadStatusByChannelId(@PathVariable("channel-id") UUID channelId){
         List<ReadStatus> readStatusList = readStatusService.updateAllByChannelId(channelId);
 
-        return ResponseEntity.ok(ApiResponse.success(readStatusList));
+        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
     }
 
     @GetMapping("/by-user-id/{user-id}")
-    public ResponseEntity<ApiResponse<List<ReadStatus>>> getReadStatusByUserId(@PathVariable("user-id") UUID userId){
+    public ResponseEntity<List<ReadStatus>> getReadStatusByUserId(@PathVariable("user-id") UUID userId){
         List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
 
-        return ResponseEntity.ok(ApiResponse.success(readStatusList));
+        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
     }
 
 
