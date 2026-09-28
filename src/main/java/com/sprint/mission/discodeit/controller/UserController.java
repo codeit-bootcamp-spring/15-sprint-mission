@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Tag(name = "User", description = "User API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
@@ -142,6 +144,10 @@ public class UserController {
     @Operation(
             summary = "전체 User 목록 조회",
             operationId = "findAll"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "User 목록 조회 성공"
     )
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {

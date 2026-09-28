@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Tag(name = "Message", description = "Message API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/messages")
@@ -119,6 +121,10 @@ public class MessageController {
     @Operation(
             summary = "Channel의 Message 목록 조회",
             operationId = "findAllByChannelId"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "채널의 메세지 목록 조회 성공"
     )
     @GetMapping
     public ResponseEntity<List<Message>> getAllByChannelId(@RequestParam("channelId") UUID channelId) {

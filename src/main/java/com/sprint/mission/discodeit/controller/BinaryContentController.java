@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "BinaryContent", description = "첨부 파일 API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/binaryContents")
@@ -66,6 +68,10 @@ public class BinaryContentController {
     @Operation(
             summary = "여러 첨부 파일 조회",
             operationId = "findAllByIdIn"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "파일리스트 조회 성공"
     )
     @GetMapping
     public ResponseEntity<List<BinaryContent>> getBinaryContentList(@RequestParam("binaryContentIds") List<UUID> binaryContentIds){
