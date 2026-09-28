@@ -5,8 +5,8 @@ import java.util.UUID;
 
 public record ChannelResponse(
     UUID id,
-    Instant createAt,
-    Instant updateAt,
+    Instant createdAt,
+    Instant updatedAt,
     String type,
     String name,
     String description

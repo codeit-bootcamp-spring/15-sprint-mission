@@ -9,7 +9,7 @@ public record ChannelDto(
     String type,
     String name,
     String description,
-    List<UUID> participantsIds,
+    List<UUID> participantIds,
     Instant lastMessageAt
 ) {
 
