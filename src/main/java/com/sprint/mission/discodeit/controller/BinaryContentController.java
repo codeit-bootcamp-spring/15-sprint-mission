@@ -14,17 +14,18 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BinaryContentController {
 
-    private final BinaryContentService binaryContentService;
+  private final BinaryContentService binaryContentService;
 
-    // 바이너리 파일 1개 조회
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponse> read(@PathVariable UUID binaryContentId) {
-        return ResponseEntity.ok(binaryContentService.read(binaryContentId));
-    }
+  // 바이너리 파일 1개 조회
+  @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+  public ResponseEntity<BinaryContentResponse> read(@PathVariable UUID binaryContentId) {
+    return ResponseEntity.ok(binaryContentService.read(binaryContentId));
+  }
 
-    // 바이너리 파일 여러 개 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponse>> readAllByIdIn(@RequestParam List<UUID> ids) {
-        return ResponseEntity.ok(binaryContentService.readAllByIdIn(ids));
-    }
+  // 바이너리 파일 여러 개 조회
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<BinaryContentResponse>> readAllByIdIn(
+      @RequestParam List<UUID> binaryContentIds) {
+    return ResponseEntity.ok(binaryContentService.readAllByIdIn(binaryContentIds));
+  }
 }

@@ -15,17 +15,17 @@ import java.util.NoSuchElementException;
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
 
-    private final UserRepository userRepository;
-    private final UserService userService;
+  private final UserRepository userRepository;
+  private final UserService userService;
 
-    @Override
-    public UserResponse login(LoginRequest request) {
-        User user = userRepository.readByUserName(request.userName());
+  @Override
+  public UserResponse login(LoginRequest request) {
+    User user = userRepository.readByUserName(request.username());
 
-        if (user == null || !user.getPassword().equals(request.password())) {
-            throw new NoSuchElementException("일치하는 유저 없음");
-        }
-
-        return userService.read(user.getId());
+    if (user == null || !user.getPassword().equals(request.password())) {
+      throw new NoSuchElementException("일치하는 유저 없음");
     }
+
+    return userService.read(user.getId());
+  }
 }

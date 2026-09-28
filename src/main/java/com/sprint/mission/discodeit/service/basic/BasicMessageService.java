@@ -20,81 +20,81 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicMessageService implements MessageService {
 
-    private final MessageRepository messageRepository;
-    private final ChannelRepository channelRepository;
-    private final UserRepository userRepository;
-    private final BinaryContentRepository binaryContentRepository;
+  private final MessageRepository messageRepository;
+  private final ChannelRepository channelRepository;
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public MessageResponse create(MessageCreateRequest request) {
-        if (channelRepository.read(request.channelId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 채널");
-        }
-        if (userRepository.read(request.authorId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 유저");
-        }
-
-        Message message = new Message(
-                request.contents(),
-                request.authorId(),
-                request.channelId(),
-                request.attachmentIds()
-        );
-        messageRepository.save(message);
-        return toResponse(message);
+  @Override
+  public MessageResponse create(MessageCreateRequest request) {
+    if (channelRepository.read(request.channelId()) == null) {
+      throw new NoSuchElementException("존재하지 않는 채널");
+    }
+    if (userRepository.read(request.authorId()) == null) {
+      throw new NoSuchElementException("존재하지 않는 유저");
     }
 
-    @Override
-    public MessageResponse read(UUID messageId) {
-        Message message = messageRepository.read(messageId);
-        if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지");
-        }
-        return toResponse(message);
+    Message message = new Message(
+        request.content(),
+        request.authorId(),
+        request.channelId(),
+        request.attachmentIds()
+    );
+    messageRepository.save(message);
+    return toResponse(message);
+  }
+
+  @Override
+  public MessageResponse read(UUID messageId) {
+    Message message = messageRepository.read(messageId);
+    if (message == null) {
+      throw new NoSuchElementException("존재하지 않는 메시지");
+    }
+    return toResponse(message);
+  }
+
+  @Override
+  public List<MessageResponse> readAllByChannelId(UUID channelId) {
+    return messageRepository.readAllByChannelId(channelId).stream()
+        .map(this::toResponse)
+        .toList();
+  }
+
+  @Override
+  public MessageResponse update(UUID messageId, MessageUpdateRequest request) {
+    Message message = messageRepository.read(messageId);
+    if (message == null) {
+      throw new NoSuchElementException("존재하지 않는 메시지");
     }
 
-    @Override
-    public List<MessageResponse> readAllByChannelId(UUID channelId) {
-        return messageRepository.readAllByChannelId(channelId).stream()
-                .map(this::toResponse)
-                .toList();
+    message.update(request.newContent());
+    messageRepository.save(message);
+    return toResponse(message);
+  }
+
+  @Override
+  public void delete(UUID messageId) {
+    Message message = messageRepository.read(messageId);
+    if (message == null) {
+      throw new NoSuchElementException("존재하지 않는 메시지");
     }
 
-    @Override
-    public MessageResponse update(UUID messageId, MessageUpdateRequest request) {
-        Message message = messageRepository.read(messageId);
-        if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지");
-        }
-
-        message.update(request.contents());
-        messageRepository.save(message);
-        return toResponse(message);
+    if (message.getAttachmentIds() != null) {
+      message.getAttachmentIds().forEach(binaryContentRepository::delete);
     }
 
-    @Override
-    public void delete(UUID messageId) {
-        Message message = messageRepository.read(messageId);
-        if (message == null) {
-            throw new NoSuchElementException("존재하지 않는 메시지");
-        }
+    messageRepository.delete(messageId);
+  }
 
-        if (message.getAttachmentIds() != null) {
-            message.getAttachmentIds().forEach(binaryContentRepository::delete);
-        }
-
-        messageRepository.delete(messageId);
-    }
-
-    private MessageResponse toResponse(Message message) {
-        return new MessageResponse(
-                message.getId(),
-                message.getContents(),
-                message.getChannelId(),
-                message.getUserId(),
-                message.getAttachmentIds(),
-                message.getCreatedAt(),
-                message.getUpdatedAt()
-        );
-    }
+  private MessageResponse toResponse(Message message) {
+    return new MessageResponse(
+        message.getId(),
+        message.getCreatedAt(),
+        message.getUpdatedAt(),
+        message.getContents(),
+        message.getChannelId(),
+        message.getUserId(),
+        message.getAttachmentIds()
+    );
+  }
 }

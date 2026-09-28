@@ -5,12 +5,13 @@ import java.util.List;
 import java.util.UUID;
 
 public record MessageResponse(
-        UUID id,
-        String contents,
-        UUID channelId,
-        UUID authorId,
-        List<UUID> attachmentIds,
-        Instant createdAt,
-        Instant updatedAt
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String content,
+    UUID channelId,
+    UUID authorId,
+    List<UUID> attachmentIds
 ) {
+
 }
