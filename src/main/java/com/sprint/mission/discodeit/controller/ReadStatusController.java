@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.readstatus.ReadStatusResponse;
 import com.sprint.mission.discodeit.dto.readstatus.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -21,14 +21,14 @@ public class ReadStatusController {
 
     // 특정 채널의 메시지 수신 정보 생성
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<ReadStatus> create(@RequestBody ReadStatusCreateRequest request) {
-        ReadStatus readStatus = readStatusService.create(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
+    public ResponseEntity<ReadStatusResponse> create(@RequestBody ReadStatusCreateRequest request) {
+        ReadStatusResponse response = readStatusService.create(request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     // 특정 채널의 메시지 수신 정보 수정
     @RequestMapping(value = "/{readStatusId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ReadStatus> update(
+    public ResponseEntity<ReadStatusResponse> update(
             @PathVariable UUID readStatusId,
             @RequestBody ReadStatusUpdateRequest request
     ) {
@@ -37,7 +37,7 @@ public class ReadStatusController {
 
     // 특정 사용자의 메시지 수신 정보 조회
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<ReadStatus>> readAllByUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ReadStatusResponse>> readAllByUserId(@RequestParam UUID userId) {
         return ResponseEntity.ok(readStatusService.readAllByUserId(userId));
     }
 }

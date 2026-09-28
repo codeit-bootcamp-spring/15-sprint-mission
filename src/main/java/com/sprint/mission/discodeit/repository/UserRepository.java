@@ -8,6 +8,7 @@ import java.util.UUID;
 public interface UserRepository {
     User save(User user);
     User read(UUID userId);
+    User readByUserName(String userName);
     List<User> readAll();
     void delete(UUID userId);
     boolean existsByUserName(String userName);

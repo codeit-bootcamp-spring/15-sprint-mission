@@ -4,12 +4,13 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record UserResponse(
-        UUID id,
-        String userName,
-        String email,
-        UUID profileId,
-        boolean online,
-        Instant createdAt,
-        Instant updatedAt
+    UUID id,
+    Instant createdAt,
+    Instant updatedAt,
+    String username,
+    String email,
+    String password,
+    UUID profileId
 ) {
+
 }
