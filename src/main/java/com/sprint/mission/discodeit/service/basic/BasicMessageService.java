@@ -132,12 +132,12 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageDto update(MessageUpdateRequest request) {
+    public MessageDto update(UUID id, MessageUpdateRequest request) {
 
-        Message message = messageRepository.findById(request.id())
+        Message message = messageRepository.findById(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
-                                "존재하지 않는 메시지입니다. ID: " + request.id()
+                                "존재하지 않는 메시지입니다. ID: " + id
                         )
                 );
 

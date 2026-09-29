@@ -18,6 +18,6 @@ public interface ChannelService  {
 
     List<ChannelDto> findAllByUserId(UUID userId);
 
-    ChannelDto update(ChannelUpdateRequest request);
+    ChannelDto update(UUID id, ChannelUpdateRequest request);
     void delete(UUID id);
 }

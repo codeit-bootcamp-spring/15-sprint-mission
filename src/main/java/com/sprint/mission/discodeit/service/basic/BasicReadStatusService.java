@@ -109,12 +109,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusDto update(ReadStatusUpdateRequest request) {
+    public ReadStatusDto update(UUID id, ReadStatusUpdateRequest request) {
 
-        ReadStatus readStatus = readStatusRepository.findById(request.id())
+        ReadStatus readStatus = readStatusRepository.findById(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
-                                "존재하지 않는 읽음 상태입니다. ID: " + request.id()
+                                "존재하지 않는 읽음 상태입니다. ID: " + id
                         )
                 );
 

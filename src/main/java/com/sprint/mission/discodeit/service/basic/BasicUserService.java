@@ -139,18 +139,18 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserDto update(UserUpdateRequest request) {
+    public UserDto update(UUID id, UserUpdateRequest request) {
 
-        User user = userRepository.findById(request.id())
+        User user = userRepository.findById(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
-                                "존재하지 않는 사용자입니다. ID: " + request.id()
+                                "존재하지 않는 사용자입니다. ID: " + id
                         )
                 );
 
         userRepository.findByUsername(request.username())
                 .ifPresent(existingUser -> {
-                    if (!existingUser.getId().equals(request.id())) {
+                    if (!existingUser.getId().equals(id)) {
                         throw new IllegalArgumentException(
                                 "이미 존재하는 username입니다: " + request.username()
                         );
@@ -159,7 +159,7 @@ public class BasicUserService implements UserService {
 
         userRepository.findByEmail(request.email())
                 .ifPresent(existingUser -> {
-                    if (!existingUser.getId().equals(request.id())) {
+                    if (!existingUser.getId().equals(id)) {
                         throw new IllegalArgumentException(
                                 "이미 존재하는 email입니다: " + request.email()
                         );

@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.controller;
+package com.sprint.mission.discodeit.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,5 +31,15 @@ public class GlobalExceptionHandler {
                 .body(Map.of(
                         "error", exception.getMessage()
                 ));
+    }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<Map<String, String>> handleException(
+        Exception exception
+    ) {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(Map.of(
+                "error", "서버 내부 오류가 발생했습니다."
+            ));
     }
 }

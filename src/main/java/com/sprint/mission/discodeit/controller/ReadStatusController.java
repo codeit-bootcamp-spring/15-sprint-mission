@@ -33,13 +33,15 @@ public class ReadStatusController {
     }
 
     @RequestMapping(
-            method = RequestMethod.PATCH
+        path = "/{readStatusId}",
+        method = RequestMethod.PATCH
     )
     public ResponseEntity<ReadStatusDto> update(
-            @RequestBody ReadStatusUpdateRequest request
+        @PathVariable("readStatusId") UUID readStatusId,
+        @RequestBody ReadStatusUpdateRequest request
     ) {
         return ResponseEntity.ok(
-                readStatusService.update(request)
+            readStatusService.update(readStatusId, request)
         );
     }
 

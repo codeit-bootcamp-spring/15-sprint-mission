@@ -47,15 +47,18 @@ public class UserController {
         );
     }
 
-    @RequestMapping(method = RequestMethod.PATCH)
+    @RequestMapping(
+        path = "/{userId}",
+        method = RequestMethod.PATCH
+    )
     public ResponseEntity<UserDto> update(
-            @RequestBody UserUpdateRequest request
+        @PathVariable("userId") UUID userId,
+        @RequestBody UserUpdateRequest request
     ) {
         return ResponseEntity.ok(
-                userService.update(request)
+            userService.update(userId, request)
         );
     }
-
     @RequestMapping(
             path = "/{userId}",
             method = RequestMethod.DELETE

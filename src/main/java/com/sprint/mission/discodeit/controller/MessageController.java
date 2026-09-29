@@ -33,13 +33,15 @@ public class MessageController {
     }
 
     @RequestMapping(
-            method = RequestMethod.PATCH
+        path = "/{messageId}",
+        method = RequestMethod.PATCH
     )
     public ResponseEntity<MessageDto> update(
-            @RequestBody MessageUpdateRequest request
+        @PathVariable("messageId") UUID messageId,
+        @RequestBody MessageUpdateRequest request
     ) {
         return ResponseEntity.ok(
-                messageService.update(request)
+            messageService.update(messageId, request)
         );
     }
 

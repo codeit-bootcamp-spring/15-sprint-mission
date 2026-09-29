@@ -131,12 +131,12 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto update(ChannelUpdateRequest request) {
+    public ChannelDto update(UUID id, ChannelUpdateRequest request) {
 
-        Channel channel = channelRepository.findById(request.id())
+        Channel channel = channelRepository.findById(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
-                                "존재하지 않는 채널입니다. ID: " + request.id()
+                                "존재하지 않는 채널입니다. ID: " + id
                         )
                 );
 
