@@ -27,8 +27,9 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(ReadStatusCreateRequest request, UUID channelId) {
+    public ReadStatus create(ReadStatusCreateRequest request) {
         UUID userId = request.userId();
+        UUID channelId = request.channelId();
 
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
@@ -59,14 +60,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID channelId, UUID readStatusId, ReadStatusUpdateRequest request) {
+    public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
         // 특정 채널에 대한 조건이 들어가므로, 특정 채널이 맞는지 검증 로직 추가.
         Instant newLastReadAt = request.newLastReadAt();
         ReadStatus readStatus = readStatusRepository.findById(readStatusId)
                 .orElseThrow(() -> new ReadStatusNotFoundException(readStatusId));
-        if (!readStatus.getChannelId().equals(channelId)) {
-            throw new IllegalArgumentException("해당 채널의 수신 정보가 아닙니다.");
-        }
+
         readStatus.update(newLastReadAt);
         return readStatusRepository.save(readStatus);
     }
