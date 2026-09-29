@@ -35,14 +35,26 @@ public class User implements Serializable {
     }
 
     public void update(String username,
-                       String email,
-                       String password,
-                       UUID profileId)
+        String email,
+        String password,
+        UUID profileId)
     {
-        this.username = username;
-        this.email = email;
-        this.password = password;
-        this.profileId = profileId;
+        if (username != null) {
+            this.username = username;
+        }
+
+        if (email != null) {
+            this.email = email;
+        }
+
+        if (password != null && !password.isBlank()) {
+            this.password = password;
+        }
+
+        if (profileId != null) {
+            this.profileId = profileId;
+        }
+
         this.updatedAt = Instant.now();
     }
 }

@@ -148,23 +148,27 @@ public class BasicUserService implements UserService {
                         )
                 );
 
-        userRepository.findByUsername(request.username())
-                .ifPresent(existingUser -> {
-                    if (!existingUser.getId().equals(id)) {
-                        throw new IllegalArgumentException(
-                                "이미 존재하는 username입니다: " + request.username()
-                        );
-                    }
-                });
+      if (request.newUsername() != null) {
+        userRepository.findByUsername(request.newUsername())
+            .ifPresent(existingUser -> {
+              if (!existingUser.getId().equals(id)) {
+                throw new IllegalArgumentException(
+                    "이미 존재하는 username입니다: " + request.newUsername()
+                );
+              }
+            });
+      }
 
-        userRepository.findByEmail(request.email())
-                .ifPresent(existingUser -> {
-                    if (!existingUser.getId().equals(id)) {
-                        throw new IllegalArgumentException(
-                                "이미 존재하는 email입니다: " + request.email()
-                        );
-                    }
-                });
+      if (request.newEmail() != null) {
+        userRepository.findByEmail(request.newEmail())
+            .ifPresent(existingUser -> {
+              if (!existingUser.getId().equals(id)) {
+                throw new IllegalArgumentException(
+                    "이미 존재하는 email입니다: " + request.newEmail()
+                );
+              }
+            });
+      }
 
         UUID profileId = user.getProfileId();
 
@@ -186,9 +190,9 @@ public class BasicUserService implements UserService {
         }
 
         user.update(
-                request.username(),
-                request.email(),
-                request.password(),
+            request.newUsername(),
+            request.newEmail(),
+            request.newPassword(),
                 profileId
         );
 
