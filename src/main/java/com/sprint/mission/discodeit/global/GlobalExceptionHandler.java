@@ -11,47 +11,47 @@ import java.util.NoSuchElementException;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<ApiResponse<Void>> handleNoSuchElementException(
+    public ResponseEntity<ApiError> handleNoSuchElementException(
             NoSuchElementException e) {
 
         ApiError error = new ApiError(
                 "NOT_FOUND",
                 e.getMessage(),
-                e.getClass().toString()
+                e.getClass().getName()
         );
 
         return ResponseEntity
                 .status(HttpStatus.NOT_FOUND)
-                .body(ApiResponse.fail(error));
+                .body(error);
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
-    public ResponseEntity<ApiResponse<Void>> handleIllegalArgumentException(
+    public ResponseEntity<ApiError> handleIllegalArgumentException(
             IllegalArgumentException e) {
 
         ApiError error = new ApiError(
                 "BAD_REQUEST",
                 e.getMessage(),
-                e.getClass().toString()
+                e.getClass().getName()
         );
 
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)
-                .body(ApiResponse.fail(error));
+                .body(error);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<ApiResponse<Void>> handleRootException(
+    public ResponseEntity<ApiError> handleRootException(
             Exception e) {
 
         ApiError error = new ApiError(
                 "INTERNAL_SERVER_ERROR",
                 e.getMessage(),
-                e.getClass().toString()
+                e.getClass().getName()
         );
 
         return ResponseEntity
                 .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(ApiResponse.fail(error));
+                .body(error);
     }
 }

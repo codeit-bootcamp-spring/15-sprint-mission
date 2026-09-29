@@ -1,8 +1,11 @@
 package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.global.ApiResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,42 +16,68 @@ import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
+@Tag(name = "BinaryContent", description = "첨부 파일 API")
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/binaryContent")
+@RequestMapping("/api/binaryContents")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
-    //이번 미션에서 파일관련 요구사항은 Get뿐이라 검증용으로 post는 ai한테 만들어 달라고 했습니다.
-    @PostMapping
-    public ResponseEntity<ApiResponse<BinaryContent>> create(
+    /*@PostMapping
+    public ResponseEntity<BinaryContent> create(
             @RequestParam("file") MultipartFile file) throws IOException {
 
         BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                 file.getOriginalFilename(),
+                file.getContentType(),
                 file.getBytes()
         );
 
         BinaryContent binaryContent = binaryContentService.create(request);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(binaryContent));
-    }
+                .body(binaryContent);
+    }*/
 
+    @Operation(
+            summary = "첨부 파일 조회",
+            operationId = "find"
+    )
+    @ApiResponses({
+            @ApiResponse(
+                    responseCode = "200",
+                    description = "파일 조회 성공"
+            ),
 
-    @GetMapping("/find")
-    public ResponseEntity<ApiResponse<BinaryContent>> getBinaryContent(@RequestParam("binaryContentId") UUID binaryContentId){
+            @ApiResponse(
+                    responseCode = "404",
+                    description = "파일을 찾을 수 없음"
+            )
+    })
+    @GetMapping("/{binaryContentId}")
+    public ResponseEntity<BinaryContent> getBinaryContent(@PathVariable("binaryContentId") UUID binaryContentId){
         BinaryContent binaryContent = binaryContentService.find(binaryContentId);
 
-        return ResponseEntity.ok(ApiResponse.success(binaryContent));
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(binaryContent);
     }
 
 
-    @GetMapping("/ids")
-    public ResponseEntity<ApiResponse<List<BinaryContent>>> getBinaryContentList(@RequestParam List<UUID> ids){
-        List<BinaryContent> binaryContents = binaryContentService.findAllByIds(ids);
 
-        return ResponseEntity.ok(ApiResponse.success(binaryContents));
+
+    @Operation(
+            summary = "여러 첨부 파일 조회",
+            operationId = "findAllByIdIn"
+    )
+    @ApiResponse(
+            responseCode = "200",
+            description = "파일리스트 조회 성공"
+    )
+    @GetMapping
+    public ResponseEntity<List<BinaryContent>> getBinaryContentList(@RequestParam("binaryContentIds") List<UUID> binaryContentIds){
+        List<BinaryContent> binaryContents = binaryContentService.findAllByIds(binaryContentIds);
+
+        return ResponseEntity.status(HttpStatus.OK).body(binaryContents);
     }
 
 }

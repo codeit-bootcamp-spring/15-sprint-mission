@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -13,7 +15,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 import java.util.UUID;
 @RequiredArgsConstructor
 @Service
@@ -26,18 +27,30 @@ public class BasicMessageService implements MessageService {
 
 
     @Override
-    public Message create(MessageCreateRequest messageCreateRequest) {
+    public Message create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
         if(!channelRepository.existsById(messageCreateRequest.channelId())){
             throw new NoSuchElementException("채널 id 없음 : "+ messageCreateRequest.channelId());
         }
 
-        if(!userRepository.existsById(messageCreateRequest.userId())){
-            throw new NoSuchElementException("유저 id 없음 : "+ messageCreateRequest.userId());
+        if(!userRepository.existsById(messageCreateRequest.authorId())){
+            throw new NoSuchElementException("유저 id 없음 : "+ messageCreateRequest.authorId());
         }
 
 
-        Message message = new Message(messageCreateRequest.channelId(),messageCreateRequest.userId(),
-                messageCreateRequest.messageString(), messageCreateRequest.binaryIds().orElse(null));
+        List<UUID> attachmentIds = binaryContentCreateRequests.stream()
+                .map(attachmentRequest -> {
+                    String fileName = attachmentRequest.fileName();
+                    String contentType = attachmentRequest.contentType();
+                    byte[] bytes = attachmentRequest.bytes();
+
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    return createdBinaryContent.getId();
+                })
+                .toList();
+
+        Message message = new Message(messageCreateRequest.channelId(),messageCreateRequest.authorId(),
+                messageCreateRequest.content(), attachmentIds);
         return messageRepository.save(message);
     }
 
@@ -61,7 +74,7 @@ public class BasicMessageService implements MessageService {
     public Message update(UUID id,MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
-        message.update(messageUpdateRequest.messageString());
+        message.update(messageUpdateRequest.newContent());
         return messageRepository.save(message);
     }
 
@@ -72,8 +85,8 @@ public class BasicMessageService implements MessageService {
                         new NoSuchElementException("메시지 id 없음 : " + id));
 
 
-        if(message.getBinaryIds()!=null){
-            for(UUID entry : message.getBinaryIds()){
+        if(message.getAttachmentIds()!=null){
+            for(UUID entry : message.getAttachmentIds()){
                 if (binaryContentRepository.existsById(entry)) {
                     binaryContentRepository.deleteById(entry);
                 }

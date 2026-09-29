@@ -24,11 +24,11 @@ public class BasicReadStatusService implements ReadStatusService {
     @Override
     public ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest) {
         if(!userRepository.existsById(readStatusCreateRequest.userId())){
-            throw new IllegalArgumentException("존재하지 않는 유저 id : "+ readStatusCreateRequest.userId());
+            throw new NoSuchElementException("존재하지 않는 유저 id : "+ readStatusCreateRequest.userId());
         }
 
         if(!channelRepository.existsById(readStatusCreateRequest.channelId())){
-            throw new IllegalArgumentException("존재하지 않는 채널 id : "+ readStatusCreateRequest.channelId());
+            throw new NoSuchElementException("존재하지 않는 채널 id : "+ readStatusCreateRequest.channelId());
         }
 
         if(readStatusRepository.existsByUserAndChannel(readStatusCreateRequest.userId(),readStatusCreateRequest.channelId())){

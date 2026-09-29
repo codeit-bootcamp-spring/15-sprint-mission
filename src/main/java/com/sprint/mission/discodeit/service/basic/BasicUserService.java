@@ -1,8 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.UserResponse;
+import com.sprint.mission.discodeit.dto.Response.UserDto;
+import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -24,23 +26,31 @@ public class BasicUserService implements UserService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public User create(UserCreateRequest userCreateRequest) {
+    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
         for (User user : userRepository.findAll()) {
-            if (user.getName().equals(userCreateRequest.name())) {
-                throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.name());
+            if (user.getUsername().equals(userCreateRequest.username())) {
+                throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.username());
             }
 
             if (user.getEmail().equals(userCreateRequest.email())) {
                 throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
             }
         }
-
         validateEmail(userCreateRequest.email());
 
-        UUID profileId = userCreateRequest.profileId().orElse(null);
+        //바이너리
+        UUID profileId = binaryContentCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
 
-        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.name(),userCreateRequest.nitroLevel(),profileId);
+        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),profileId);
         UserStatus userStatus = new UserStatus(user.getId());
         userRepository.save(user);
         userStatusRepository.save(userStatus);
@@ -49,18 +59,24 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse find(UUID id) {
+    public UserDto find(UUID id) {
         return userRepository.findById(id).map(this::toUserResponse)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
     }
 
     @Override
-    public List<UserResponse> findAll() {
+    public List<UserDto> findAll() {
         return userRepository.findAll().stream().map(this::toUserResponse).toList();
     }
 
     @Override
-    public User update(UUID id, UserUpdateRequest userUpdateRequest) {
+    public User update(UUID id, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
+
+        if (userUpdateRequest == null) {
+            return userRepository.findById(id)
+                    .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
+        }
+
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
 
@@ -69,25 +85,55 @@ public class BasicUserService implements UserService {
         for (User entry : userRepository.findAll()) {
             if (entry.getId().equals(id)) continue;
 
-            if (entry.getName().equals(userUpdateRequest.name())) {
+            if (userUpdateRequest.newUsername() != null
+                    && entry.getUsername().equals(userUpdateRequest.newUsername())) {
 
-                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.name());
+                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.newUsername());
 
             }
-            if (entry.getEmail().equals(userUpdateRequest.email())) {
-                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.email());
+            if (userUpdateRequest.newEmail() != null
+            && entry.getEmail().equals(userUpdateRequest.newEmail())) {
+                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.newEmail());
             }
         }
-        validateEmail(userUpdateRequest.email());
+
+        String email;
         String password;
-        if (userUpdateRequest.password() != null) {
-            password = userUpdateRequest.password();
+        String name;
+
+
+        if(userUpdateRequest.newEmail() != null) {
+            email = userUpdateRequest.newEmail();
+        }else {
+            email = user.getEmail();
+        }
+        validateEmail(email);
+
+
+        if (userUpdateRequest.newPassword() != null) {
+            password = userUpdateRequest.newPassword();
         } else {
             password = user.getPassword();
         }
 
-        UUID profileId = userUpdateRequest.profileId().orElse(user.getProfileId());
-        user.update(userUpdateRequest.email(), password, userUpdateRequest.name(), userUpdateRequest.nitroLevel(),profileId);
+        if(userUpdateRequest.newUsername() != null) {
+            name = userUpdateRequest.newUsername();
+        }else {
+            name = user.getUsername();
+        }
+
+        UUID profileId = binaryContentCreateRequest
+                .map(profileRequest -> {
+                    String fileName = profileRequest.fileName();
+                    String contentType = profileRequest.contentType();
+                    byte[] bytes = profileRequest.bytes();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
+                    return binaryContentRepository.save(binaryContent).getId();
+                })
+                .orElse(null);
+
+
+        user.update(email, password, name, profileId);
         return userRepository.save(user);
 
     }
@@ -106,20 +152,19 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(id);
     }
 
-    public UserResponse toUserResponse(User user) {
+    public UserDto toUserResponse(User user) {
         UserStatus userStatus = userStatusRepository
                 .findByUserId(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저의 스테이터스가 없습니다."));
         boolean online = userStatus.isOnline();
 
         //UUID testId= Optional.ofNullable(user.getProfileId()).orElse(null);
 
-        return new UserResponse(
+        return new UserDto(
                 user.getId(),
                 user.getCreatedAt(),
                 user.getUpdatedAt(),
                 user.getEmail(),
-                user.getName(),
-                user.getNitroLevel(),
+                user.getUsername(),
                 Optional.ofNullable(user.getProfileId()),
                 online
         );
