@@ -9,31 +9,37 @@ import java.util.UUID;
 
 @Getter
 public class UserStatus implements Serializable {
-
     private static final long serialVersionUID = 1L;
-
-    private final UUID id;
-    private final UUID userId;
-
-    private Instant lastActiveAt;
-
-    private final Instant createdAt;
+    private UUID id;
+    private Instant createdAt;
     private Instant updatedAt;
+    //
+    private UUID userId;
+    private Instant lastActiveAt;
 
     public UserStatus(UUID userId, Instant lastActiveAt) {
         this.id = UUID.randomUUID();
+        this.createdAt = Instant.now();
+        //
         this.userId = userId;
         this.lastActiveAt = lastActiveAt;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
     }
 
     public void update(Instant lastActiveAt) {
-        this.lastActiveAt = lastActiveAt;
-        this.updatedAt = Instant.now();
+        boolean anyValueUpdated = false;
+        if (lastActiveAt != null && !lastActiveAt.equals(this.lastActiveAt)) {
+            this.lastActiveAt = lastActiveAt;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now();
+        }
     }
 
-    public boolean isOnline() {
-        return Duration.between(lastActiveAt, Instant.now()).toMinutes() <= 5;
+    public Boolean isOnline() {
+        Instant instantFiveMinutesAgo = Instant.now().minus(Duration.ofMinutes(5));
+
+        return lastActiveAt.isAfter(instantFiveMinutesAgo);
     }
 }
