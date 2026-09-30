@@ -74,10 +74,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(ChannelUpdateDto dto) {
-        Channel channel = data.get(dto.id());
+    public ChannelResponseDto update(UUID id, ChannelUpdateDto dto) {
+        Channel channel = data.get(id);
         if (channel == null) {
-            throw new NoSuchElementException("채널을 찾을 수 없습니다: " + dto.id());
+            throw new NoSuchElementException("채널을 찾을 수 없습니다: " + id);
         }
 
         if (channel.getType() == ChannelType.PRIVATE) {

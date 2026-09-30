@@ -71,10 +71,10 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
-    public Message update(MessageUpdateDto dto) {
-        Message message = data.get(dto.id());
+    public Message update(UUID id, MessageUpdateDto dto) {
+        Message message = data.get(id);
         if (message == null) {
-            throw new NoSuchElementException("메시지를 찾을 수 없습니다: " + dto.id());
+            throw new NoSuchElementException("메시지를 찾을 수 없습니다: " + id);
         }
         message.update(dto.content());
         return message;

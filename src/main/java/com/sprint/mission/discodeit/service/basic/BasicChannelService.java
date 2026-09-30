@@ -78,9 +78,9 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelResponseDto update(ChannelUpdateDto dto) {
-        Channel channel = channelRepository.findById(dto.id())
-                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다: " + dto.id()));
+    public ChannelResponseDto update(UUID id, ChannelUpdateDto dto) {
+        Channel channel = channelRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("채널을 찾을 수 없습니다: " + id));
 
         // PRIVATE 채널은 수정 불가
         if (channel.getType() == ChannelType.PRIVATE) {
