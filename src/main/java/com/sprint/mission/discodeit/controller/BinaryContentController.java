@@ -31,13 +31,13 @@ public class BinaryContentController {
     }
 
     @RequestMapping(
-            method = RequestMethod.GET
+        method = RequestMethod.GET
     )
     public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(
-            @RequestParam("ids") List<UUID> ids
+        @RequestParam("binaryContentIds") List<UUID> binaryContentIds
     ) {
         return ResponseEntity.ok(
-                binaryContentService.findAllByIdIn(ids)
+            binaryContentService.findAllByIdIn(binaryContentIds)
         );
     }
 }

@@ -83,10 +83,6 @@ public class UserController {
         @RequestPart(value = "profile", required = false) MultipartFile profile
     ) throws Exception {
 
-        System.out.println("UPDATE username = " + request.newUsername());
-        System.out.println("UPDATE email = " + request.newEmail());
-        System.out.println("UPDATE profile = " +
-            (profile == null ? "NULL" : profile.getOriginalFilename()));
 
         BinaryContentCreateRequest profileRequest = null;
 
