@@ -47,4 +47,14 @@ public class UserStatus extends BaseUpdatableEntity {
   public void updateLastActiveAt(Instant lastActiveAt) {
     this.lastActiveAt = lastActiveAt;
   }
+
+  private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(
+      5); // 온라인 판정 기준 (기존 프로젝트 기준에 맞춤)
+
+  public boolean isOnline() {
+    if (this.lastActiveAt == null) {
+      return false;
+    }
+    return Instant.now().minus(ONLINE_THRESHOLD).isBefore(this.lastActiveAt);
+  }
 }

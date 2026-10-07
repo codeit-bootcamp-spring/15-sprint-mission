@@ -9,10 +9,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
-import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -21,118 +21,103 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
 
-    private final UserRepository userRepository;
-    private final UserStatusRepository userStatusRepository;
-    private final BinaryContentRepository binaryContentRepository;
+  private final UserRepository userRepository;
+  private final BinaryContentRepository binaryContentRepository;
 
-    @Override
-    public UserResponseDto create(UserCreateDto dto) {
-        // 1. username, email 중복 체크
-        if (userRepository.existsByUsername(dto.username())) {
-            throw new IllegalArgumentException("이미 존재하는 username입니다: " + dto.username());
-        }
-        if (userRepository.existsByEmail(dto.email())) {
-            throw new IllegalArgumentException("이미 존재하는 email입니다: " + dto.email());
-        }
-
-        // 2. 선택적 프로필 이미지 저장
-        UUID profileImageId = null;
-        if (dto.profileImage() != null) {
-            BinaryContentCreateDto imgDto = dto.profileImage();
-
-            BinaryContent profile = new BinaryContent(
-                    imgDto.fileName(),
-                    (long) imgDto.bytes().length,
-                    imgDto.contentType(),
-                    imgDto.bytes()
-            );
-            profileImageId = binaryContentRepository.save(profile).getId();
-        }
-
-        // 3. User 엔티티 생성 및 저장
-        User user = new User(dto.username(), dto.email(), dto.password(), profileImageId);
-        User savedUser = userRepository.save(user);
-
-        // 4. UserStatus 생성 및 저장 (기본 접속 시간: 현재 시간)
-        UserStatus userStatus = new UserStatus(savedUser.getId(), Instant.now());
-        userStatusRepository.save(userStatus);
-
-        return UserResponseDto.of(savedUser, userStatus.isOnline());
+  @Override
+  @Transactional
+  public UserResponseDto create(UserCreateDto dto) {
+    // 1. 유효성 검증
+    if (userRepository.existsByUsername(dto.username())) {
+      throw new IllegalArgumentException("이미 존재하는 username입니다: " + dto.username());
+    }
+    if (userRepository.existsByEmail(dto.email())) {
+      throw new IllegalArgumentException("이미 존재하는 email입니다: " + dto.email());
     }
 
-    @Override
-    public UserResponseDto find(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
-
-        return UserResponseDto.of(user, checkOnline(user.getId()));
+    // 2. 프로필 메타데이터 저장 (bytes 제외)
+    BinaryContent profile = null;
+    if (dto.profileImage() != null) {
+      BinaryContentCreateDto imgDto = dto.profileImage();
+      profile = binaryContentRepository.save(new BinaryContent(
+          imgDto.fileName(),
+          (long) imgDto.bytes().length,
+          imgDto.contentType()
+      ));
     }
 
-    @Override
-    public List<UserResponseDto> findAll() {
-        return userRepository.findAll().stream()
-                .map(user -> UserResponseDto.of(user, checkOnline(user.getId())))
-                .toList();
+    // 3. User 엔티티 생성
+    User user = new User(dto.username(), dto.email(), dto.password(), profile);
+
+    // 4. UserStatus 생성 후 연관관계 설정 (CascadeType.ALL로 user 저장 시 함께 저장됨)
+    UserStatus status = new UserStatus(user, Instant.now());
+    user.updateStatus(status);
+
+    User savedUser = userRepository.save(user);
+    return UserResponseDto.of(savedUser, status.isOnline());
+  }
+
+  @Override
+  public UserResponseDto find(UUID id) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
+
+    return UserResponseDto.of(user, isUserOnline(user));
+  }
+
+  @Override
+  public List<UserResponseDto> findAll() {
+    return userRepository.findAll().stream()
+        .map(user -> UserResponseDto.of(user, isUserOnline(user)))
+        .toList();
+  }
+
+  @Override
+  @Transactional
+  public UserResponseDto update(UUID id, UserUpdateDto dto) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
+
+    BinaryContent profile = user.getProfile();
+
+    // 새 프로필 이미지가 들어온 경우 교체
+    if (dto.newProfileImage() != null) {
+      if (profile != null) {
+        binaryContentRepository.delete(profile);
+      }
+      BinaryContentCreateDto newImgDto = dto.newProfileImage();
+      profile = binaryContentRepository.save(new BinaryContent(
+          newImgDto.fileName(),
+          (long) newImgDto.bytes().length,
+          newImgDto.contentType()
+      ));
     }
 
-    @Override
-    public UserResponseDto update(UUID id, UserUpdateDto dto) {
-        // dto.id() 대신 URL 파라미터로 넘어온 id 사용
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
+    // 변경 감지(Dirty Checking): updateProfile만 호출하면 트랜잭션 커밋 시 자동 반영 (save 호출 불필요)
+    user.updateProfile(dto.username(), dto.email(), profile);
 
-        UUID profileImageId = user.getProfileImageId();
+    return UserResponseDto.of(user, isUserOnline(user));
+  }
 
-        // 새 프로필 이미지가 들어온 경우 기존 이미지 교체/삭제 처리
-        if (dto.newProfileImage() != null) {
-            // 1. 기존 프로필 이미지가 존재했다면 삭제
-            if (profileImageId != null) {
-                binaryContentRepository.deleteById(profileImageId);
-            }
+  @Override
+  @Transactional
+  public void delete(UUID id) {
+    User user = userRepository.findById(id)
+        .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
 
-            // 2. 새 프로필 이미지 꺼내기
-            BinaryContentCreateDto newImgDto = dto.newProfileImage();
-
-            // 3. BinaryContent 엔티티 생성 (생성자 순서: fileName, size, contentType, bytes)
-            BinaryContent newProfile = new BinaryContent(
-                    newImgDto.fileName(),
-                    (long) newImgDto.bytes().length,
-                    newImgDto.contentType(),
-                    newImgDto.bytes()
-            );
-            // 4. 저장 후 새 ID 갱신
-            profileImageId = binaryContentRepository.save(newProfile).getId();
-        }
-
-        user.update(dto.username(), dto.email(), dto.password(), profileImageId);
-        User updatedUser = userRepository.save(user);
-
-        return UserResponseDto.of(updatedUser, checkOnline(updatedUser.getId()));
+    // 1. 프로필 이미지 삭제 (ON DELETE SET NULL 정책 대응)
+    if (user.getProfile() != null) {
+      binaryContentRepository.delete(user.getProfile());
     }
 
-    @Override
-    public void delete(UUID id) {
-        User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
+    // 2. UserStatus는 cascade = CascadeType.ALL, orphanRemoval = true 설정에 의해 자동 삭제됨
+    userRepository.delete(user);
+  }
 
-        // 1. 프로필 이미지(BinaryContent) 연관 삭제
-        if (user.getProfileImageId() != null) {
-            binaryContentRepository.deleteById(user.getProfileImageId());
-        }
-
-        // 2. UserStatus 연관 삭제
-        userStatusRepository.findByUserId(id)
-                .ifPresent(status -> userStatusRepository.deleteById(status.getId()));
-
-        // 3. User 본체 삭제
-        userRepository.deleteById(id);
-    }
-
-    private boolean checkOnline(UUID userId) {
-        return userStatusRepository.findByUserId(userId)
-                .map(UserStatus::isOnline)
-                .orElse(false);
-    }
+  private boolean isUserOnline(User user) {
+    return user.getStatus() != null && user.getStatus().isOnline();
+  }
 }
