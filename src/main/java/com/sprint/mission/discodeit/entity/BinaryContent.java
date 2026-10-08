@@ -1,13 +1,13 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
 import lombok.Getter;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class BinaryContent implements Serializable {
+public class BinaryContent extends BaseEntity {
 
   private static final long serialVersionUID = 1L;
   private UUID id;
