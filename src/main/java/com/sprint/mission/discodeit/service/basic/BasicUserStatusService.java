@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponse;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -9,6 +10,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -17,52 +19,76 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class BasicUserStatusService implements UserStatusService {
 
-    private final UserStatusRepository userStatusRepository;
-    private final UserRepository userRepository;
+  private static final long RECENT_ACTIVITY_SECONDS = 5 * 60;
 
-    @Override
-    public UserStatus create(UserStatusCreateRequest request) {
-        if (userRepository.read(request.userId()) == null) {
-            throw new NoSuchElementException("존재하지 않는 유저");
-        }
+  private final UserStatusRepository userStatusRepository;
+  private final UserRepository userRepository;
 
-        if (userStatusRepository.existsByUserId(request.userId())) {
-            throw new IllegalStateException("이미 존재하는 데이터");
-        }
-
-        UserStatus userStatus = new UserStatus(request.userId(), request.lastAccessedAt());
-
-        return userStatusRepository.save(userStatus);
+  @Override
+  public UserStatus create(UserStatusCreateRequest request) {
+    if (userRepository.read(request.userId()) == null) {
+      throw new NoSuchElementException("존재하지 않는 유저");
     }
 
-    @Override
-    public UserStatus read(UUID id) {
-        return userStatusRepository.read(id);
+    if (userStatusRepository.existsByUserId(request.userId())) {
+      throw new IllegalStateException("이미 존재하는 데이터");
     }
 
-    @Override
-    public List<UserStatus> readAll() {
-        return userStatusRepository.readAll();
+    UserStatus userStatus = new UserStatus(request.userId(), request.lastAccessedAt());
+
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatus read(UUID id) {
+    return userStatusRepository.read(id);
+  }
+
+  @Override
+  public List<UserStatus> readAll() {
+    return userStatusRepository.readAll();
+  }
+
+  @Override
+  public UserStatus update(UUID id, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.read(id);
+    userStatus.update(request.newLastActiveAt());
+
+    return userStatusRepository.save(userStatus);
+  }
+
+  @Override
+  public UserStatusResponse updateByUserId(UUID userId, UserStatusUpdateRequest request) {
+    UserStatus userStatus = userStatusRepository.readByUserId(userId);
+    if (userStatus == null) {
+      throw new NoSuchElementException("존재하지 않는 유저 상태");
     }
 
-    @Override
-    public UserStatus update(UUID id, UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.read(id);
-        userStatus.update(request.lastAccessedAt());
+    userStatus.update(request.newLastActiveAt());
+    userStatusRepository.save(userStatus);
 
-        return userStatusRepository.save(userStatus);
-    }
+    return toResponse(userStatus);
+  }
 
-    @Override
-    public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
-        UserStatus userStatus = userStatusRepository.readByUserId(userId);
-        userStatus.update(request.lastAccessedAt());
+  @Override
+  public void delete(UUID id) {
+    userStatusRepository.delete(id);
+  }
 
-        return userStatusRepository.save(userStatus);
-    }
+  private UserStatusResponse toResponse(UserStatus userStatus) {
+    return new UserStatusResponse(
+        userStatus.getId(),
+        userStatus.getCreatedAt(),
+        userStatus.getUpdatedAt(),
+        userStatus.getUserId(),
+        userStatus.getLastAccessedAt(),
+        isOnline(userStatus)
+    );
+  }
 
-    @Override
-    public void delete(UUID id) {
-        userStatusRepository.delete(id);
-    }
+  private boolean isOnline(UserStatus userStatus) {
+    return userStatus.getLastAccessedAt() != null
+        && userStatus.getLastAccessedAt()
+        .isAfter(Instant.now().minusSeconds(RECENT_ACTIVITY_SECONDS));
+  }
 }

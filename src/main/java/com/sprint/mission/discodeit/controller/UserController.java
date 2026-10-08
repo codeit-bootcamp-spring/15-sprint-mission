@@ -4,10 +4,11 @@ import tools.jackson.core.JacksonException;
 import tools.jackson.databind.json.JsonMapper;
 import com.sprint.mission.discodeit.dto.binarycontent.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.user.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.user.UserDto;
 import com.sprint.mission.discodeit.dto.user.UserResponse;
 import com.sprint.mission.discodeit.dto.user.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.userstatus.UserStatusResponse;
 import com.sprint.mission.discodeit.dto.userstatus.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import lombok.RequiredArgsConstructor;
@@ -27,79 +28,79 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserController {
 
-    private final UserService userService;
-    private final UserStatusService userStatusService;
-    private final JsonMapper jsonMapper;
+  private final UserService userService;
+  private final UserStatusService userStatusService;
+  private final JsonMapper jsonMapper;
 
-    // 사용자 등록 (프로필 이미지는 선택)
-    @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponse> create(
-            @RequestPart("userCreateRequest") String userCreateRequestJson,
-            @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) {
-        UserCreateRequest userCreateRequest = parseJson(userCreateRequestJson, UserCreateRequest.class);
-        BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
-        UserResponse response = userService.create(userCreateRequest, profileRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
+  // 사용자 등록 (프로필 이미지는 선택)
+  @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<UserResponse> create(
+      @RequestPart("userCreateRequest") String userCreateRequestJson,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    UserCreateRequest userCreateRequest = parseJson(userCreateRequestJson, UserCreateRequest.class);
+    BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
+    UserResponse response = userService.create(userCreateRequest, profileRequest);
+    return ResponseEntity.status(HttpStatus.CREATED).body(response);
+  }
 
-    // 사용자 정보 수정 (프로필 이미지 재업로드는 선택)
-    @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserResponse> update(
-            @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") String userUpdateRequestJson,
-            @RequestPart(value = "profile", required = false) MultipartFile profile
-    ) {
-        UserUpdateRequest userUpdateRequest = parseJson(userUpdateRequestJson, UserUpdateRequest.class);
-        BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
-        UserResponse response = userService.update(userId, userUpdateRequest, profileRequest);
-        return ResponseEntity.ok(response);
-    }
+  // 사용자 정보 수정 (프로필 이미지 재업로드는 선택)
+  @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+  public ResponseEntity<UserResponse> update(
+      @PathVariable UUID userId,
+      @RequestPart("userUpdateRequest") String userUpdateRequestJson,
+      @RequestPart(value = "profile", required = false) MultipartFile profile
+  ) {
+    UserUpdateRequest userUpdateRequest = parseJson(userUpdateRequestJson, UserUpdateRequest.class);
+    BinaryContentCreateRequest profileRequest = resolveProfileRequest(profile);
+    UserResponse response = userService.update(userId, userUpdateRequest, profileRequest);
+    return ResponseEntity.ok(response);
+  }
 
-    // 사용자 삭제
-    @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
-    public ResponseEntity<Void> delete(@PathVariable UUID userId) {
-        userService.delete(userId);
-        return ResponseEntity.noContent().build();
-    }
+  // 사용자 삭제
+  @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
+  public ResponseEntity<Void> delete(@PathVariable UUID userId) {
+    userService.delete(userId);
+    return ResponseEntity.noContent().build();
+  }
 
-    // 모든 사용자 조회
-    @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserResponse>> readAll() {
-        return ResponseEntity.ok(userService.readAll());
-    }
+  // 모든 사용자 조회
+  @RequestMapping(method = RequestMethod.GET)
+  public ResponseEntity<List<UserDto>> readAll() {
+    return ResponseEntity.ok(userService.readAll());
+  }
 
-    // 사용자 온라인 상태 업데이트
-    @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatus> updateUserStatus(
-            @PathVariable UUID userId,
-            @RequestBody UserStatusUpdateRequest request
-    ) {
-        UserStatus updated = userStatusService.updateByUserId(userId, request);
-        return ResponseEntity.ok(updated);
-    }
+  // 사용자 온라인 상태 업데이트
+  @RequestMapping(value = "/{userId}/userStatus", method = RequestMethod.PATCH)
+  public ResponseEntity<UserStatusResponse> updateUserStatus(
+      @PathVariable UUID userId,
+      @RequestBody UserStatusUpdateRequest request
+  ) {
+    UserStatusResponse updated = userStatusService.updateByUserId(userId, request);
+    return ResponseEntity.ok(updated);
+  }
 
-    private BinaryContentCreateRequest resolveProfileRequest(MultipartFile profile) {
-        if (profile == null || profile.isEmpty()) {
-            return null;
-        }
-        try {
-            return new BinaryContentCreateRequest(
-                    profile.getOriginalFilename(),
-                    profile.getSize(),
-                    profile.getContentType(),
-                    profile.getBytes()
-            );
-        } catch (IOException e) {
-            throw new UncheckedIOException("프로필 이미지 처리 중 오류가 발생했습니다.", e);
-        }
+  private BinaryContentCreateRequest resolveProfileRequest(MultipartFile profile) {
+    if (profile == null || profile.isEmpty()) {
+      return null;
     }
+    try {
+      return new BinaryContentCreateRequest(
+          profile.getOriginalFilename(),
+          profile.getSize(),
+          profile.getContentType(),
+          profile.getBytes()
+      );
+    } catch (IOException e) {
+      throw new UncheckedIOException("프로필 이미지 처리 중 오류가 발생했습니다.", e);
+    }
+  }
 
-    private <T> T parseJson(String json, Class<T> type) {
-        try {
-            return jsonMapper.readValue(json, type);
-        } catch (JacksonException e) {
-            throw new IllegalArgumentException("잘못된 요청 형식입니다: " + type.getSimpleName());
-        }
+  private <T> T parseJson(String json, Class<T> type) {
+    try {
+      return jsonMapper.readValue(json, type);
+    } catch (JacksonException e) {
+      throw new IllegalArgumentException("잘못된 요청 형식입니다: " + type.getSimpleName());
     }
+  }
 }

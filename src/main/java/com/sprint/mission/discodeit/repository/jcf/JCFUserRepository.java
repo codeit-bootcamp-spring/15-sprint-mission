@@ -47,6 +47,14 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
+    public User readByUserName(String userName) {
+        return data.values().stream()
+                .filter(user -> user.getUserName().equals(userName))
+                .findFirst()
+                .orElse(null);
+    }
+
+    @Override
     public boolean existsByEmail(String email) {
         return data.values().stream().anyMatch(user -> user.getEmail().equals(email));
     }
