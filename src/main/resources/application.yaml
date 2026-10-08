@@ -13,3 +13,12 @@ spring:
       max-file-size: 10MB
       max-request-size: 30MB
 
+  jpa:
+    properties:
+      hibernate:
+        format_sql: true
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
