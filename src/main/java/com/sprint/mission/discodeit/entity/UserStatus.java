@@ -1,9 +1,6 @@
 package com.sprint.mission.discodeit.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.Duration;
@@ -15,9 +12,10 @@ import java.util.UUID;
 @Getter
 public class UserStatus extends BaseUpdatableEntity {
     @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id",unique = true,nullable = false)
     private User user;
     
-
+    @Column(nullable = false)
     private Instant lastActiveAt;
 
     protected UserStatus(){}
@@ -26,6 +24,7 @@ public class UserStatus extends BaseUpdatableEntity {
         super();
         this.user=user;
         this.lastActiveAt=lastActiveAt;
+        user.setStatus(this);
 
     }
 

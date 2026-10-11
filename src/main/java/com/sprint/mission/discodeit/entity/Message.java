@@ -15,20 +15,20 @@ public class Message extends BaseUpdatableEntity {
     private Channel channel;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
-    private User user;
+    @JoinColumn(name = "author_id")
+    private User author;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "message_attachments",
             joinColumns = @JoinColumn(name = "message_id"),
             inverseJoinColumns = @JoinColumn(name = "attachment_id")
     )
-    private List<BinaryContent> attachments;
+    private List<BinaryContent> attachments =  new ArrayList<>();
 
 
 
@@ -40,9 +40,9 @@ public class Message extends BaseUpdatableEntity {
     }
 
 
-    public Message(Channel channel, User user , String content, List<BinaryContent> attachments){
+    public Message(Channel channel, User author , String content, List<BinaryContent> attachments){
         this.channel=channel;
-        this.user =user;
+        this.author =author;
         this.content = content;
         this.attachments = attachments == null
                 ? new ArrayList<>()
