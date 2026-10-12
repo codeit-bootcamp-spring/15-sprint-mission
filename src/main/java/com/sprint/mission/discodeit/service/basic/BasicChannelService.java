@@ -4,11 +4,9 @@ import com.sprint.mission.discodeit.dto.Request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Response.ChannelDto;
+import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.repository.BinaryContentRepository;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +24,7 @@ public class BasicChannelService implements ChannelService {
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -41,25 +40,21 @@ public class BasicChannelService implements ChannelService {
         ReadStatus readStatus;
         channelRepository.save(channel);
         for (UUID entry : membersId){
-            readStatus= new ReadStatus(entry, channel.getId(),Instant.MIN);
+            User user=userRepository.findById(entry).orElseThrow(() -> new NoSuchElementException("유저 id 찾을 수 없음 : "+ entry));
+            readStatus= new ReadStatus(user, channel,Instant.MIN);
             readStatusRepository.save(readStatus);
         }
 
         return channel;
     }
 
+
     @Override
-    public ChannelDto find(UUID id) {
-        Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
-
-        return toChannelResponse(channel);
-    }
-
     public ChannelDto toChannelResponse(Channel channel){
-        List<UUID> memberIds = readStatusRepository.findAllByChannelId(channel.getId())
+        List<UserDto> UserDtos = readStatusRepository.findAllByChannelId(channel.getId())
                 .stream()
-                .map(ReadStatus::getUserId)
+                .map(readStatus -> readStatus.getUser())
+                .map(user -> UserRepository.)
                 .toList();
 
         Instant latestMessageAt = messageRepository.findAllByChannelId(channel.getId())
@@ -72,16 +67,13 @@ public class BasicChannelService implements ChannelService {
                 channel.getName(),
                 channel.getDescription(),
                 channel.getType(),
-                memberIds,
+                UserDtos,
                 latestMessageAt
 
         );
     }
 
-    @Override
-    public List<ChannelDto> findAll() {
-        return channelRepository.findAll().stream().map(this::toChannelResponse).toList();
-    }
+
 
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
@@ -147,4 +139,5 @@ public class BasicChannelService implements ChannelService {
         }
         channelRepository.deleteById(id);
     }
+
 }

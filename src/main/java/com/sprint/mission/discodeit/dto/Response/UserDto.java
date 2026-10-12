@@ -1,10 +1,8 @@
 package com.sprint.mission.discodeit.dto.Response;
 
 
-import java.time.Instant;
-import java.util.Optional;
+import com.sprint.mission.discodeit.entity.User;
 import java.util.UUID;
-// todo toDto 메서드 수정필요
 public record UserDto(
         UUID id,
         String username,
@@ -12,5 +10,10 @@ public record UserDto(
         BinaryContentDto profile,
         boolean online
 ) {
+    public static UserDto from(User user){
+        return new UserDto(user.getId(), user.getUsername(), user.getEmail(),
+                user.getProfile() == null ? null : BinaryContentDto.from(user.getProfile()),
+                user.getStatus() != null && user.getStatus().isOnline());
+    }
 
 }

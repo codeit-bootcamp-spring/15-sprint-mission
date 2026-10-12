@@ -33,7 +33,7 @@ public class BasicReadStatusService implements ReadStatusService {
             throw new NoSuchElementException("존재하지 않는 채널 id : "+ readStatusCreateRequest.channelId());
         }
 
-        if(readStatusRepository.existsByUserAndChannel(readStatusCreateRequest.userId(),readStatusCreateRequest.channelId())){
+        if(readStatusRepository.existsByUserIdAndChannelId(readStatusCreateRequest.userId(),readStatusCreateRequest.channelId())){
             throw new IllegalArgumentException("해당 채널, 유저의 ReadStatus가 이미 존재합니다");
         }
 

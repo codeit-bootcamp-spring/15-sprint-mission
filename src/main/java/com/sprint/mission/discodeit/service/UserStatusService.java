@@ -8,11 +8,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService {
-    UserStatus create(UserStatusCreateRequest userStatusCreateRequest);
-    UserStatus find(UUID id);
-    List<UserStatus> findAll();
-    UserStatus update(UUID id, UserStatusUpdateRequest userStatusUpdateRequest);
+    //UserStatus create(UserStatusCreateRequest userStatusCreateRequest);
+    //UserStatus find(UUID id);
+    //List<UserStatus> findAll();
+    //UserStatus update(UUID id, UserStatusUpdateRequest userStatusUpdateRequest);
     UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest);
-    void delete(UUID id);
+    //void delete(UUID id);
 
 }

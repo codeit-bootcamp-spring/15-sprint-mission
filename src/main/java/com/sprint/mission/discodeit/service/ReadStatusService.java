@@ -9,12 +9,12 @@ import java.util.UUID;
 
 public interface ReadStatusService {
     ReadStatus create(ReadStatusCreateRequest readStatusCreateRequest);
-    ReadStatus find(UUID id);
+    //ReadStatus find(UUID id);
     List<ReadStatus> findAllByUserId(UUID userId);
-    List<ReadStatus> findAllByChannelId(UUID channelId);
+    //List<ReadStatus> findAllByChannelId(UUID channelId);
     ReadStatus update(UUID id, ReadStatusUpdateRequest readStatusUpdateRequest);
     //List<ReadStatus> updateAllByUserId(UUID userId);
     //List<ReadStatus> updateAllByChannelId(UUID channelId);
-    void delete(UUID id);
+    //void delete(UUID id);
 
 }

@@ -28,7 +28,7 @@ CREATE TABLE user_statuses(
     id UUID PRIMARY KEY ,
     created_at timestamptz NOT NULL ,
     updated_at timestamptz,
-    user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE ,
+    user_id UUID UNIQUE REFERENCES users(id) ON DELETE CASCADE NOT NULL ,
     last_active_at timestamptz NOT NULL
 );
 
