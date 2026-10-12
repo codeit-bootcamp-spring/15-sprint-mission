@@ -103,7 +103,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               lock.unlock();
             }
           })
-          .filter(readStatus -> readStatus.getUserId().equals(userId))
+          .filter(readStatus -> readStatus.getUser().getId().equals(userId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
@@ -129,7 +129,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
               lock.unlock();
             }
           })
-          .filter(readStatus -> readStatus.getChannelId().equals(channelId))
+          .filter(readStatus -> readStatus.getUser().getId().equals(channelId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);

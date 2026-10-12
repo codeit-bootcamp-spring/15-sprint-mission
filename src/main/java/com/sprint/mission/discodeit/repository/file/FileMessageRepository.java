@@ -103,7 +103,7 @@ public class FileMessageRepository implements MessageRepository {
               lock.unlock();
             }
           })
-          .filter(message -> message.getChannelId().equals(channelId))
+          .filter(message -> message.getChannel().getId().equals(channelId))
           .toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
