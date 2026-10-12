@@ -7,9 +7,11 @@ import com.sprint.mission.discodeit.dto.UserUpdateDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,6 +28,8 @@ public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
+  private final BinaryContentStorage binaryContentStorage; // 파일 저장소 주입
+  private final UserMapper userMapper;                     // 매퍼 주입
 
   @Override
   @Transactional
@@ -38,26 +42,28 @@ public class BasicUserService implements UserService {
       throw new IllegalArgumentException("이미 존재하는 email입니다: " + dto.email());
     }
 
-    // 2. 프로필 메타데이터 저장 (bytes 제외)
+    // 2. 프로필 메타데이터 저장 및 실제 파일 디스크 저장
     BinaryContent profile = null;
-    if (dto.profileImage() != null) {
-      BinaryContentCreateDto imgDto = dto.profileImage();
+    if (dto.profileDto() != null) {
+      BinaryContentCreateDto imgDto = dto.profileDto();
       profile = binaryContentRepository.save(new BinaryContent(
           imgDto.fileName(),
           (long) imgDto.bytes().length,
           imgDto.contentType()
       ));
+      // 스토리지에 실제 파일 저장
+      binaryContentStorage.put(profile.getId(), imgDto.bytes());
     }
 
     // 3. User 엔티티 생성
     User user = new User(dto.username(), dto.email(), dto.password(), profile);
 
-    // 4. UserStatus 생성 후 연관관계 설정 (CascadeType.ALL로 user 저장 시 함께 저장됨)
+    // 4. UserStatus 생성 및 연관관계 설정
     UserStatus status = new UserStatus(user, Instant.now());
     user.updateStatus(status);
 
     User savedUser = userRepository.save(user);
-    return UserResponseDto.of(savedUser, status.isOnline());
+    return userMapper.toResponseDto(savedUser, status.isOnline());
   }
 
   @Override
@@ -65,13 +71,13 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
 
-    return UserResponseDto.of(user, isUserOnline(user));
+    return userMapper.toResponseDto(user, isUserOnline(user));
   }
 
   @Override
   public List<UserResponseDto> findAll() {
     return userRepository.findAll().stream()
-        .map(user -> UserResponseDto.of(user, isUserOnline(user)))
+        .map(user -> userMapper.toResponseDto(user, isUserOnline(user)))
         .toList();
   }
 
@@ -94,12 +100,14 @@ public class BasicUserService implements UserService {
           (long) newImgDto.bytes().length,
           newImgDto.contentType()
       ));
+      // 새 파일 디스크 저장
+      binaryContentStorage.put(profile.getId(), newImgDto.bytes());
     }
 
-    // 변경 감지(Dirty Checking): updateProfile만 호출하면 트랜잭션 커밋 시 자동 반영 (save 호출 불필요)
+    // 변경 감지(Dirty Checking)
     user.updateProfile(dto.username(), dto.email(), profile);
 
-    return UserResponseDto.of(user, isUserOnline(user));
+    return userMapper.toResponseDto(user, isUserOnline(user));
   }
 
   @Override
@@ -108,12 +116,12 @@ public class BasicUserService implements UserService {
     User user = userRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("해당 유저를 찾을 수 없습니다: " + id));
 
-    // 1. 프로필 이미지 삭제 (ON DELETE SET NULL 정책 대응)
+    // 1. 프로필 이미지 삭제
     if (user.getProfile() != null) {
       binaryContentRepository.delete(user.getProfile());
     }
 
-    // 2. UserStatus는 cascade = CascadeType.ALL, orphanRemoval = true 설정에 의해 자동 삭제됨
+    // 2. 유저 삭제
     userRepository.delete(user);
   }
 

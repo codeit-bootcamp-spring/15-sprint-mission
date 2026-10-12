@@ -12,5 +12,6 @@ public record UserResponseDto(
     BinaryContentDto profile, // 엔티티 대신 DTO 사용
     Boolean isOnline
 ) {
+  
 
 }
