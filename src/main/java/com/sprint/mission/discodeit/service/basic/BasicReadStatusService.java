@@ -42,21 +42,14 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.save(readStatus);
     }
 
-    @Override
-    public ReadStatus find(UUID id) {
-        return readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("ReadStatus id 없음 : " + id));
 
-    }
 
     @Override
     public List<ReadStatus> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUserId(userId);
     }
 
-    @Override
-    public List<ReadStatus> findAllByChannelId(UUID channelId) {
-        return readStatusRepository.findAllByChannelId(channelId);
-    }
+
 
     @Override
     public ReadStatus update(UUID id, ReadStatusUpdateRequest readStatusUpdateRequest) {
@@ -65,32 +58,4 @@ public class BasicReadStatusService implements ReadStatusService {
         return readStatusRepository.save(readStatus);
     }
 
-    /*@Override
-    public List<ReadStatus> updateAllByUserId(UUID userId) {
-
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByUserId(userId);
-        for(ReadStatus entry : readStatusList){
-            update(entry.getId());
-        }
-        return readStatusList;
-    }
-
-    @Override
-    public List<ReadStatus> updateAllByChannelId(UUID channelId) {
-        List<ReadStatus> readStatusList = readStatusRepository.findAllByChannelId(channelId);
-        for(ReadStatus entry : readStatusList){
-            update(entry.getId());
-        }
-        return readStatusList;
-    }*/
-
-    @Override
-    public void delete(UUID id) {
-
-        if(!readStatusRepository.existsById(id)){
-            throw new NoSuchElementException("ReadStatus id 없음 : " + id);
-        }
-        readStatusRepository.deleteById(id);
-
-    }
 }

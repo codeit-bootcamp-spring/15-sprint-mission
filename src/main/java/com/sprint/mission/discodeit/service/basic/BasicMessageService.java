@@ -54,21 +54,13 @@ public class BasicMessageService implements MessageService {
         return messageRepository.save(message);
     }
 
-    @Override
-    public Message find(UUID id) {
-        return messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
-    }
+
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId){
         return messageRepository.findAllByChannelId(channelId);
     }
 
-    @Override
-    public List<Message> findAll() {
-        return messageRepository.findAll();
-    }
 
     @Override
     public Message update(UUID id,MessageUpdateRequest messageUpdateRequest) {

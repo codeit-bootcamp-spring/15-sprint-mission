@@ -59,11 +59,7 @@ public class BasicUserService implements UserService {
         return user;
     }
 
-    @Override
-    public UserDto find(UUID id) {
-        return userRepository.findById(id).map(this::toUserResponse)
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
-    }
+
 
     @Override
     public List<UserDto> findAll() {
@@ -153,23 +149,7 @@ public class BasicUserService implements UserService {
         userRepository.deleteById(id);
     }
 
-    public UserDto toUserResponse(User user) {
-        UserStatus userStatus = userStatusRepository
-                .findByUserId(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저의 스테이터스가 없습니다."));
-        boolean online = userStatus.isOnline();
 
-        //UUID testId= Optional.ofNullable(user.getProfileId()).orElse(null);
-
-        return new UserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getEmail(),
-                user.getUsername(),
-                Optional.ofNullable(user.getProfileId()),
-                online
-        );
-    }
 
     private void validateEmail(String email){
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {

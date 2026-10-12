@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.UUID;
 
 public interface UserStatusService {
-    //UserStatus create(UserStatusCreateRequest userStatusCreateRequest);
+    UserStatus create(UserStatusCreateRequest userStatusCreateRequest);
     //UserStatus find(UUID id);
     //List<UserStatus> findAll();
     //UserStatus update(UUID id, UserStatusUpdateRequest userStatusUpdateRequest);

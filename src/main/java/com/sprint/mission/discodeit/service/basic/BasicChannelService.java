@@ -51,26 +51,13 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto toChannelResponse(Channel channel){
-        List<UserDto> UserDtos = readStatusRepository.findAllByChannelId(channel.getId())
-                .stream()
-                .map(readStatus -> readStatus.getUser())
-                .map(user -> UserRepository.)
-                .toList();
+        List<User> users = readStatusRepository.findAllByChannelId(channel.getId()).stream()
+                .map(readStatus -> readStatus.getUser()).toList();
 
-        Instant latestMessageAt = messageRepository.findAllByChannelId(channel.getId())
-                .stream()
-                .map(Message::getCreatedAt)
-                .max(Instant::compareTo)
-                .orElse(null);
-        return new ChannelDto(
-                channel.getId(),
-                channel.getName(),
-                channel.getDescription(),
-                channel.getType(),
-                UserDtos,
-                latestMessageAt
 
-        );
+        Instant latestMessageAt = messageRepository.findLastMessageAt(channel.getId()).orElse(Instant.MIN);
+
+        return  ChannelDto.from(channel,users,latestMessageAt);
     }
 
 
