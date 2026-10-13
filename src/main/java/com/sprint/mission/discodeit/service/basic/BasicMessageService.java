@@ -11,6 +11,8 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.dto.data.MessageDto;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -29,10 +31,11 @@ public class BasicMessageService implements MessageService {
   private final MessageRepository messageRepository;
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
+  private final MessageMapper messageMapper;
 
   @Transactional
   @Override
-  public Message create(MessageCreateRequest messageCreateRequest,
+  public MessageDto create(MessageCreateRequest messageCreateRequest,
       List<BinaryContentCreateRequest> binaryContentCreateRequests) {
     UUID channelId = messageCreateRequest.channelId();
     UUID authorId = messageCreateRequest.authorId();
@@ -62,30 +65,35 @@ public class BasicMessageService implements MessageService {
         author,
         attachments
     );
-    return messageRepository.save(message);
+    Message savedMessage = messageRepository.save(message);
+    return messageMapper.toDto(savedMessage);
   }
 
   @Override
-  public Message find(UUID messageId) {
+  public MessageDto find(UUID messageId) {
     return messageRepository.findById(messageId)
-        .orElseThrow(
-            () -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        .map(messageMapper::toDto)
+        .orElseThrow(() -> new NoSuchElementException(
+            "Message with id " + messageId + " not found"));
   }
 
   @Override
-  public List<Message> findAllByChannelId(UUID channelId) {
-    return messageRepository.findAllByChannel_Id(channelId);
+  public List<MessageDto> findAllByChannelId(UUID channelId) {
+    return messageRepository.findAllByChannel_Id(channelId)
+        .stream()
+        .map(messageMapper::toDto)
+        .toList();
   }
 
   @Transactional
   @Override
-  public Message update(UUID messageId, MessageUpdateRequest request) {
+  public MessageDto update(UUID messageId, MessageUpdateRequest request) {
     String newContent = request.newContent();
     Message message = messageRepository.findById(messageId)
         .orElseThrow(
             () -> new NoSuchElementException("Message with id " + messageId + " not found"));
     message.update(newContent);
-    return message;
+    return messageMapper.toDto(message);
   }
 
   @Transactional
