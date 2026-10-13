@@ -20,4 +20,5 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     """)
     Optional<Instant> findLastMessageAt(UUID channelId);
 
+    void deleteAllByChannel_Id(UUID channelId);
 }

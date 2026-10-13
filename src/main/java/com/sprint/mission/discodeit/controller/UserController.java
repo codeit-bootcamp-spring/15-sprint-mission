@@ -6,6 +6,7 @@ import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.UserDto;
+import com.sprint.mission.discodeit.dto.Response.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
@@ -52,7 +53,7 @@ public class UserController {
 
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profile", required = false) MultipartFile profile)throws IOException {
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
@@ -68,10 +69,10 @@ public class UserController {
                             }
                         });
 
-        User user = userService.create(userCreateRequest, binaryRequest);
+        UserDto userDto = userService.create(userCreateRequest, binaryRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(user);
+                .body(userDto);
     }
 
     //유저 수정
@@ -94,7 +95,7 @@ public class UserController {
             )
     })
     @PatchMapping(path = "/{user-id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<User> patchUser(
+    public ResponseEntity<UserDto> patchUser(
             @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
@@ -114,9 +115,9 @@ public class UserController {
                         });
 
 
-        User user = userService.update(uuid, userUpdateRequest, binaryRequest);
+        UserDto userDto = userService.update(uuid, userUpdateRequest, binaryRequest);
         return ResponseEntity.status(HttpStatus.OK)
-                .body(user);
+                .body(userDto);
     }
 
     //삭제
@@ -173,10 +174,10 @@ public class UserController {
             )
     })
     @PatchMapping("/{userId}/userStatus")
-    public ResponseEntity<UserStatus> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-                                                               @RequestBody UserStatusUpdateRequest userStatusUpdateRequest){
-        UserStatus userStatus=userStatusService.updateByUserId(userId,userStatusUpdateRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(userStatus);
+    public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
+                                                                  @RequestBody UserStatusUpdateRequest userStatusUpdateRequest){
+        UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,userStatusUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(userStatusDto);
     }
 
 

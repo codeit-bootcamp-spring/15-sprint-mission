@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.Request.ReadStatusCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.Response.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -44,11 +45,11 @@ public class ReadStatusController {
             )
     })
     @PostMapping
-    public ResponseEntity<ReadStatus> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
-        ReadStatus readStatus = readStatusService.create(readStatusCreateRequest);
+    public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+        ReadStatusDto readStatusDto = readStatusService.create(readStatusCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(readStatus);
+                .body(readStatusDto);
     }
 
     @Operation(
@@ -66,27 +67,15 @@ public class ReadStatusController {
             )
     })
     @PatchMapping("/{readStatusId}")
-    public ResponseEntity<ReadStatus> patchReadStatus(@PathVariable("readStatusId") UUID readStatusId,
+    public ResponseEntity<ReadStatusDto> patchReadStatus(@PathVariable("readStatusId") UUID readStatusId,
                                                       @RequestBody ReadStatusUpdateRequest request){
-        ReadStatus readStatus = readStatusService.update(readStatusId, request);
+        ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);
 
-        return ResponseEntity.ok(readStatus);
+        return ResponseEntity.ok(readStatusDto);
     }
 
 
-    /*@PatchMapping("/by-user-id/{user-id}")
-    public ResponseEntity<List<ReadStatus>> patchReadStatusByUserId(@PathVariable("user-id") UUID userId){
-        List<ReadStatus> readStatusList = readStatusService.updateAllByUserId(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
-    }
-
-    @PatchMapping("/by-channel-id/{channel-id}")
-    public ResponseEntity<List<ReadStatus>> patchReadStatusByChannelId(@PathVariable("channel-id") UUID channelId){
-        List<ReadStatus> readStatusList = readStatusService.updateAllByChannelId(channelId);
-
-        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
-    }*/
 
     @Operation(
             summary = "User의 Message 읽음 상태 목록 조회",
@@ -97,14 +86,11 @@ public class ReadStatusController {
             description = "유저의 리드스테이터스 목록 조회 성공"
     )
     @GetMapping
-    public ResponseEntity<List<ReadStatus>> getReadStatusByUserId( @RequestParam("userId") UUID userId){
-        List<ReadStatus> readStatusList = readStatusService.findAllByUserId(userId);
+    public ResponseEntity<List<ReadStatusDto>> getReadStatusByUserId( @RequestParam("userId") UUID userId){
+        List<ReadStatusDto> readStatusDtoList = readStatusService.findAllByUserId(userId);
 
-        return ResponseEntity.status(HttpStatus.OK).body(readStatusList);
+        return ResponseEntity.status(HttpStatus.OK).body(readStatusDtoList);
     }
-
-
-
 
 
 }

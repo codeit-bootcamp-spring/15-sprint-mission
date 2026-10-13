@@ -10,6 +10,7 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -28,24 +29,28 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel create(PublicChannelCreateRequest publicChannelCreateRequest) {
+    @Transactional
+    public ChannelDto create(PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = new Channel(publicChannelCreateRequest.name(),publicChannelCreateRequest.description(), ChannelType.PUBLIC);
-        return channelRepository.save(channel);
+        channelRepository.save(channel);
+        return toChannelResponse(channel);
     }
 
     @Override
-    public Channel create(PrivateChannelCreateRequest privateChannelCreateRequest) {
+    @Transactional
+    public ChannelDto create(PrivateChannelCreateRequest privateChannelCreateRequest) {
         Channel channel = new Channel(null,null,ChannelType.PRIVATE);
         List<UUID> membersId = privateChannelCreateRequest.participantIds();
-        ReadStatus readStatus;
         channelRepository.save(channel);
-        for (UUID entry : membersId){
-            User user=userRepository.findById(entry).orElseThrow(() -> new NoSuchElementException("유저 id 찾을 수 없음 : "+ entry));
-            readStatus= new ReadStatus(user, channel,Instant.MIN);
-            readStatusRepository.save(readStatus);
-        }
 
-        return channel;
+        userRepository.findAllByIdIn(membersId).forEach(user ->
+                readStatusRepository.save(
+                        new ReadStatus(user, channel, Instant.MIN)
+                )
+        );
+
+
+        return toChannelResponse(channel);
     }
 
 
@@ -63,18 +68,11 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
+    @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<Channel> publicChannels = channelRepository.findAll().stream().filter(channel -> channel.getType()==ChannelType.PUBLIC).toList();
-        List<UUID> privateChannelIdList = readStatusRepository.findAllByUserId(userId).stream()
-                .map(readStatus -> readStatus.getChannelId()).toList();
-        List<Channel> privateChannels = new ArrayList<>();
-        for(UUID id : privateChannelIdList){
-            if(channelRepository.existsById(id)){
-                privateChannels.add(channelRepository.findById(id).get());
-            }
-        }
-
-        privateChannels= privateChannels.stream().filter(channel -> channel.getType()==ChannelType.PRIVATE).toList();
+        List<Channel> publicChannels = channelRepository.findAllByTypeEquals(ChannelType.PUBLIC);
+        List<Channel> privateChannels = readStatusRepository.findAllByUserId(userId).stream()
+                .map(readStatus -> readStatus.getChannel()).filter(channel -> channel.getType()==ChannelType.PRIVATE).toList();
 
         List<Channel> concatList = new ArrayList<>();
         List<ChannelDto> resultList;
@@ -90,40 +88,27 @@ public class BasicChannelService implements ChannelService {
 
 
     @Override
-    public Channel update(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
+    @Transactional
+    public ChannelDto update(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
         Channel channel = channelRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
         if(channel.getType()==ChannelType.PRIVATE){
             throw new IllegalArgumentException("private채널은 업데이트할 수 없습니다.");
         }
         channel.update(publicChannelUpdateRequest.name(), publicChannelUpdateRequest.description());
-        return channelRepository.save(channel);
+        //channelRepository.save(channel);
+        return toChannelResponse(channel);
     }
 
     @Override
+    @Transactional
     public void delete(UUID id) {
         if (!channelRepository.existsById(id)) {
             throw new NoSuchElementException("채널 id 없음 : " + id);
         }
 
-        List<Message> messages =messageRepository.findAllByChannelId(id);
-        List<UUID> readStatus = readStatusRepository.findAllByChannelId(id).stream().map(r -> r.getId()).toList();
-
-        for(Message message : messages){
-            if(message.getAttachmentIds()!=null){
-                for(UUID entry : message.getAttachmentIds()){
-                    if (binaryContentRepository.existsById(entry)) {
-                        binaryContentRepository.deleteById(entry);
-                    }
-                }
-            }
-            messageRepository.deleteById(message.getId());
-        }
-
-
-        for(UUID readStatusId : readStatus){
-            readStatusRepository.deleteById(readStatusId);
-        }
+        //messageRepository.deleteAllByChannel_Id(id);
+        //readStatusRepository.deleteAllByChannel_Id(id);
         channelRepository.deleteById(id);
     }
 

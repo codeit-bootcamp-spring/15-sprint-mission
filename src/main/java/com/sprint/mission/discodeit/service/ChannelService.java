@@ -13,13 +13,10 @@ public interface ChannelService {
 
     //Channel create(String name, ChannelType channelType);
 
-    Channel create(PublicChannelCreateRequest publicChannelCreateRequest);
-    Channel create(PrivateChannelCreateRequest privateChannelCreateRequest);
-
-    //ChannelDto find(UUID id);
-    //List<ChannelDto> findAll();
+    ChannelDto create(PublicChannelCreateRequest publicChannelCreateRequest);
+    ChannelDto create(PrivateChannelCreateRequest privateChannelCreateRequest);
     List<ChannelDto> findAllByUserId(UUID userId);
-    Channel update(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest);
+    ChannelDto update(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest);
     void delete(UUID id);
     ChannelDto toChannelResponse(Channel channel);
 
