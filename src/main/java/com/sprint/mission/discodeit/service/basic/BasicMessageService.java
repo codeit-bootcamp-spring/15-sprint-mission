@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.dto.data.MessageDto;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,7 @@ public class BasicMessageService implements MessageService {
   private final ChannelRepository channelRepository;
   private final UserRepository userRepository;
   private final MessageMapper messageMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Transactional
   @Override
@@ -54,7 +56,7 @@ public class BasicMessageService implements MessageService {
           String contentType = attachmentRequest.contentType();
           byte[] bytes = attachmentRequest.bytes();
 
-          return new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+          return new BinaryContent(fileName, (long) bytes.length, contentType);
         })
         .collect(Collectors.toCollection(ArrayList::new));
 
@@ -66,6 +68,15 @@ public class BasicMessageService implements MessageService {
         attachments
     );
     Message savedMessage = messageRepository.save(message);
+
+// 첨부 파일의 실제 데이터를 별도 저장소에 저장
+    for (int i = 0; i < attachments.size(); i++) {
+      binaryContentStorage.put(
+          attachments.get(i).getId(),
+          binaryContentCreateRequests.get(i).bytes()
+      );
+    }
+
     return messageMapper.toDto(savedMessage);
   }
 

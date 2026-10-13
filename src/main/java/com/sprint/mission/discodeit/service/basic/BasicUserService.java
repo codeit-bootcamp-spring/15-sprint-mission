@@ -11,6 +11,7 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.mapper.UserMapper;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -29,6 +30,7 @@ public class BasicUserService implements UserService {
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserMapper userMapper;
+  private final BinaryContentStorage binaryContentStorage;
 
   @Transactional
   @Override
@@ -45,14 +47,7 @@ public class BasicUserService implements UserService {
     }
 
     BinaryContent nullableprofile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
-          byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
-          return binaryContentRepository.save(binaryContent);
-        })
+        .map(this::saveProfile)
         .orElse(null);
     String password = userCreateRequest.password();
 
@@ -105,18 +100,7 @@ public class BasicUserService implements UserService {
     BinaryContent oldProfile = user.getProfile();
 
     BinaryContent newProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          byte[] bytes = profileRequest.bytes();
-
-          BinaryContent binaryContent = new BinaryContent(
-              profileRequest.fileName(),
-              (long) bytes.length,
-              profileRequest.contentType(),
-              bytes
-          );
-
-          return binaryContentRepository.save(binaryContent);
-        })
+        .map(this::saveProfile)
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
@@ -145,5 +129,25 @@ public class BasicUserService implements UserService {
     if (profile != null) {
       binaryContentRepository.delete(profile);
     }
+  }
+
+  private BinaryContent saveProfile(BinaryContentCreateRequest request) {
+
+    byte[] bytes = request.bytes();
+
+    // 1. 파일 메타 정보 생성
+    BinaryContent binaryContent = new BinaryContent(
+        request.fileName(),
+        (long) bytes.length,
+        request.contentType()
+    );
+
+    // 2. 메타 정보를 DB에 저장
+    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
+
+    // 3. 실제 파일 데이터를 별도 저장소에 저장
+    binaryContentStorage.put(savedContent.getId(), bytes);
+
+    return savedContent;
   }
 }
