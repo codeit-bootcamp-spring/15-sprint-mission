@@ -16,15 +16,18 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository readStatusRepository;
   private final UserRepository userRepository;
   private final ChannelRepository channelRepository;
 
+  @Transactional
   @Override
   public ReadStatus create(ReadStatusCreateRequest request) {
     UUID userId = request.userId();
@@ -38,7 +41,7 @@ public class BasicReadStatusService implements ReadStatusService {
         .orElseThrow(() -> new NoSuchElementException(
             "Channel with id " + channelId + " does not exist"));
 
-    return readStatusRepository.findAllByUserId(userId).stream()
+    return readStatusRepository.findAllByUser_Id(userId).stream()
         .filter(readStatus -> readStatus.getChannel().getId().equals(channelId))
         .findFirst()
         .orElseGet(() -> {
@@ -57,10 +60,10 @@ public class BasicReadStatusService implements ReadStatusService {
 
   @Override
   public List<ReadStatus> findAllByUserId(UUID userId) {
-    return readStatusRepository.findAllByUserId(userId).stream()
-        .toList();
+    return readStatusRepository.findAllByUser_Id(userId);
   }
 
+  @Transactional
   @Override
   public ReadStatus update(UUID readStatusId, ReadStatusUpdateRequest request) {
     Instant newLastReadAt = request.newLastReadAt();
@@ -68,9 +71,10 @@ public class BasicReadStatusService implements ReadStatusService {
         .orElseThrow(
             () -> new NoSuchElementException("ReadStatus with id " + readStatusId + " not found"));
     readStatus.update(newLastReadAt);
-    return readStatusRepository.save(readStatus);
+    return readStatus;
   }
 
+  @Transactional
   @Override
   public void delete(UUID readStatusId) {
     if (!readStatusRepository.existsById(readStatusId)) {

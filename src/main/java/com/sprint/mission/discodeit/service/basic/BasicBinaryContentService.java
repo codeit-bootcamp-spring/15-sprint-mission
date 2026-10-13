@@ -10,13 +10,16 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
 
+  @Transactional
   @Override
   public BinaryContent create(BinaryContentCreateRequest request) {
     String fileName = request.fileName();
@@ -40,10 +43,10 @@ public class BasicBinaryContentService implements BinaryContentService {
 
   @Override
   public List<BinaryContent> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds).stream()
-        .toList();
+    return binaryContentRepository.findAllByIdIn(binaryContentIds);
   }
 
+  @Transactional
   @Override
   public void delete(UUID binaryContentId) {
     if (!binaryContentRepository.existsById(binaryContentId)) {

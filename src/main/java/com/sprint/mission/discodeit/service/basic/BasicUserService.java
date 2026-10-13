@@ -19,15 +19,18 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
 
   private final UserRepository userRepository;
   private final BinaryContentRepository binaryContentRepository;
   private final UserStatusRepository userStatusRepository;
 
+  @Transactional
   @Override
   public User create(UserCreateRequest userCreateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -54,13 +57,11 @@ public class BasicUserService implements UserService {
     String password = userCreateRequest.password();
 
     User user = new User(username, email, password, nullableprofile);
-    User createdUser = userRepository.save(user);
 
-    UserStatus userStatus = new UserStatus(createdUser, Instant.now());
-    createdUser.assignStatus(userStatus);
-    userStatusRepository.save(userStatus);
+    UserStatus userStatus = new UserStatus(user, Instant.now());
+    user.assignStatus(userStatus);
 
-    return createdUser;
+    return userRepository.save(user);
   }
 
   @Override
@@ -78,6 +79,7 @@ public class BasicUserService implements UserService {
         .toList();
   }
 
+  @Transactional
   @Override
   public User update(UUID userId, UserUpdateRequest userUpdateRequest,
       Optional<BinaryContentCreateRequest> optionalProfileCreateRequest) {
@@ -98,41 +100,53 @@ public class BasicUserService implements UserService {
           "User with username " + newUsername + " already exists");
     }
 
-    BinaryContent nullableProfile = optionalProfileCreateRequest
-        .map(profileRequest -> {
-          Optional.ofNullable(user.getProfile())
-              .ifPresent(profile ->
-                  binaryContentRepository.deleteById(profile.getId()));
+    BinaryContent oldProfile = user.getProfile();
 
-          String fileName = profileRequest.fileName();
-          String contentType = profileRequest.contentType();
+    BinaryContent newProfile = optionalProfileCreateRequest
+        .map(profileRequest -> {
           byte[] bytes = profileRequest.bytes();
-          BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length,
-              contentType, bytes);
+
+          BinaryContent binaryContent = new BinaryContent(
+              profileRequest.fileName(),
+              (long) bytes.length,
+              profileRequest.contentType(),
+              bytes
+          );
+
           return binaryContentRepository.save(binaryContent);
         })
         .orElse(null);
 
     String newPassword = userUpdateRequest.newPassword();
-    user.update(newUsername, newEmail, newPassword, nullableProfile);
 
-    return userRepository.save(user);
+    user.update(newUsername, newEmail, newPassword, newProfile);
+
+    if (newProfile != null && oldProfile != null) {
+      userRepository.flush();
+      binaryContentRepository.delete(oldProfile);
+    }
+
+    return user;
   }
 
+  @Transactional
   @Override
   public void delete(UUID userId) {
     User user = userRepository.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("User with id " + userId + " not found"));
 
-    Optional.ofNullable(user.getProfile())
-        .ifPresent(profile ->
-            binaryContentRepository.deleteById(profile.getId()));
+    BinaryContent profile = user.getProfile();
 
-    userRepository.deleteById(userId);
+    userRepository.delete(user);
+    userRepository.flush();
+
+    if (profile != null) {
+      binaryContentRepository.delete(profile);
+    }
   }
 
   private UserDto toDto(User user) {
-    Boolean online = userStatusRepository.findByUserId(user.getId())
+    Boolean online = userStatusRepository.findByUser_Id(user.getId())
         .map(UserStatus::isOnline)
         .orElse(null);
 

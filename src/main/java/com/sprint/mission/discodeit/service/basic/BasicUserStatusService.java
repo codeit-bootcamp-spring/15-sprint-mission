@@ -14,14 +14,17 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class BasicUserStatusService implements UserStatusService {
 
   private final UserStatusRepository userStatusRepository;
   private final UserRepository userRepository;
 
+  @Transactional
   @Override
   public UserStatus create(UserStatusCreateRequest request) {
     UUID userId = request.userId();
@@ -30,13 +33,14 @@ public class BasicUserStatusService implements UserStatusService {
         .orElseThrow(() -> new NoSuchElementException(
             "User with id " + userId + " does not exist"));
 
-    if (userStatusRepository.findByUserId(userId).isPresent()) {
+    if (userStatusRepository.findByUser_Id(userId).isPresent()) {
       throw new IllegalArgumentException(
           "UserStatus with id " + userId + " already exists");
     }
 
     Instant lastActiveAt = request.lastActiveAt();
     UserStatus userStatus = new UserStatus(user, lastActiveAt);
+    user.assignStatus(userStatus);
 
     return userStatusRepository.save(userStatus);
   }
@@ -50,10 +54,10 @@ public class BasicUserStatusService implements UserStatusService {
 
   @Override
   public List<UserStatus> findAll() {
-    return userStatusRepository.findAll().stream()
-        .toList();
+    return userStatusRepository.findAll();
   }
 
+  @Transactional
   @Override
   public UserStatus update(UUID userStatusId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
@@ -63,26 +67,29 @@ public class BasicUserStatusService implements UserStatusService {
             () -> new NoSuchElementException("UserStatus with id " + userStatusId + " not found"));
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+    return userStatus;
   }
 
+  @Transactional
   @Override
   public UserStatus updateByUserId(UUID userId, UserStatusUpdateRequest request) {
     Instant newLastActiveAt = request.newLastActiveAt();
 
-    UserStatus userStatus = userStatusRepository.findByUserId(userId)
+    UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
         .orElseThrow(
             () -> new NoSuchElementException("UserStatus with userId " + userId + " not found"));
     userStatus.update(newLastActiveAt);
 
-    return userStatusRepository.save(userStatus);
+    return userStatus;
   }
 
+  @Transactional
   @Override
   public void delete(UUID userStatusId) {
-    if (!userStatusRepository.existsById(userStatusId)) {
-      throw new NoSuchElementException("UserStatus with id " + userStatusId + " not found");
-    }
-    userStatusRepository.deleteById(userStatusId);
+    UserStatus userStatus = userStatusRepository.findById(userStatusId)
+        .orElseThrow(() -> new NoSuchElementException(
+            "UserStatus with id " + userStatusId + " not found"));
+
+    userStatus.getUser().assignStatus(null);
   }
 }
