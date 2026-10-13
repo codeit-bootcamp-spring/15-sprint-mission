@@ -3,7 +3,19 @@ create database discodeit;
 create user discodeit_user WITH PASSWORD 'discodeit1234';
 GRANT CONNECT ON DATABASE discodeit TO discodeit_user;
 
--- 위 3줄 디비버에서 실행한 후 생성한 유저로 연결했습니다.
+GRANT CONNECT ON DATABASE discodeit TO discodeit_user;
+
+GRANT USAGE ON SCHEMA public TO discodeit_user;
+
+GRANT SELECT, INSERT, UPDATE, DELETE
+    ON ALL TABLES IN SCHEMA public
+    TO discodeit_user;
+
+GRANT USAGE, SELECT
+    ON ALL SEQUENCES IN SCHEMA public
+    TO discodeit_user;
+
+--위의 코드들 디비버에서 실행한 후 생성한 유저로 연결했습니다.
 
 CREATE TABLE binary_contents(
     id UUID PRIMARY KEY ,

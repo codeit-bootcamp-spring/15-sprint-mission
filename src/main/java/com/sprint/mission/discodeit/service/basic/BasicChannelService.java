@@ -45,7 +45,7 @@ public class BasicChannelService implements ChannelService {
 
         userRepository.findAllByIdIn(membersId).forEach(user ->
                 readStatusRepository.save(
-                        new ReadStatus(user, channel, Instant.MIN)
+                        new ReadStatus(user, channel, Instant.now())
                 )
         );
 
