@@ -1,14 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
-import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,12 +32,12 @@ public class MessageController {
 
   @Tag(name = "메세지 생성")
   @PostMapping
-  public ResponseEntity<ApiResponse<Message>> createMessage(
-      @Valid @ModelAttribute MessageCreateRequest request,
-      @RequestParam(required = false) List<MultipartFile> multipartFile) throws IOException {
+  public ResponseEntity<MessageDto> createMessage(
+      @Valid @RequestPart("messageCreateRequest") MessageCreateRequest request,
+      @RequestParam(required = false) List<MultipartFile> attachments) throws IOException {
     List<BinaryContentCreateRequest> profile = new ArrayList<>();
-    if (multipartFile != null && !multipartFile.isEmpty()) {
-      for (MultipartFile file : multipartFile) {
+    if (attachments != null && !attachments.isEmpty()) {
+      for (MultipartFile file : attachments) {
         validateImageFile(file);
         byte[] photo = file.getBytes();
         String fileName = file.getOriginalFilename();
@@ -42,8 +45,8 @@ public class MessageController {
         profile.add(new BinaryContentCreateRequest(fileName, extension, photo));
       }
     }
-    Message message = messageService.create(request, profile);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(message));
+    MessageDto message = messageService.create(request, profile);
+    return ResponseEntity.status(HttpStatus.CREATED).body(message);
   }
 
   @Tag(name = "메세지 첨부파일 검증")
@@ -64,24 +67,26 @@ public class MessageController {
 
   @Tag(name = "메세지 수정")
   @PatchMapping("/{messageId}")
-  public ResponseEntity<ApiResponse<Message>> updateMessage(
+  public ResponseEntity<MessageDto> updateMessage(
       @PathVariable("messageId") UUID messageId,
       @Valid @ModelAttribute MessageUpdateRequest request) {
-    Message message = messageService.update(messageId, request);
-    return ResponseEntity.ok().body(ApiResponse.success(message));
+    MessageDto message = messageService.update(messageId, request);
+    return ResponseEntity.ok().body(message);
   }
 
   @Tag(name = "채널 전체 메시지 호출")
   @GetMapping()
-  public ResponseEntity<ApiResponse<List<Message>>> findAllInChannel(
-      @RequestParam("channelId") UUID channelId) {
-    List<Message> list = messageService.findAllByChannelId(channelId);
-    return ResponseEntity.ok().body(ApiResponse.success(list));
+  public ResponseEntity<PageResponse<MessageDto>> findAllInChannel(
+      @RequestParam("channelId") UUID channelId,
+      @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
+      Pageable pageable) {
+    PageResponse<MessageDto> list = messageService.findAllByChannelId(channelId, pageable);
+    return ResponseEntity.ok().body(list);
   }
 
   @Tag(name = "메세지 삭제")
   @DeleteMapping("/{messageId}")
-  public ResponseEntity<ApiResponse<Void>> deleteMessage(
+  public ResponseEntity<Void> deleteMessage(
       @PathVariable("messageId") UUID messageId) {
     messageService.delete(messageId);
     return ResponseEntity.noContent().build();
