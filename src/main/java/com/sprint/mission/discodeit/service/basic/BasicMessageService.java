@@ -13,6 +13,7 @@ import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,6 +29,7 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
 
 
     @Transactional
@@ -44,9 +46,9 @@ public class BasicMessageService implements MessageService {
                     String fileName = attachmentRequest.fileName();
                     String contentType = attachmentRequest.contentType();
                     byte[] bytes = attachmentRequest.bytes();
-
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long) bytes.length, contentType, bytes);
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType);
                     BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(createdBinaryContent.getId(),bytes);
                     return createdBinaryContent;
                 })
                 .toList();
@@ -65,7 +67,7 @@ public class BasicMessageService implements MessageService {
         return messages.stream().map(message -> MessageDto.from(message)).toList();
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     @Override
     public MessageDto update(UUID id,MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(id)

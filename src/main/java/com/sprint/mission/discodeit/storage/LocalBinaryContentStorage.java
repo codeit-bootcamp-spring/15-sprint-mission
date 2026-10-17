@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.Response.BinaryContentDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.http.ContentDisposition;
 import org.springframework.http.HttpHeaders;
@@ -16,11 +16,16 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.NoSuchElementException;
-import java.util.Optional;
+import java.util.Comparator;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 @Component
+@ConditionalOnProperty(
+        prefix = "discodeit.storage",
+        name = "type",
+        havingValue = "local"
+)
 public class LocalBinaryContentStorage implements BinaryContentStorage{
 
     private final Path root;
@@ -29,6 +34,15 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
     public LocalBinaryContentStorage(@Value("${discodeit.storage.local.root-path}") String rootPath) {
         this.root = Paths.get(rootPath);
 
+
+    }
+    private Path resolvePath(UUID id) {
+        return root.resolve(id.toString());
+    }
+
+
+    @PostConstruct
+    private void init() {
         if (Files.notExists(root)) {
             try {
                 Files.createDirectories(root);
@@ -36,15 +50,6 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
                 throw new RuntimeException(e);
             }
         }
-    }
-    private Path resolvePath(UUID id) {
-        return root.resolve(id.toString());
-    }
-
-
-
-    private void init() {
-
     }
 
 

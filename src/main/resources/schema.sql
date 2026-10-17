@@ -22,8 +22,8 @@ CREATE TABLE binary_contents(
     created_at timestamptz NOT NULL ,
     file_name varchar(255) NOT NULL ,
     size bigint NOT NULL ,
-    content_type varchar(100) NOT NULL,
-    bytes bytea NOT NULL
+    content_type varchar(100) NOT NULL
+    --bytes bytea NOT NULL
 );
 
 CREATE TABLE users(

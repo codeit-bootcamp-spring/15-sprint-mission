@@ -18,7 +18,7 @@ public class BinaryContent extends BaseEntity {
     @Column(nullable = false,length = 100)
     private String contentType;
 
-    //@Column(nullable = false)
+    /*@Column(nullable = false)
     private byte[] bytes;//*/
 
     protected BinaryContent(){

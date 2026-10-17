@@ -67,4 +67,9 @@ public class BinaryContentController {
     }
 
     // todo 다운로드 추가 api/binaryContents/{binaryContentId}/download
+
+    @GetMapping("{binaryContentId}/download")
+    public ResponseEntity<?> download(@PathVariable UUID binaryContentId){
+        return binaryContentService.download(binaryContentId);
+    }
 }
