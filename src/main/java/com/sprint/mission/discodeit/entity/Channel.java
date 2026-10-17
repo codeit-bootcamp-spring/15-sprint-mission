@@ -1,38 +1,47 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.Instant;
 import java.util.UUID;
 
 @Getter
+@Entity // <-- 필수
+@Table(name = "channels")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Channel extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+  private String name;
+  private String description;
+  
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false, length = 20)
+  private ChannelType type;
 
-    private String name;
-    private String description;
-    private final ChannelType type;
+  public Channel(String name, String description, ChannelType type) {
+    super();
+    this.name = name;
+    this.description = description;
+    this.type = type;
+  }
 
-    public Channel(String name, String description) {
-        this(name, description, ChannelType.PUBLIC);
-    }
-//todo 이거 해야할꺼같다.
-    public Channel(String name, String description,ChannelType type)
-    {
-        super();
-        this.name = name;
-        this.description = description;
-        this.type = ( type != null )? type : ChannelType.PUBLIC;
-    }
-//todo 확인용
-    public void update(String name, String description)
-    {
-        this.name = name;
-        this.description = description;
-        touch();
-    }
+  public Channel(UUID id, String name, String description, ChannelType type) {
+    super(id);
+    this.name = name;
+    this.description = description;
+    this.type = type;
+  }
 
+  public void update(String name, String description) {
+    this.name = name;
+    this.description = description;
+  }
 }
-
-

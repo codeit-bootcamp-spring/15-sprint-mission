@@ -1,36 +1,60 @@
 package com.sprint.mission.discodeit.entity;
 
 
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.Getter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
-public class UserStatus extends BaseEntity{
+@Entity
+@Table(name = "user_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseUpdatableEntity {
 
-    private final UUID userId;
-    private Instant lastActiveAt;
+  @OneToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false, unique = true)
+  private User user;
 
-    public UserStatus(UUID userId, Instant lastActiveAt)
-    {
-        super();
-        this.userId = userId;
-        this.lastActiveAt = Instant.now();
+  @Column(name = "last_active_at", nullable = false)
+  private Instant lastActiveAt;
+
+  public UserStatus(User user, Instant lastActiveAt) {
+    super();
+    this.user = user;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public UserStatus(UUID id, User user, Instant lastActiveAt) {
+    super(id);
+    this.user = user;
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  public void updateLastActiveAt(Instant lastActiveAt) {
+    this.lastActiveAt = lastActiveAt;
+  }
+
+  private static final Duration ONLINE_THRESHOLD = Duration.ofMinutes(
+      5); // 온라인 판정 기준 (기존 프로젝트 기준에 맞춤)
+
+  public boolean isOnline() {
+    if (this.lastActiveAt == null) {
+      return false;
     }
-
-    // 서비스에서 호출하는 isOnline() 메서드
-    public boolean isOnline() {
-        if (this.lastActiveAt == null) {
-            return false;
-        }
-        return this.lastActiveAt.isAfter(Instant.now().minus(Duration.ofMinutes(5)));
-    }
-
-    public void update(Instant lastActiveAt) {
-        this.lastActiveAt = lastActiveAt;
-        touch();
-    }
+    return Instant.now().minus(ONLINE_THRESHOLD).isBefore(this.lastActiveAt);
+  }
 }

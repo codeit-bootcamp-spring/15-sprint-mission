@@ -54,10 +54,16 @@ public class ChannelController {
     return ResponseEntity.ok(response);
   }
 
-  @Operation(summary = "사용자별 채널 목록 조회", description = "특정 사용자가 참여/접근 가능한 채널 목록을 조회합니다.")
+  @Operation(summary = "채널 목록 조회", description = "userId가 주어지면 사용자별 채널 목록을 조회합니다.")
   @GetMapping
-  public ResponseEntity<List<ChannelResponseDto>> findAllByUserId(
-      @RequestParam("userId") UUID userId) {
+  public ResponseEntity<List<ChannelResponseDto>> findAll(
+      @RequestParam(value = "userId", required = false) UUID userId) {
+
+    // userId가 넘어오지 않았을 때 null 방어 (서비스의 findAllByUserId만 사용)
+    if (userId == null) {
+      return ResponseEntity.ok(List.of());
+    }
+
     List<ChannelResponseDto> response = channelService.findAllByUserId(userId);
     return ResponseEntity.ok(response);
   }
