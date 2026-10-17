@@ -18,7 +18,7 @@ abstract public class BaseEntity implements Serializable {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,updatable = false)
     @CreatedDate
     private Instant  createdAt;
 

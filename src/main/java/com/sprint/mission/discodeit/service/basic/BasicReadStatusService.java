@@ -39,7 +39,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
         if(readStatusRepository.existsByUserIdAndChannelId(readStatusCreateRequest.userId(),readStatusCreateRequest.channelId())){
             throw new IllegalArgumentException("해당 채널, 유저의 ReadStatus가 이미 존재합니다");
-        }
+        }// todo 멘토링 질문용 링크
 
         ReadStatus readStatus = new ReadStatus(user,channel,
                 readStatusCreateRequest.lastReadAt());
