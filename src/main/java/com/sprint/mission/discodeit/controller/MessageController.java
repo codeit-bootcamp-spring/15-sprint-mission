@@ -4,14 +4,15 @@ import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.MessageDto;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springdoc.core.converters.models.Pageable;
+import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Tag(name = "Message", description = "Message API")
@@ -128,9 +128,8 @@ public class MessageController {
             description = "채널의 메세지 목록 조회 성공"
     )
     @GetMapping
-    public ResponseEntity<List<MessageDto>> getAllByChannelId(@RequestParam("channelId") UUID channelId) {
-        List<MessageDto> messageDtos = messageService.findAllByChannelId(channelId);
-
+    public ResponseEntity<Slice<MessageDto>> getAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
+        Slice<MessageDto> messageDtos = messageService.findAllByChannelId(channelId,page);
         return ResponseEntity.ok(messageDtos);
     }
 }
