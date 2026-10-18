@@ -4,6 +4,8 @@ import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.MessageDto;
+import com.sprint.mission.discodeit.dto.Response.PageResponse;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -128,8 +130,9 @@ public class MessageController {
             description = "채널의 메세지 목록 조회 성공"
     )
     @GetMapping
-    public ResponseEntity<Slice<MessageDto>> getAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
+    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
         Slice<MessageDto> messageDtos = messageService.findAllByChannelId(channelId,page);
-        return ResponseEntity.ok(messageDtos);
+
+        return ResponseEntity.ok(PageResponseMapper.fromSlice(messageDtos));
     }
 }
