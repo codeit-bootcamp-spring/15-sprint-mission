@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @EntityListeners(AuditingEntityListener.class)
 @MappedSuperclass
-abstract public class BaseEntity implements Serializable {
+abstract public class BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
