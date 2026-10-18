@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
 import com.sprint.mission.discodeit.dto.Response.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -22,6 +23,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -66,10 +68,43 @@ public class BasicMessageService implements MessageService {
 
     @Transactional(readOnly = true)
     @Override
-    public Slice<MessageDto> findAllByChannelId(UUID channelId, int page){
-        Pageable pageable = PageRequest.of(page,50, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<MessageDto> messages = messageRepository.findAllByChannelIdJoinUser(channelId,pageable).map(MessageDto::from);
-        return messages;
+    public MessageCursorResponse<MessageDto> findAllByChannelId(
+            UUID channelId,
+            Instant cursor,
+            Pageable pageable
+    ) {
+        Slice<Message> messages;
+
+        if (cursor == null) {
+            messages = messageRepository.findAllByChannelIdJoinUser(
+                    channelId, pageable
+            );
+        } else {
+            messages = messageRepository.findAllByChannelIdBeforeCursor(
+                    channelId, cursor, pageable
+            );
+        }
+
+        List<MessageDto> content = messages.getContent()
+                .stream()
+                .map(MessageDto::from)
+                .toList();
+
+        String nextCursor = null;
+
+        if (messages.hasNext() && !messages.getContent().isEmpty()) {
+            Message lastMessage = messages.getContent()
+                    .get(messages.getNumberOfElements() - 1);
+
+            nextCursor = lastMessage.getCreatedAt().toString();
+        }
+
+        return new MessageCursorResponse<>(
+                content,
+                nextCursor,
+                messages.getSize(),
+                messages.hasNext()
+        );
     }
 
     @Transactional

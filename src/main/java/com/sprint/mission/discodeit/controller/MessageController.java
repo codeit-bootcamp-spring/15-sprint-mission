@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
 import com.sprint.mission.discodeit.dto.Response.MessageDto;
 import com.sprint.mission.discodeit.dto.Response.PageResponse;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
@@ -12,9 +13,11 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springdoc.core.converters.models.Pageable;
 import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -23,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -130,9 +134,17 @@ public class MessageController {
             description = "채널의 메세지 목록 조회 성공"
     )
     @GetMapping
-    public ResponseEntity<PageResponse<MessageDto>> getAllByChannelId(@RequestParam("channelId") UUID channelId, @RequestParam(defaultValue = "0") int page) {
-        Slice<MessageDto> messageDtos = messageService.findAllByChannelId(channelId,page);
-
-        return ResponseEntity.ok(PageResponseMapper.fromSlice(messageDtos));
+    public MessageCursorResponse<MessageDto> getAllByChannelId(
+            @RequestParam UUID channelId,
+            @RequestParam(required = false) Instant cursor,
+            @PageableDefault(
+                    size = 50,
+                    sort = "createdAt",
+                    direction = Sort.Direction.DESC
+            ) Pageable pageable
+    ) {
+        return messageService.findAllByChannelId(
+                channelId, cursor, pageable
+        );
     }
 }
