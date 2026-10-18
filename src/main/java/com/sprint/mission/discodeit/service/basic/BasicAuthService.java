@@ -20,6 +20,7 @@ public class BasicAuthService implements AuthService {
   private final UserStatusRepository statuses;
   private final UserMapper userMapper;
 
+
   public UserDto login(LoginRequest request) {
     Optional<User> result = users.findByUsername(request.username());
     if (result.isEmpty() || !result.get().getPassword().equals(request.password())) {

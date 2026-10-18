@@ -8,7 +8,9 @@ import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -54,10 +56,17 @@ public class BasicMessageService implements MessageService {
   }
 
   @Transactional(readOnly = true)
-  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Pageable pageable) {
-    Slice<MessageDto> slice = messageRepository.findAllByChannelId(channelId, pageable)
-        .map(messageMapper::toDto);
-    return pageResponseMapper.fromSlice(slice);
+  public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor,
+      Pageable pageable) {
+    // 커서 방식에는 "몇 번째 페이지" 개념이 없으니 page는 항상 0으로 고정
+    Pageable firstPage = PageRequest.of(0, pageable.getPageSize(), pageable.getSort());
+
+    Slice<Message> slice = (cursor == null)
+        ? messageRepository.findAllByChannelId(channelId, firstPage)
+        : messageRepository.findAllByChannelIdAndCreatedAtLessThan(channelId, cursor, firstPage);
+
+    Slice<MessageDto> dtoSlice = slice.map(messageMapper::toDto);
+    return pageResponseMapper.fromSlice(dtoSlice, MessageDto::createdAt);
   }
 
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {

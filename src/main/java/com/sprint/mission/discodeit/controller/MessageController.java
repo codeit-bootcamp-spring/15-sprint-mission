@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -79,8 +80,8 @@ public class MessageController {
   public ResponseEntity<PageResponse<MessageDto>> findAllInChannel(
       @RequestParam("channelId") UUID channelId,
       @PageableDefault(size = 50, sort = "createdAt", direction = Sort.Direction.DESC)
-      Pageable pageable) {
-    PageResponse<MessageDto> list = messageService.findAllByChannelId(channelId, pageable);
+      Pageable pageable, @RequestParam(value = "cursor", required = false) Instant cursor) {
+    PageResponse<MessageDto> list = messageService.findAllByChannelId(channelId, cursor, pageable);
     return ResponseEntity.ok().body(list);
   }
 

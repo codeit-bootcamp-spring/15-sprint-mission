@@ -44,11 +44,13 @@ public class BasicUserService implements UserService {
     return userMapper.toDto(user);
   }
 
+  @Transactional(readOnly = true)
   public UserDto find(UUID id) {
     return userMapper.toDto(users.findById(id)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User")));
   }
 
+  @Transactional(readOnly = true)
   public List<UserDto> findAll() {
     List<UserDto> result = new ArrayList<>();
     for (User user : users.findAll()) {

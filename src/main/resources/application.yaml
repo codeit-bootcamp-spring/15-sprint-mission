@@ -7,12 +7,14 @@ spring:
     password: discodeit1234
 
   jpa:
+    open-in-view: false
     hibernate:
       ddl-auto: create
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
         format_sql: true
+        default_batch_fetch_size: 100
 
 logging:
   level:
