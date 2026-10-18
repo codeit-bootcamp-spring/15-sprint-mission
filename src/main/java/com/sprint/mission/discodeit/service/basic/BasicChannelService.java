@@ -4,7 +4,6 @@ import com.sprint.mission.discodeit.dto.Request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Response.ChannelDto;
-import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -13,10 +12,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Service
@@ -56,13 +53,13 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelDto toChannelResponse(Channel channel){
-        List<User> users = readStatusRepository.findAllByChannelId(channel.getId()).stream()
+        List<User> users = readStatusRepository.findAllByChannelIdJoinUser(channel.getId()).stream()
                 .map(readStatus -> readStatus.getUser()).toList();
 
 
-        Instant latestMessageAt = messageRepository.findLastMessageAt(channel.getId()).orElse(Instant.MIN);
+        Instant lastMessageAt = messageRepository.findLastMessageAt(channel.getId()).orElse(Instant.now());
 
-        return  ChannelDto.from(channel,users,latestMessageAt);
+        return  ChannelDto.from(channel,users,lastMessageAt);
     }
 
 
@@ -70,20 +67,42 @@ public class BasicChannelService implements ChannelService {
     @Override
     @Transactional(readOnly = true)
     public List<ChannelDto> findAllByUserId(UUID userId) {
-        List<Channel> publicChannels = channelRepository.findAllByTypeEquals(ChannelType.PUBLIC);
-        List<Channel> privateChannels = readStatusRepository.findAllByUserId(userId).stream()
-                .map(readStatus -> readStatus.getChannel()).filter(channel -> channel.getType()==ChannelType.PRIVATE).toList();
+        List<Channel> channels = channelRepository.findAllVisibleToUser(userId,
+                ChannelType.PUBLIC,ChannelType.PRIVATE);
 
-        List<Channel> concatList = new ArrayList<>();
-        List<ChannelDto> resultList;
+        if (channels.isEmpty()) {
+            return List.of();
+        }
 
-        concatList.addAll(publicChannels);
-        concatList.addAll(privateChannels);
+        List<UUID> channelIds = channels.stream()
+                .map(Channel::getId)
+                .toList();
 
-        resultList = concatList.stream().map(this::toChannelResponse).toList();
+        Map<UUID, List<User>> usersByChannelId =
+                readStatusRepository.findAllByChannelIdsJoinUserDetails(channelIds)
+                        .stream()
+                        .collect(Collectors.groupingBy(
+                                rs -> rs.getChannel().getId(),
+                                Collectors.mapping(ReadStatus::getUser, Collectors.toList())
+                        ));
 
+        Map<UUID, Instant> latestMessageAtByChannelId =
+                messageRepository.findLastMessageAtByChannelIds(channelIds)
+                        .stream()
+                        .collect(Collectors.toMap(
+                                ChannelLastMessageAt::getChannelId,
+                                ChannelLastMessageAt::getLatestMessageAt
+                        ));
 
-        return resultList;
+        return channels.stream()
+                .map(channel -> ChannelDto.from(
+                        channel,
+                        usersByChannelId.getOrDefault(channel.getId(), List.of()),
+                        latestMessageAtByChannelId.getOrDefault(
+                                channel.getId(), Instant.now()
+                        )
+                ))
+                .toList();
     }
 
 

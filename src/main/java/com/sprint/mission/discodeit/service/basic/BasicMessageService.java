@@ -15,7 +15,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.boot.data.autoconfigure.web.DataWebProperties;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -69,7 +68,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public Slice<MessageDto> findAllByChannelId(UUID channelId, int page){
         Pageable pageable = PageRequest.of(page,50, Sort.by(Sort.Direction.DESC, "createdAt"));
-        Slice<MessageDto> messages = messageRepository.findAllByChannelId(channelId,pageable).map(MessageDto::from);
+        Slice<MessageDto> messages = messageRepository.findAllByChannelIdJoinUser(channelId,pageable).map(MessageDto::from);
         return messages;
     }
 

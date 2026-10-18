@@ -7,8 +7,6 @@ import com.sprint.mission.discodeit.dto.Request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.dto.Response.UserStatusDto;
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;

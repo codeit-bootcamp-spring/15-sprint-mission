@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.*;
 
@@ -21,7 +22,7 @@ public class Message extends BaseUpdatableEntity {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-
+    @BatchSize(size = 50)
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "message_attachments",

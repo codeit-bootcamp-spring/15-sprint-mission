@@ -69,7 +69,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAll() {
 
-        return userRepository.findAll().stream().map(UserDto::from).toList();
+        return userRepository.findAllJoinProfileAndStatus().stream().map(UserDto::from).toList();
     }
 
     @Transactional
