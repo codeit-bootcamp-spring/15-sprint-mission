@@ -1,137 +1,67 @@
-// API 주소
+// API endpoints
 const API_BASE_URL = '/api';
-
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/users/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binarycontents/find`
+    USERS: `${API_BASE_URL}/user/findAll`,
+    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
 };
 
-
-// HTML이 모두 로딩되면 사용자 목록 조회
+// Initialize the application
 document.addEventListener('DOMContentLoaded', () => {
     fetchAndRenderUsers();
 });
 
-
-// 사용자 목록 조회
+// Fetch users from the API
 async function fetchAndRenderUsers() {
-
     try {
-
-        // 백엔드 API 호출
         const response = await fetch(ENDPOINTS.USERS);
-
-        if (!response.ok) {
-            throw new Error('사용자 목록 조회 실패');
-        }
-
-        // JSON → JavaScript 객체
+        if (!response.ok) throw new Error('Failed to fetch users');
         const users = await response.json();
-
-        // 화면에 사용자 출력
         renderUserList(users);
-
     } catch (error) {
-
-        console.error('사용자 조회 오류:', error);
-
+        console.error('Error fetching users:', error);
     }
 }
 
-
-// 프로필 이미지 조회
+// Fetch user profile image
 async function fetchUserProfile(profileId) {
-
     try {
-
-        const response = await fetch(
-            `${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${profileId}`
-        );
-
-        if (!response.ok) {
-            throw new Error('프로필 이미지 조회 실패');
-        }
-
+        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${profileId}`);
+        if (!response.ok) throw new Error('Failed to fetch profile');
         const profile = await response.json();
 
-        // BinaryContent의 byte[] content는
-        // JSON으로 전달될 때 Base64 문자열로 전달됨
-        return `data:${profile.contentType};base64,${profile.content}`;
-
+        // Convert base64 encoded bytes to data URL
+        return `data:${profile.contentType};base64,${profile.bytes}`;
     } catch (error) {
-
-        console.error('프로필 이미지 조회 오류:', error);
-
-        // 이미지 조회 실패 시 기본 이미지
-        return '/images/default-avatar.png';
+        console.error('Error fetching profile:', error);
+        return '/default-avatar.png'; // Fallback to default avatar
     }
 }
 
-
-// 사용자 목록 화면 생성
+// Render user list
 async function renderUserList(users) {
+    const userListElement = document.getElementById('userList');
+    userListElement.innerHTML = ''; // Clear existing content
 
-    const userListElement =
-        document.getElementById('userList');
-
-    // 기존 내용 제거
-    userListElement.innerHTML = '';
-
-
-    // 사용자 한 명씩 화면 생성
     for (const user of users) {
-
-        const userElement =
-            document.createElement('div');
-
+        const userElement = document.createElement('div');
         userElement.className = 'user-item';
 
+        // Get profile image URL
+        const profileUrl = user.profileId ?
+            await fetchUserProfile(user.profileId) :
+            '/default-avatar.png';
 
-        // 프로필 이미지 결정
-        let profileUrl;
-
-        if (user.profileId) {
-
-            profileUrl =
-                await fetchUserProfile(user.profileId);
-
-        } else {
-
-            profileUrl =
-                '/images/default-avatar.png';
-        }
-
-
-        // HTML 생성
         userElement.innerHTML = `
-
-            <img
-                src="${profileUrl}"
-                alt="${user.username}"
-                class="user-avatar"
-            >
-
+            <img src="${profileUrl}" alt="${user.username}" class="user-avatar">
             <div class="user-info">
-
-                <div class="user-name">
-                    ${user.username}
-                </div>
-
-                <div class="user-email">
-                    ${user.email}
-                </div>
-
+                <div class="user-name">${user.username}</div>
+                <div class="user-email">${user.email}</div>
             </div>
-
             <div class="status-badge ${user.online ? 'online' : 'offline'}">
-
                 ${user.online ? '온라인' : '오프라인'}
-
             </div>
         `;
 
-
-        // 사용자 목록에 추가
         userListElement.appendChild(userElement);
     }
 }

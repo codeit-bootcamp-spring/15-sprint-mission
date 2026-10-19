@@ -1,36 +1,38 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-
 import java.time.Instant;
-import java.util.UUID;
 
+@Entity
+@Table(name = "read_statuses")
 @Getter
-public class ReadStatus implements java.io.Serializable {
+public class ReadStatus extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private UUID channelId;
-    private UUID userId;
-    private Instant lastReadAt;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "user_id", nullable = false)
+  private User user;
 
-    public ReadStatus(UUID channelId, UUID userId) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.channelId = channelId;
-        this.userId = userId;
-        this.lastReadAt = null;
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "channel_id", nullable = false)
+  private Channel channel;
+
+  @Column(name = "last_read_at")
+  private Instant lastReadAt;
+
+  protected ReadStatus() {
+  }
+
+  public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+    this.user = user;
+    this.channel = channel;
+    this.lastReadAt = lastReadAt;
+  }
+
+  public void update(Instant newLastReadAt) {
+    if (newLastReadAt != null && !newLastReadAt.equals(this.lastReadAt)) {
+      this.lastReadAt = newLastReadAt;
     }
-
-    public void updateLastReadAt(Instant lastReadAt) {
-
-        if (lastReadAt == null) {
-            throw new IllegalArgumentException("읽은 시간이 필요합니다.");
-        }
-
-        this.lastReadAt = lastReadAt;
-        this.updatedAt = Instant.now();
-    }
+  }
 }

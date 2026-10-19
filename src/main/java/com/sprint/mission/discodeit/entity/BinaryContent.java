@@ -1,47 +1,31 @@
 package com.sprint.mission.discodeit.entity;
 
-
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "binary_contents")
 @Getter
-public final class BinaryContent implements Serializable {
+public class BinaryContent extends BaseEntity {
 
-    private final UUID id;
-    private final Instant createdAt;
-    private final String contentType;
-    private final String fileName;
-    private final long fileSize;
-    private final byte[] content;
+  @Column(name = "file_name")
+  private String fileName;
 
-    public BinaryContent(
-            String contentType,
-            String fileName,
-            long fileSize,
-            byte[] content
-    ) {
+  @Column(name = "size")
+  private Long size;
 
-        if (content == null) {
-            throw new IllegalArgumentException(
-                    "파일 내용은 null일 수 없습니다."
-            );
-        }
+  @Column(name = "content_type")
+  private String contentType;
 
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.contentType = contentType;
-        this.fileName = fileName;
-        this.fileSize = fileSize;
+  protected BinaryContent() {
+  }
 
-        // 중요
-        this.content = content.clone();
-    }
-
-    // byte[]만 직접 getter 작성
-    public byte[] getContent() {
-        return content.clone();
-    }
+  public BinaryContent(String fileName, Long size, String contentType) {
+    this.fileName = fileName;
+    this.size = size;
+    this.contentType = contentType;
+  }
 }

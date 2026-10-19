@@ -1,51 +1,43 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Table;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.UUID;
-
+@Entity
+@Table(name = "channels")
 @Getter
-public class Channel implements Serializable {
+public class Channel extends BaseUpdatableEntity {
 
-    private UUID id;
-    private Instant createdAt;
-    private Instant updatedAt;
-    private String channelName;
-    private String channelDescription;
-    private ChannelType type;
-    private UUID ownerId;
+  @Enumerated(EnumType.STRING)
+  @Column(name = "type", nullable = false)
+  private ChannelType type;
 
+  @Column(name = "name")
+  private String name;
 
-    public Channel(
-            UUID ownerId,
-            String channelName,
-            String channelDescription,
-            ChannelType type
-    ) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now();
-        this.updatedAt = this.createdAt;
-        this.ownerId = ownerId;
-        this.channelName = channelName;
-        this.channelDescription = channelDescription;
-        this.type = type;
+  @Column(name = "description")
+  private String description;
+
+  protected Channel() {
+  }
+
+  public Channel(ChannelType type, String name, String description) {
+    this.type = type;
+    this.name = name;
+    this.description = description;
+  }
+
+  public void update(String newName, String newDescription) {
+    if (newName != null && !newName.equals(this.name)) {
+      this.name = newName;
     }
-
-    public void update(
-            String channelName,
-            String channelDescription
-    ) {
-
-        if (channelName != null) {
-            this.channelName = channelName;
-        }
-
-        if (channelDescription != null) {
-            this.channelDescription = channelDescription;
-        }
-
-        this.updatedAt = Instant.now();
+    if (newDescription != null && !newDescription.equals(this.description)) {
+      this.description = newDescription;
     }
+  }
 }
