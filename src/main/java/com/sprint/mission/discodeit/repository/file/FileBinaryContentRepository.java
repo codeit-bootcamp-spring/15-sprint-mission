@@ -89,6 +89,8 @@ public class FileBinaryContentRepository implements BinaryContentRepository {
     public boolean existsById(UUID id) {
         return Files.exists(path(id));
     }
+
+    @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
         List<BinaryContent> result = new ArrayList<>();
         for (UUID id : ids) {
