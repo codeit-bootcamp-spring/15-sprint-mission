@@ -4,7 +4,6 @@ package com.sprint.mission.discodeit.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 
-import java.util.UUID;
 
 @Table(name = "users")
 @Entity

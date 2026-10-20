@@ -6,7 +6,6 @@ import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
 import com.sprint.mission.discodeit.dto.Response.MessageDto;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
 
 import java.time.Instant;
 import java.util.List;

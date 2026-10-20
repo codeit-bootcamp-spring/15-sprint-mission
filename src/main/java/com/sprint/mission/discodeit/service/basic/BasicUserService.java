@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -28,6 +29,7 @@ public class BasicUserService implements UserService {
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
     @Transactional
     @Override
@@ -60,7 +62,7 @@ public class BasicUserService implements UserService {
         userRepository.save(user);
         userStatusRepository.save(userStatus);
 
-        return UserDto.from(user);
+        return userMapper.toDto(user);
     }
 
 
@@ -69,7 +71,7 @@ public class BasicUserService implements UserService {
     @Override
     public List<UserDto> findAll() {
 
-        return userRepository.findAllJoinProfileAndStatus().stream().map(UserDto::from).toList();
+        return userRepository.findAllJoinProfileAndStatus().stream().map(userMapper::toDto).toList();
     }
 
     @Transactional
@@ -122,7 +124,7 @@ public class BasicUserService implements UserService {
 
 
         user.update(email, password, name, profile);
-        return UserDto.from(user);
+        return userMapper.toDto(user);
 
     }
 

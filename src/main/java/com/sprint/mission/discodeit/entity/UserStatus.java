@@ -5,7 +5,6 @@ import lombok.Getter;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.UUID;
 
 @Table(name = "user_statuses")
 @Entity

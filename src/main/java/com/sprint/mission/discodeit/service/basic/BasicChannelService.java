@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.Response.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +24,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserRepository userRepository;
+    private final ChannelMapper channelMapper;
 
 
     @Override
@@ -59,7 +61,7 @@ public class BasicChannelService implements ChannelService {
 
         Instant lastMessageAt = messageRepository.findLastMessageAt(channel.getId()).orElse(Instant.now());
 
-        return  ChannelDto.from(channel,users,lastMessageAt);
+        return  channelMapper.toDto(channel,users,lastMessageAt);
     }
 
 
@@ -95,7 +97,7 @@ public class BasicChannelService implements ChannelService {
                         ));
 
         return channels.stream()
-                .map(channel -> ChannelDto.from(
+                .map(channel -> channelMapper.toDto(
                         channel,
                         usersByChannelId.getOrDefault(channel.getId(), List.of()),
                         latestMessageAtByChannelId.getOrDefault(

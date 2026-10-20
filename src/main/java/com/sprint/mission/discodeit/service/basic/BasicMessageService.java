@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -16,10 +17,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +35,8 @@ public class BasicMessageService implements MessageService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final BinaryContentStorage binaryContentStorage;
+    private final MessageMapper messageMapper;
+
 
 
     @Transactional
@@ -62,7 +63,7 @@ public class BasicMessageService implements MessageService {
         Message message = new Message(channel,user,
                 messageCreateRequest.content(), attachments);
         messageRepository.save(message);
-        return MessageDto.from(message);
+        return messageMapper.toDto(message);
     }
 
 
@@ -87,7 +88,7 @@ public class BasicMessageService implements MessageService {
 
         List<MessageDto> content = messages.getContent()
                 .stream()
-                .map(MessageDto::from)
+                .map(messageMapper::toDto)
                 .toList();
 
         String nextCursor = null;
@@ -113,7 +114,7 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
         message.update(messageUpdateRequest.newContent());
-        return MessageDto.from(message);
+        return messageMapper.toDto(message);
     }
 
     @Transactional
