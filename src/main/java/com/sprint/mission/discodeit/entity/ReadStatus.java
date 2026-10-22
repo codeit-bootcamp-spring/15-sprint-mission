@@ -1,36 +1,49 @@
+
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class ReadStatus implements Serializable{
+@Entity
+@Table(
+    name = "read_statuses",
+    uniqueConstraints = @UniqueConstraint(
+        name = "uq_read_statuses_user_channel",
+        columnNames = {"user_id", "channel_id"}
+    )
+)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ReadStatus extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private final UUID id;
-    private final UUID userId;
-    private final UUID channelId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+
+    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
 
-    private final Instant createdAt;
-    private Instant updatedAt;
-
-    public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt){
-        this.id = UUID.randomUUID();
-        this.userId = userId;
-        this.channelId = channelId;
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        this.user = user;
+        this.channel = channel;
         this.lastReadAt = lastReadAt;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
     }
 
-    public void update(Instant lastReadAt){
+    public void update(Instant lastReadAt) {
         this.lastReadAt = lastReadAt;
-        this.updatedAt = Instant.now();
     }
 }

@@ -42,7 +42,7 @@ public class BasicReadStatusService implements ReadStatusService {
                 );
 
         if (readStatusRepository
-                .findByUserIdAndChannelId(request.userId(), request.channelId())
+                .findByUser_IdAndChannel_Id(request.userId(), request.channelId())
                 .isPresent()) {
             throw new IllegalArgumentException(
                     "이미 존재하는 읽음 상태입니다."
@@ -50,8 +50,10 @@ public class BasicReadStatusService implements ReadStatusService {
         }
 
         ReadStatus readStatus = new ReadStatus(
-                request.userId(),
-                request.channelId(),
+            userRepository.findById(request.userId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")),
+            channelRepository.findById(request.channelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다.")),
                 request.lastReadAt()
         );
 
@@ -59,8 +61,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
         return new ReadStatusDto(
                 savedReadStatus.getId(),
-                savedReadStatus.getUserId(),
-                savedReadStatus.getChannelId(),
+                savedReadStatus.getUser().getId(),
+                savedReadStatus.getChannel().getId(),
                 savedReadStatus.getLastReadAt(),
                 savedReadStatus.getCreatedAt(),
                 savedReadStatus.getUpdatedAt()
@@ -77,8 +79,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
         return new ReadStatusDto(
                 readStatus.getId(),
-                readStatus.getUserId(),
-                readStatus.getChannelId(),
+                readStatus.getUser().getId(),
+                readStatus.getChannel().getId(),
                 readStatus.getLastReadAt(),
                 readStatus.getCreatedAt(),
                 readStatus.getUpdatedAt()
@@ -95,12 +97,12 @@ public class BasicReadStatusService implements ReadStatusService {
                         )
                 );
 
-        return readStatusRepository.findAllByUserId(userId)
+        return readStatusRepository.findAllByUser_Id(userId)
                 .stream()
                 .map(readStatus -> new ReadStatusDto(
                         readStatus.getId(),
-                        readStatus.getUserId(),
-                        readStatus.getChannelId(),
+                        readStatus.getUser().getId(),
+                        readStatus.getChannel().getId(),
                         readStatus.getLastReadAt(),
                         readStatus.getCreatedAt(),
                         readStatus.getUpdatedAt()
@@ -124,8 +126,8 @@ public class BasicReadStatusService implements ReadStatusService {
 
         return new ReadStatusDto(
                 savedReadStatus.getId(),
-                savedReadStatus.getUserId(),
-                savedReadStatus.getChannelId(),
+                savedReadStatus.getUser().getId(),
+                savedReadStatus.getChannel().getId(),
                 savedReadStatus.getLastReadAt(),
                 savedReadStatus.getCreatedAt(),
                 savedReadStatus.getUpdatedAt()

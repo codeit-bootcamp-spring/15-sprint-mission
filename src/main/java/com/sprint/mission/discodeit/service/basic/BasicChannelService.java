@@ -61,11 +61,11 @@ public class BasicChannelService implements ChannelService {
 
         if (channel.getType() == ChannelType.PRIVATE) {
             participantIds = readStatusRepository
-                    .findAllByChannelId(channel.getId()).stream()
-                    .map(ReadStatus::getUserId) .toList();
+                    .findAllByChannel_Id(channel.getId()).stream()
+                .map(readStatus -> readStatus.getUser().getId()) .toList();
         }
         java.time.Instant lastMessageAt = messageRepository
-                .findAllByChannelId(channel.getId()) .stream()
+                .findAllByChannel_Id(channel.getId()) .stream()
                 .map(message ->
                         message.getCreatedAt())
                 .max(java.time.Instant::compareTo)
@@ -95,7 +95,7 @@ public class BasicChannelService implements ChannelService {
                 .filter(channel ->
                         channel.getType() == ChannelType.PUBLIC
                 || readStatusRepository
-                                .findByUserIdAndChannelId(userId, channel.getId())
+                                .findByUser_IdAndChannel_Id(userId, channel.getId())
                                 .isPresent()
                 )
                 .map(channel -> {
@@ -104,14 +104,14 @@ public class BasicChannelService implements ChannelService {
 
                     if (channel.getType() == ChannelType.PRIVATE){
                         participantIds = readStatusRepository
-                                .findAllByChannelId(channel.getId())
+                                .findAllByChannel_Id(channel.getId())
                                 .stream()
-                                .map(ReadStatus::getUserId)
+                            .map(readStatus -> readStatus.getUser().getId())
                                 .toList();
                     }
 
                     java.time.Instant lastMessageAt = messageRepository
-                            .findAllByChannelId(channel.getId())
+                            .findAllByChannel_Id(channel.getId())
                             .stream()
                             .map(message -> message.getCreatedAt())
                             .max(java.time.Instant::compareTo)
@@ -151,7 +151,7 @@ public class BasicChannelService implements ChannelService {
         Channel savedChannel = channelRepository.save(channel);
 
         java.time.Instant lastMessageAt = messageRepository
-                .findAllByChannelId(savedChannel.getId())
+                .findAllByChannel_Id(savedChannel.getId())
                 .stream()
                 .map(message -> message.getCreatedAt())
                 .max(java.time.Instant::compareTo)
@@ -178,12 +178,12 @@ public class BasicChannelService implements ChannelService {
                         )
                 );
 
-        messageRepository.findAllByChannelId(id)
+        messageRepository.findAllByChannel_Id(id)
                 .forEach(message ->
                         messageRepository.deleteById(message.getId())
                 );
 
-        readStatusRepository.findAllByChannelId(id)
+        readStatusRepository.findAllByChannel_Id(id)
                 .forEach(readStatus ->
                         readStatusRepository.deleteById(readStatus.getId())
                 );
@@ -210,8 +210,9 @@ public class BasicChannelService implements ChannelService {
 
         request.participantIds().forEach(userId -> {
             ReadStatus readStatus = new ReadStatus(
-                    userId,
-                    savedChannel.getId(),
+                userRepository.findById(userId)
+                    .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")),
+                savedChannel,
                     java.time.Instant.now()
             );
             readStatusRepository.save(readStatus);

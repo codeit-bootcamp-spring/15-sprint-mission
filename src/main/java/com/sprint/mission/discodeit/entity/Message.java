@@ -1,44 +1,59 @@
+
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
 @Getter
-public class Message implements Serializable {
+@Entity
+@Table(name = "messages")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Message extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private final UUID id;
+    @Column(columnDefinition = "TEXT")
     private String content;
-    private UUID channelId;
-    private UUID authorId;
 
-    private List<UUID> attachmentIds;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
 
-    private final Instant createdAt;
-    private Instant updatedAt;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "author_id", nullable = false)
+    private User author;
 
-    public Message(
-            String content,
-            UUID channelId,
-            UUID authorId,
-            List<UUID> attachmentIds
-    ) {
-        this.id = UUID.randomUUID();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "message_attachments",
+        joinColumns = @JoinColumn(name = "message_id"),
+        inverseJoinColumns = @JoinColumn(name = "binary_content_id")
+    )
+    private List<BinaryContent> attachments = new ArrayList<>();
+
+    public Message(String content,
+        Channel channel,
+        User author,
+        List<BinaryContent> attachments) {
         this.content = content;
-        this.channelId = channelId;
-        this.authorId = authorId;
-        this.attachmentIds = attachmentIds;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
+        this.channel = channel;
+        this.author = author;
+
+        if (attachments != null) {
+            this.attachments.addAll(attachments);
+        }
     }
 
     public void update(String content) {
         this.content = content;
-        this.updatedAt = Instant.now();
     }
 }
