@@ -36,3 +36,9 @@ out/
 ### VS Code ###
 .vscode/
 .DS_Store
+
+# Uploaded files
+/storage/
+
+# Local database credentials
+/src/main/resources/application.yaml

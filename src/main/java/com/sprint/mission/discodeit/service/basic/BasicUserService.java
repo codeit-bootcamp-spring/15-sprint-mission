@@ -51,7 +51,7 @@ public class BasicUserService implements UserService {
             BinaryContent profile = new BinaryContent(
                     profileRequest.fileName(),
                     profileRequest.contentType(),
-                    profileRequest.bytes()
+                profileRequest.bytes().length
             );
 
             profileId = binaryContentRepository.save(profile).getId();
@@ -67,7 +67,7 @@ public class BasicUserService implements UserService {
         User savedUser = userRepository.save(user);
 
         UserStatus userStatus = new UserStatus(
-                savedUser.getId(),
+                savedUser,
                 Instant.now()
         );
 
@@ -94,7 +94,7 @@ public class BasicUserService implements UserService {
                         )
                 );
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
+        UserStatus userStatus = userStatusRepository.findByUser_Id(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
                                 "사용자 상태가 존재하지 않습니다. User ID: " + id
@@ -118,7 +118,7 @@ public class BasicUserService implements UserService {
         return userRepository.findAll().stream()
                 .map(user -> {
 
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                    UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
                             .orElseThrow(() ->
                                     new NoSuchElementException(
                                             "사용자 상태가 존재하지 않습니다. User ID: " + user.getId()
@@ -183,7 +183,7 @@ public class BasicUserService implements UserService {
             BinaryContent newProfile = new BinaryContent(
                     profileRequest.fileName(),
                     profileRequest.contentType(),
-                    profileRequest.bytes()
+                profileRequest.bytes().length
             );
 
             profileId = binaryContentRepository.save(newProfile).getId();
@@ -198,7 +198,7 @@ public class BasicUserService implements UserService {
 
         User savedUser = userRepository.save(user);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(savedUser.getId())
+        UserStatus userStatus = userStatusRepository.findByUser_Id(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
                                 "사용자 상태가 존재하지 않습니다. User ID: " + savedUser.getId()
@@ -226,7 +226,7 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteById(user.getProfileId());
         }
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
+        UserStatus userStatus = userStatusRepository.findByUser_Id(id)
                 .orElseThrow(() ->
                         new NoSuchElementException(
                                 "사용자 상태가 존재하지 않습니다. User ID: " + id )

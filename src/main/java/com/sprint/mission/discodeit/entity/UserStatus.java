@@ -1,39 +1,45 @@
+
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
 
 @Getter
-public class UserStatus implements Serializable {
+@Entity
+@Table(name = "user_statuses")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class UserStatus extends BaseEntity {
 
-    private static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
 
-    private final UUID id;
-    private final UUID userId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false, unique = true)
+    private User user;
 
+    @Column(name = "last_active_at", nullable = false)
     private Instant lastActiveAt;
 
-    private final Instant createdAt;
-    private Instant updatedAt;
-
-    public UserStatus(UUID userId, Instant lastActiveAt) {
-        this.id = UUID.randomUUID();
-        this.userId = userId;
+    public UserStatus(User user, Instant lastActiveAt) {
+        this.user = user;
         this.lastActiveAt = lastActiveAt;
-        this.createdAt = Instant.now();
-        this.updatedAt = Instant.now();
     }
 
     public void update(Instant lastActiveAt) {
         this.lastActiveAt = lastActiveAt;
-        this.updatedAt = Instant.now();
     }
 
     public boolean isOnline() {
-        return Duration.between(lastActiveAt, Instant.now()).toMinutes() <= 5;
+        return lastActiveAt != null
+            && !lastActiveAt.isAfter(Instant.now())
+            && Duration.between(lastActiveAt, Instant.now()).toMinutes() <= 5;
     }
 }

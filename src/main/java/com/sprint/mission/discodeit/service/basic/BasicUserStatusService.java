@@ -34,14 +34,15 @@ public class BasicUserStatusService implements UserStatusService {
                         )
                 );
 
-        if (userStatusRepository.findByUserId(request.userId()).isPresent()) {
+        if (userStatusRepository.findByUser_Id(request.userId()).isPresent()) {
             throw new IllegalArgumentException(
                     "이미 존재하는 사용자 상태입니다."
             );
         }
 
         UserStatus userStatus = new UserStatus(
-                request.userId(),
+            userRepository.findById(request.userId())
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다.")),
                 request.lastActiveAt()
         );
 
@@ -49,7 +50,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         return new UserStatusDto(
                 savedUserStatus.getId(),
-                savedUserStatus.getUserId(),
+                savedUserStatus.getUser().getId(),
                 savedUserStatus.getLastActiveAt(),
                 savedUserStatus.isOnline(),
                 savedUserStatus.getCreatedAt(),
@@ -69,7 +70,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         return new UserStatusDto(
                 userStatus.getId(),
-                userStatus.getUserId(),
+                userStatus.getUser().getId(),
                 userStatus.getLastActiveAt(),
                 userStatus.isOnline(),
                 userStatus.getCreatedAt(),
@@ -84,7 +85,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .stream()
                 .map(userStatus -> new UserStatusDto(
                         userStatus.getId(),
-                        userStatus.getUserId(),
+                        userStatus.getUser().getId(),
                         userStatus.getLastActiveAt(),
                         userStatus.isOnline(),
                         userStatus.getCreatedAt(),
@@ -109,7 +110,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         return new UserStatusDto(
                 savedUserStatus.getId(),
-                savedUserStatus.getUserId(),
+                savedUserStatus.getUser().getId(),
                 savedUserStatus.getLastActiveAt(),
                 savedUserStatus.isOnline(),
                 savedUserStatus.getCreatedAt(),
@@ -120,7 +121,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto updateByUserId(UUID userId, Instant lastActiveAt) {
 
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+        UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
                 .orElseThrow(() ->
                         new NoSuchElementException(
                                 "존재하지 않는 사용자 상태입니다. User ID: " + userId
@@ -133,7 +134,7 @@ public class BasicUserStatusService implements UserStatusService {
 
         return new UserStatusDto(
                 savedUserStatus.getId(),
-                savedUserStatus.getUserId(),
+                savedUserStatus.getUser().getId(),
                 savedUserStatus.getLastActiveAt(),
                 savedUserStatus.isOnline(),
                 savedUserStatus.getCreatedAt(),

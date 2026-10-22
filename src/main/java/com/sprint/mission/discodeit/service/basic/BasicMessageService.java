@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
+
+import com.sprint.mission.discodeit.service.BinaryContentService;
+import org.springframework.transaction.annotation.Transactional;
 import com.sprint.mission.discodeit.dto.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
@@ -27,7 +30,10 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final BinaryContentRepository binaryContentRepository;
 
+  private final BinaryContentService binaryContentService;
+
     @Override
+    @Transactional
     public MessageDto create(MessageCreateRequest request) {
 
         userRepository.findById(request.authorId())
@@ -50,25 +56,19 @@ public class BasicMessageService implements MessageService {
             attachmentIds = List.of();
         } else {
             attachmentIds = request.attachments().stream()
-                    .map(attachmentRequest -> {
-                        BinaryContent binaryContent = new BinaryContent(
-                                attachmentRequest.fileName(),
-                                attachmentRequest.contentType(),
-                                attachmentRequest.bytes()
-                        );
-
-                        return binaryContentRepository
-                                .save(binaryContent)
-                                .getId();
-                    })
+                .map(attachmentRequest ->
+                    binaryContentService.create(attachmentRequest).id()
+                )
                     .toList();
         }
 
         Message message = new Message(
                 request.content(),
-                request.channelId(),
-                request.authorId(),
-                attachmentIds
+            channelRepository.findById(request.channelId())
+                .orElseThrow(() -> new IllegalArgumentException("채널을 찾을 수 없습니다.")),
+            userRepository.findById(request.authorId())
+                .orElseThrow(() -> new IllegalArgumentException("작성자를 찾을 수 없습니다.")),
+            binaryContentRepository.findAllById(attachmentIds)
         );
 
         Message savedMessage = messageRepository.save(message);
@@ -76,15 +76,18 @@ public class BasicMessageService implements MessageService {
         return new MessageDto(
                 savedMessage.getId(),
                 savedMessage.getContent(),
-                savedMessage.getChannelId(),
-                savedMessage.getAuthorId(),
-                savedMessage.getAttachmentIds(),
+                savedMessage.getChannel().getId(),
+                savedMessage.getAuthor().getId(),
+                savedMessage.getAttachments().stream()
+                    .map(BinaryContent::getId)
+                    .toList(),
                 savedMessage.getCreatedAt(),
                 savedMessage.getUpdatedAt()
         );
     }
 
     @Override
+    @Transactional(readOnly = true)
     public MessageDto find(UUID id) {
 
         Message message = messageRepository.findById(id)
@@ -97,15 +100,18 @@ public class BasicMessageService implements MessageService {
         return new MessageDto(
                 message.getId(),
                 message.getContent(),
-                message.getChannelId(),
-                message.getAuthorId(),
-                message.getAttachmentIds(),
+                message.getChannel().getId(),
+                message.getAuthor().getId(),
+            message.getAttachments().stream()
+                .map(BinaryContent::getId)
+                .toList(),
                 message.getCreatedAt(),
                 message.getUpdatedAt()
         );
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<MessageDto> findAllByChannelId(UUID channelId) {
 
         channelRepository.findById(channelId)
@@ -115,15 +121,18 @@ public class BasicMessageService implements MessageService {
                         )
                 );
 
-        return messageRepository.findAllByChannelId(channelId)
+
+        return messageRepository.findAllByChannel_Id(channelId)
                 .stream()
                 .map(message ->
                         new MessageDto(
                                 message.getId(),
                                 message.getContent(),
-                                message.getChannelId(),
-                                message.getAuthorId(),
-                                message.getAttachmentIds(),
+                                message.getChannel().getId(),
+                                message.getAuthor().getId(),
+                            message.getAttachments().stream()
+                                .map(BinaryContent::getId)
+                                .toList(),
                                 message.getCreatedAt(),
                                 message.getUpdatedAt()
                         )
@@ -132,6 +141,7 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
+    @Transactional
     public MessageDto update(UUID id, MessageUpdateRequest request) {
 
         Message message = messageRepository.findById(id)
@@ -148,28 +158,40 @@ public class BasicMessageService implements MessageService {
         return new MessageDto(
                 savedMessage.getId(),
                 savedMessage.getContent(),
-                savedMessage.getChannelId(),
-                savedMessage.getAuthorId(),
-                savedMessage.getAttachmentIds(),
+                savedMessage.getChannel().getId(),
+                savedMessage.getAuthor().getId(),
+                savedMessage.getAttachments().stream()
+                    .map(BinaryContent::getId)
+                    .toList(),
                 savedMessage.getCreatedAt(),
                 savedMessage.getUpdatedAt()
         );
     }
 
-    @Override
-    public void delete(UUID id) {
+  @Override
+  @Transactional
+  public void delete(UUID id) {
 
-        Message message = messageRepository.findById(id)
-                .orElseThrow(() ->
-                        new NoSuchElementException(
-                                "존재하지 않는 메시지입니다. ID: " + id
-                        )
-                );
+    Message message = messageRepository.findById(id)
+        .orElseThrow(() ->
+            new NoSuchElementException(
+                "존재하지 않는 메시지입니다. ID: " + id
+            )
+        );
 
-        message.getAttachmentIds()
-                .forEach(binaryContentRepository::deleteById);
+    List<UUID> attachmentIds = message.getAttachments().stream()
+        .map(BinaryContent::getId)
+        .toList();
 
-        messageRepository.deleteById(id);
-    }
+    message.getAttachments().clear();
+
+    messageRepository.flush();
+
+    messageRepository.delete(message);
+
+    messageRepository.flush();
+
+    attachmentIds.forEach(binaryContentService::delete);
+  }
 
 }
