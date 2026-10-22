@@ -1,13 +1,16 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.Response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
@@ -16,38 +19,32 @@ import java.util.UUID;
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final BinaryContentMapper binaryContentMapper;
+
+
 
     @Override
-    public BinaryContent create(BinaryContentCreateRequest binaryContentCreateRequest) {
-        BinaryContent binaryContent = new BinaryContent(binaryContentCreateRequest.fileName(),
-                (long) binaryContentCreateRequest.bytes().length,
-                binaryContentCreateRequest.contentType(),
-                binaryContentCreateRequest.bytes());
-        return binaryContentRepository.save(binaryContent);
-    }
-
-    @Override
-    public BinaryContent find(UUID id) {
-        return binaryContentRepository.findById(id)
+    @Transactional(readOnly = true)
+    public BinaryContentDto find(UUID id) {
+        BinaryContent binaryContent = binaryContentRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("바이너리컨텐츠 id 없음 : " + id));
+        return binaryContentMapper.toDto(binaryContent);
     }
 
-    @Override
-    public List<BinaryContent> findAllByIds(List<UUID> binaryContentIds) {
-        List<BinaryContent> binaryContentList = new ArrayList<>();
-        for(UUID id : binaryContentIds){
-            binaryContentList.add(binaryContentRepository.findById(id)
-                    .orElseThrow(() -> new NoSuchElementException("바이너리컨텐츠 id 없음 : " + id)));
-        }
-        return binaryContentList;
-    }
 
     @Override
-    public void delete(UUID id) {
-        if(!binaryContentRepository.existsById(id)){
-            throw new NoSuchElementException("바이너리컨텐츠 id 없음 : " + id);
-        }
-        binaryContentRepository.deleteById(id);
+    @Transactional(readOnly = true)
+    public List<BinaryContentDto> findAllByIds(List<UUID> binaryContentIds) {
+        return binaryContentRepository.findAllByIdIn(binaryContentIds)
+                .stream()
+                .map(binaryContentMapper::toDto)
+                .toList();
+    }// todo Ids에서 하나라도 노서치가 발생하면 익셉션을 던질지 고민중
 
+
+    @Override
+    public ResponseEntity<?> download(UUID id){
+        return binaryContentStorage.download(find(id));
     }
 }

@@ -7,13 +7,17 @@ import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -24,77 +28,73 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final UserStatusRepository userStatusRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
+    private final UserMapper userMapper;
 
+    @Transactional
     @Override
-    public User create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
+    public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
-        for (User user : userRepository.findAll()) {
-            if (user.getUsername().equals(userCreateRequest.username())) {
-                throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.username());
-            }
+        if(userRepository.existsByUsername(userCreateRequest.username())){
+            throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.username());
+        }
 
-            if (user.getEmail().equals(userCreateRequest.email())) {
-                throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
-            }
+        if(userRepository.existsByEmail(userCreateRequest.email())){
+            throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
         }
         validateEmail(userCreateRequest.email());
 
         //바이너리
-        UUID profileId = binaryContentCreateRequest
+        BinaryContent profile = binaryContentCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(createdBinaryContent.getId(),bytes);
+                    return createdBinaryContent;
                 })
                 .orElse(null);
 
-        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),profileId);
-        UserStatus userStatus = new UserStatus(user.getId());
+        User user = new User(userCreateRequest.email(),userCreateRequest.password(),userCreateRequest.username(),profile);
+        UserStatus userStatus = new UserStatus(user, Instant.now());
         userRepository.save(user);
         userStatusRepository.save(userStatus);
 
-        return user;
+        return userMapper.toDto(user);
     }
 
-    @Override
-    public UserDto find(UUID id) {
-        return userRepository.findById(id).map(this::toUserResponse)
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
-    }
 
+
+    @Transactional(readOnly = true)
     @Override
     public List<UserDto> findAll() {
-        return userRepository.findAll().stream().map(this::toUserResponse).toList();
+
+        return userRepository.findAllJoinProfileAndStatus().stream().map(userMapper::toDto).toList();
     }
 
+    @Transactional
     @Override
-    public User update(UUID id, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
+    public UserDto update(UUID id, UserUpdateRequest userUpdateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
-        if (userUpdateRequest == null) {
-            return userRepository.findById(id)
-                    .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
-        }
+
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
 
+        if (userUpdateRequest.newUsername() != null
+                && userRepository.existsByUsernameAndIdNot(
+                userUpdateRequest.newUsername(), id)) {
+            throw new IllegalArgumentException(
+                    "중복된 이름입니다: " + userUpdateRequest.newUsername());
+        }
 
-
-        for (User entry : userRepository.findAll()) {
-            if (entry.getId().equals(id)) continue;
-
-            if (userUpdateRequest.newUsername() != null
-                    && entry.getUsername().equals(userUpdateRequest.newUsername())) {
-
-                throw new IllegalArgumentException("중복된 이름입니다" + userUpdateRequest.newUsername());
-
-            }
-            if (userUpdateRequest.newEmail() != null
-            && entry.getEmail().equals(userUpdateRequest.newEmail())) {
-                throw new IllegalArgumentException("중복된 메일입니다" + userUpdateRequest.newEmail());
-            }
+        if (userUpdateRequest.newEmail() != null
+                && userRepository.existsByEmailAndIdNot(
+                userUpdateRequest.newEmail(), id)) {
+            throw new IllegalArgumentException(
+                    "중복된 메일입니다: " + userUpdateRequest.newEmail());
         }
 
         String email;
@@ -102,76 +102,46 @@ public class BasicUserService implements UserService {
         String name;
 
 
-        if(userUpdateRequest.newEmail() != null) {
-            email = userUpdateRequest.newEmail();
-        }else {
-            email = user.getEmail();
-        }
+        email = userUpdateRequest.newEmail() == null ? user.getEmail() : userUpdateRequest.newEmail();
         validateEmail(email);
 
+        password = userUpdateRequest.newPassword() == null ? user.getPassword() : userUpdateRequest.newPassword();
+        name = userUpdateRequest.newUsername() == null ? user.getUsername() : userUpdateRequest.newUsername();
 
-        if (userUpdateRequest.newPassword() != null) {
-            password = userUpdateRequest.newPassword();
-        } else {
-            password = user.getPassword();
-        }
 
-        if(userUpdateRequest.newUsername() != null) {
-            name = userUpdateRequest.newUsername();
-        }else {
-            name = user.getUsername();
-        }
 
-        UUID profileId = binaryContentCreateRequest
+        BinaryContent profile = binaryContentCreateRequest
                 .map(profileRequest -> {
                     String fileName = profileRequest.fileName();
                     String contentType = profileRequest.contentType();
                     byte[] bytes = profileRequest.bytes();
-                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType, bytes);
-                    return binaryContentRepository.save(binaryContent).getId();
+                    BinaryContent binaryContent = new BinaryContent(fileName, (long)bytes.length, contentType);
+                    BinaryContent createdBinaryContent = binaryContentRepository.save(binaryContent);
+                    binaryContentStorage.put(createdBinaryContent.getId(),bytes);
+                    return createdBinaryContent;
                 })
-                .orElse(null);
+                .orElse(user.getProfile());
 
 
-        user.update(email, password, name, profileId);
-        return userRepository.save(user);
+        user.update(email, password, name, profile);
+        return userMapper.toDto(user);
 
     }
 
+    @Transactional
     @Override
     public void delete(UUID id) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
 
-        userStatusRepository.deleteByUserId(id);
-
-        if (user.getProfileId() != null) {
-            binaryContentRepository.deleteById(user.getProfileId());
-        }
-
-        userRepository.deleteById(id);
+        userRepository.delete(user);
     }
 
-    public UserDto toUserResponse(User user) {
-        UserStatus userStatus = userStatusRepository
-                .findByUserId(user.getId()).orElseThrow(() -> new NoSuchElementException("해당 유저의 스테이터스가 없습니다."));
-        boolean online = userStatus.isOnline();
 
-        //UUID testId= Optional.ofNullable(user.getProfileId()).orElse(null);
-
-        return new UserDto(
-                user.getId(),
-                user.getCreatedAt(),
-                user.getUpdatedAt(),
-                user.getEmail(),
-                user.getUsername(),
-                Optional.ofNullable(user.getProfileId()),
-                online
-        );
-    }
 
     private void validateEmail(String email){
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
+
             throw new IllegalArgumentException("메일 형식이 아님.");
         }
     }

@@ -1,14 +1,14 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.Request.*;
+import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.Request.PublicChannelUpdateRequest;
 import com.sprint.mission.discodeit.dto.Response.ChannelDto;
-import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,11 +35,11 @@ public class ChannelController {
             description = "공개 채널 등록 성공"
     )
     @PostMapping("/public")
-    public ResponseEntity<Channel> createPublicChannel(@RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
-        Channel channel = channelService.create(publicChannelCreateRequest);
+    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
+        ChannelDto channelDto = channelService.create(publicChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(channel);
+                .body(channelDto);
     }
 
     //비공개 채널 생성
@@ -52,11 +52,11 @@ public class ChannelController {
             description = "비공개 채널 등록 성공"
     )
     @PostMapping("/private")
-    public ResponseEntity<Channel> createPrivateChannel(@RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
-        Channel channel = channelService.create(privateChannelCreateRequest);
+    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
+        ChannelDto channelDto = channelService.create(privateChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(channel);
+                .body(channelDto);
     }
 
     //업데이트(공개 채널만 가능)
@@ -79,13 +79,13 @@ public class ChannelController {
             )
     })
     @PatchMapping("/{channel-id}")
-    public ResponseEntity<Channel> patchChannel(
-            @PathVariable("channel-id") UUID uuid, @RequestBody ChannelUpdateRequest channelUpdateRequest) {
+    public ResponseEntity<ChannelDto> patchChannel(
+            @PathVariable("channel-id") UUID uuid, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
 
 
-        Channel channel = channelService.update(uuid, channelUpdateRequest);
-        return ResponseEntity.status(HttpStatus.OK).body(channel);
+        ChannelDto channelDto = channelService.update(uuid, publicChannelUpdateRequest);
+        return ResponseEntity.status(HttpStatus.OK).body(channelDto);
     }
 
     //삭제

@@ -2,17 +2,17 @@ package com.sprint.mission.discodeit.controller;
 
 import com.sprint.mission.discodeit.dto.Request.LoginRequest;
 import com.sprint.mission.discodeit.dto.Response.UserDto;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.AuthService;
-import com.sprint.mission.discodeit.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @Tag(name = "Auth", description = "인증 API")
 @RequiredArgsConstructor
@@ -20,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/auth")
 public class AuthController {
     private final AuthService authService;
-    private final UserService userService;
 
 
     @Operation(
@@ -38,16 +37,13 @@ public class AuthController {
             ),
             @ApiResponse(
                     responseCode = "404",
-                    description = "email 사용자 없음"
+                    description = "username 사용자 없음"
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<User> login(@RequestBody LoginRequest loginRequest) {
-        User user=authService.login(loginRequest);
-        //UserDto userDto = userService.toUserResponse(user);
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(user);
+    public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+        UserDto dto=authService.login(loginRequest);
+
+        return ResponseEntity.ok(dto);
     }
-
-
 }

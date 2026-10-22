@@ -1,11 +1,13 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.Request.LoginRequest;
+import com.sprint.mission.discodeit.dto.Response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -16,12 +18,14 @@ public class BasicAuthService implements AuthService {
 
 
     @Override
-    public User login(LoginRequest loginRequest) {
+    @Transactional(readOnly = true)
+    public UserDto login(LoginRequest loginRequest) {
         User user;
-        user=userRepository.findByUsername(loginRequest.username()).orElseThrow(() -> new NoSuchElementException("로그인 오류. name이 일치하는 user 없음 : "+ loginRequest.username()));
+        user=userRepository.findByUsername(loginRequest.username())
+                .orElseThrow(() -> new NoSuchElementException("로그인 오류. name이 일치하는 user 없음 : "+ loginRequest.username()));
         if(!user.getPassword().equals(loginRequest.password())){
             throw new IllegalArgumentException("비밀번호가 다름");
         }
-        return user;
+        return UserDto.from(user);
     }
 }
