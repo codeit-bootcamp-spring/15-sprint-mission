@@ -1,9 +1,8 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.common.ApiResponse;
 import com.sprint.mission.discodeit.dto.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.ReadStatusDto;
 import com.sprint.mission.discodeit.dto.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -24,35 +23,35 @@ public class ReadStatusController {
 
   @Tag(name = "읽음 상태 생성")
   @PostMapping
-  public ResponseEntity<ApiResponse<ReadStatus>> create(
+  public ResponseEntity<ReadStatusDto> create(
       @Valid @RequestBody ReadStatusCreateRequest request) {
-    ReadStatus readStatus = readStatusService.create(request);
-    return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success(readStatus));
+    ReadStatusDto readStatus = readStatusService.create(request);
+    return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
   }
 
   @Tag(name = "특정 유저 채널별 읽음 확인")
   @GetMapping
-  public ResponseEntity<ApiResponse<List<ReadStatus>>> getStatusByUser(
+  public ResponseEntity<List<ReadStatusDto>> getStatusByUser(
       @RequestParam("userId") UUID userId) {
-    List<ReadStatus> list = readStatusService.findAllByUserId(userId);
-    return ResponseEntity.ok().body(ApiResponse.success(list));
+    List<ReadStatusDto> list = readStatusService.findAllByUserId(userId);
+    return ResponseEntity.ok().body(list);
   }
 
   @Tag(name = "특정 채널 전체 읽음 확인")
   @GetMapping("/channel/{channel-id}")
-  public ResponseEntity<ApiResponse<List<ReadStatus>>> getStatusByChannel(
+  public ResponseEntity<List<ReadStatusDto>> getStatusByChannel(
       @PathVariable("channel-id") UUID channelId) {
-    List<ReadStatus> list = readStatusService.findAllByChannelId(channelId);
-    return ResponseEntity.ok().body(ApiResponse.success(list));
+    List<ReadStatusDto> list = readStatusService.findAllByChannelId(channelId);
+    return ResponseEntity.ok().body(list);
   }
 
   @Tag(name = "특정 읽음 상태 수정")
   @PatchMapping("/{readStatusId}")
-  public ResponseEntity<ApiResponse<ReadStatus>> update(
+  public ResponseEntity<ReadStatusDto> update(
       @PathVariable("readStatusId") UUID readStatusId,
       @Valid @RequestBody ReadStatusUpdateRequest request) {
-    ReadStatus readStatus = readStatusService.update(readStatusId, request);
-    return ResponseEntity.ok().body(ApiResponse.success(readStatus));
+    ReadStatusDto readStatus = readStatusService.update(readStatusId, request);
+    return ResponseEntity.ok().body(readStatus);
   }
 
 }

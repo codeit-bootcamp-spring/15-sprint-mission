@@ -1,8 +1,30 @@
 spring:
   application:
     name: discodeit
+  datasource:
+    url: jdbc:postgresql://localhost:5432/discodeit
+    username: discodeit_user
+    password: discodeit1234
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: create
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 100
+
+logging:
+  level:
+    org.hibernate.orm.jdbc.bind: trace
+    org.springframework.transaction.interceptor: DEBUG
+    org.springframework.orm.jpa.JpaTransactionManager: DEBUG
+    org.hibernate.SQL: DEBUG
 
 discodeit:
-  repository:
-    type: file
-    file-directory: .discodeit
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/storage

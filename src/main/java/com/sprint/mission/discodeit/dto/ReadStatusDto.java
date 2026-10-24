@@ -1,0 +1,21 @@
+package com.sprint.mission.discodeit.dto;
+
+import io.swagger.v3.oas.annotations.media.Schema;
+import java.time.Instant;
+import java.util.UUID;
+
+public record ReadStatusDto(
+
+    @Schema(description = "읽음 상태 ID")
+    UUID id,
+
+    @Schema(description = "사용자 ID")
+    UUID userId,
+
+    @Schema(description = "채널 ID")
+    UUID channelId,
+
+    @Schema(description = "해당 채널의 메시지를 마지막으로 읽은 시각")
+    Instant lastReadAt) {
+
+}
