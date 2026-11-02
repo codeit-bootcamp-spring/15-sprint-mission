@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.dto.Response;
+package com.sprint.mission.discodeit.dto.response;
 
 import com.sprint.mission.discodeit.entity.BinaryContent;
 

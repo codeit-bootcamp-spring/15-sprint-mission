@@ -1,10 +1,10 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
-import com.sprint.mission.discodeit.dto.Response.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.MessageCursorResponse;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;

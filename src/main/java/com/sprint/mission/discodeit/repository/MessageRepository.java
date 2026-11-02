@@ -17,19 +17,6 @@ import java.util.UUID;
 public interface MessageRepository extends JpaRepository<Message, UUID> {
 
     @Query("""
-        select m from Message m
-        left join fetch m.author u
-        left join fetch u.profile
-        left join fetch u.status
-        where m.channel.id = :channelId
-                and (:cursor is null or m.createdAt < :cursor)
-        """)
-    Slice<Message> findAllByChannelIdWithCursor(
-            @Param("channelId") UUID channelId,
-            @Param("cursor") Instant cursor,
-            Pageable pageable);
-
-    @Query("""
     select m
     from Message m
     left join fetch m.author u

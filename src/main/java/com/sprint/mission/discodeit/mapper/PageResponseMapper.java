@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.Response.PageResponse;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Slice;
 
