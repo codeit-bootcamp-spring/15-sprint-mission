@@ -4,7 +4,7 @@ import java.util.List;
 
 public record PageResponse<T>(
         List<T> content,
-        int number,
+        String nextCursor,
         int size,
         boolean hasNext,
         Long totalElements

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.response.MessageCursorResponse;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
 import org.springframework.data.domain.Pageable;
 
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public interface MessageService {
     MessageDto create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests);
-    MessageCursorResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
+    PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, Pageable pageable);
     MessageDto update(UUID id,MessageUpdateRequest messageUpdateRequest);
     void delete(UUID id);
 }
