@@ -7,11 +7,13 @@ import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -28,6 +30,9 @@ public class BasicAuthService implements AuthService {
         if(!user.getPassword().equals(loginRequest.password())){
             throw new IllegalArgumentException("비밀번호가 다름");
         }
-        return userMapper.toDto(user);
+
+        UserDto dto = userMapper.toDto(user);
+        log.info("로그인 성공: userId={}", user.getId());
+        return dto;
     }
 }
