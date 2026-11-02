@@ -10,10 +10,6 @@ public record UserDto(
         BinaryContentDto profile,
         boolean online
 ) {
-    public static UserDto from(User user){
-        return new UserDto(user.getId(), user.getUsername(), user.getEmail(),
-                user.getProfile() == null ? null : BinaryContentDto.from(user.getProfile()),
-                user.getStatus() != null && user.getStatus().isOnline());
-    }
+
 
 }

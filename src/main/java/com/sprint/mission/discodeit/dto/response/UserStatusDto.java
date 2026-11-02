@@ -11,7 +11,4 @@ public record UserStatusDto(
         Instant lastActiveAt
 ) {
 
-    public static UserStatusDto from(UserStatus userStatus) {
-        return new UserStatusDto(userStatus.getId(),userStatus.getUser().getId(),userStatus.getLastActiveAt());
-    }
 }

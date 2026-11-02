@@ -11,8 +11,5 @@ public record ReadStatusDto(
         UUID channelId,
         Instant lastReadAt
 ) {
-    public static ReadStatusDto from(ReadStatus readStatus) {
-        return new ReadStatusDto(readStatus.getId(), readStatus.getUser().getId(),
-                readStatus.getChannel().getId(), readStatus.getLastReadAt());
-    }
+
 }

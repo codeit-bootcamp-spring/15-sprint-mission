@@ -17,9 +17,6 @@ public record ChannelDto(
         Instant lastMessageAt
 
 ) {
-    public static ChannelDto from(Channel channel, List<User> users, Instant lastMessageAt) {
-        List<UserDto> userDtos = users.stream().map(UserDto::from).toList();
-        return new ChannelDto(channel.getId(), channel.getName(), channel.getDescription(), channel.getType(), userDtos, lastMessageAt);
-    }
+
 
 }
