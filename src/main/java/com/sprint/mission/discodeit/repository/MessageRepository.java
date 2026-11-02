@@ -11,6 +11,9 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+import com.sprint.mission.discodeit.dto.ChannelLastMessageAt;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 @Repository
 public interface MessageRepository extends JpaRepository<Message, UUID> {
@@ -25,4 +28,17 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
   List<Message> findAllByChannelId(UUID channelId);
 
   Optional<Message> findTopByChannelIdOrderByCreatedAtDesc(UUID id);
+
+  @Query("""
+      select new com.sprint.mission.discodeit.dto.ChannelLastMessageAt(
+          m.channel.id,
+          max(m.createdAt)
+      )
+      from Message m
+      where m.channel.id in :channelIds
+      group by m.channel.id
+      """)
+  List<ChannelLastMessageAt> findLastMessageAtByChannelIds(
+      @Param("channelIds") List<UUID> channelIds
+  );
 }

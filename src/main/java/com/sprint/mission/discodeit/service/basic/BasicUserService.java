@@ -25,7 +25,7 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
 
   public UserDto create(UserCreateRequest request, BinaryContentCreateRequest profile) {
-    checkUnique(null, request.username(), request.email());
+    checkUnique(request.username(), request.email());
     BinaryContent image = null;
     if (profile != null) {
       byte[] bytes = profile.getBytes();
@@ -64,7 +64,7 @@ public class BasicUserService implements UserService {
     // 1. DTO의 ID로 기존 사용자를 조회합니다.
     User user = users.findById(userId)
         .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
-    checkUnique(user.getId(), request.newUsername(), request.newEmail());
+    checkUnique(request.newUsername(), request.newEmail());
     BinaryContent image = null;
     if (profile != null) {
       byte[] bytes = profile.getBytes();
@@ -81,7 +81,6 @@ public class BasicUserService implements UserService {
     if (image != null) {
       user.replaceProfile(image);
     }
-    users.save(user);
     // 파일에서 읽은 객체는 수정 후 다시 저장해야 파일에도 반영됩니다.
     if (image != null && previous != null) {
       binaries.delete(previous);
@@ -106,17 +105,12 @@ public class BasicUserService implements UserService {
     users.deleteById(id);
   }
 
-  private void checkUnique(UUID ownId, String username, String email) {
-    for (User other : users.findAll()) {
-      if (other.getId().equals(ownId)) {
-        continue;
-      }
-      if (username != null && username.equals(other.getUsername())) {
-        throw new IllegalArgumentException("중복 newUsername");
-      }
-      if (email != null && email.equals(other.getEmail())) {
-        throw new IllegalArgumentException("중복 newEmail");
-      }
+  private void checkUnique(String username, String email) {
+    if (users.existsByEmail(email)) {
+      throw new IllegalArgumentException("중복된 이메일 입니다.");
+    }
+    if (users.existsByUsername(username)) {
+      throw new IllegalArgumentException("중복된 유저 이름 입니다.");
     }
   }
 }

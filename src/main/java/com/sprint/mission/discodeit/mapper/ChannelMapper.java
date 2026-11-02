@@ -28,6 +28,11 @@ public abstract class ChannelMapper {
   @Mapping(target = "lastMessageAt", expression = "java(findLastMessageAt(channel))")
   public abstract ChannelDto toDto(Channel channel);
 
+  @Mapping(target = "participants", source = "participants")
+  @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+  public abstract ChannelDto toDto(Channel channel, List<UserDto> participants,
+      Instant lastMessageAt);
+
   protected List<UserDto> findParticipants(Channel channel) {
     return readStatusRepository.findAllByChannelId(channel.getId()).stream()
         .map(readStatus -> userMapper.toDto(readStatus.getUser()))

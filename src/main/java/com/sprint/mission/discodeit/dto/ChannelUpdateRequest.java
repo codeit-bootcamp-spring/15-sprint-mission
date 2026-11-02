@@ -8,10 +8,6 @@ import java.util.UUID;
 
 public record ChannelUpdateRequest(
 
-    @NotNull
-    @Schema(description = "수정 요청의 채널 ID")
-    UUID id,
-
     @Schema(description = "변경할 채널 이름")
     @NotBlank
     String name,
