@@ -43,6 +43,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     }// todo Ids에서 하나라도 노서치가 발생하면 익셉션을 던질지 고민중
 
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity<?> download(UUID id){
         return binaryContentStorage.download(find(id));

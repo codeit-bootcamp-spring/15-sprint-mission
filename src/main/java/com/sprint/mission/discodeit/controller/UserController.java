@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +27,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "User", description = "User API")
 @RequiredArgsConstructor
 @RestController
@@ -53,6 +55,7 @@ public class UserController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profile", required = false) MultipartFile profile)throws IOException {
+        log.debug("회원가입 요청");
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
@@ -97,7 +100,7 @@ public class UserController {
             @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
-
+        log.debug("회원정보 업데이트 요청");
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
@@ -136,6 +139,7 @@ public class UserController {
     @DeleteMapping("/{user-id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID uuid) {
         //UUID uuid = UUID.fromString(Id);
+        log.debug("탈퇴 요청");
         userService.delete(uuid);
         return ResponseEntity.noContent().build();
     }
@@ -151,6 +155,7 @@ public class UserController {
     )
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {
+        log.debug("전체 회원정보 조회 요청");
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
