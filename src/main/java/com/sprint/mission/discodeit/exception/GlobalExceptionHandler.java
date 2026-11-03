@@ -2,10 +2,13 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.response.ErrorResponse;
 import java.time.Instant;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
@@ -90,5 +93,29 @@ public class GlobalExceptionHandler {
     );
 
     return ResponseEntity.status(status).body(response);
+  }
+
+  @ExceptionHandler(MethodArgumentNotValidException.class)
+  public ResponseEntity<ErrorResponse> handleValidationException(
+      MethodArgumentNotValidException e
+  ) {
+    Map<String, Object> details = new LinkedHashMap<>();
+
+    for (FieldError error : e.getBindingResult().getFieldErrors()) {
+      details.put(error.getField(), error.getDefaultMessage());
+    }
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        "VALIDATION_FAILED",
+        "요청 데이터 검증에 실패했습니다.",
+        details,
+        e.getClass().getSimpleName(),
+        HttpStatus.BAD_REQUEST.value()
+    );
+
+    return ResponseEntity
+        .status(HttpStatus.BAD_REQUEST)
+        .body(errorResponse);
   }
 }
