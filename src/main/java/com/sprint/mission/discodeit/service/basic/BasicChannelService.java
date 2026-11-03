@@ -9,13 +9,14 @@ import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicChannelService implements ChannelService {
@@ -32,7 +33,9 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto create(PublicChannelCreateRequest publicChannelCreateRequest) {
         Channel channel = new Channel(publicChannelCreateRequest.name(),publicChannelCreateRequest.description(), ChannelType.PUBLIC);
         channelRepository.save(channel);
-        return toChannelResponse(channel);
+        ChannelDto dto = toChannelResponse(channel);
+        log.info("공개 채널 생성 성공 : {}", dto.id());
+        return dto;
     }
 
     @Override
@@ -49,7 +52,9 @@ public class BasicChannelService implements ChannelService {
         );
 
 
-        return toChannelResponse(channel);
+        ChannelDto dto = toChannelResponse(channel);
+        log.info("비공개 채널 생성 성공 : {}", dto.id());
+        return dto;
     }
 
 
@@ -117,8 +122,10 @@ public class BasicChannelService implements ChannelService {
             throw new IllegalArgumentException("private채널은 업데이트할 수 없습니다.");
         }
         channel.update(publicChannelUpdateRequest.name(), publicChannelUpdateRequest.description());
-        //channelRepository.save(channel);
-        return toChannelResponse(channel);
+
+        ChannelDto dto = toChannelResponse(channel);
+        log.info("채널 업데이트 성공 : {}", dto.id());
+        return dto;
     }
 
     @Override
@@ -131,6 +138,7 @@ public class BasicChannelService implements ChannelService {
         //messageRepository.deleteAllByChannel_Id(id);
         //readStatusRepository.deleteAllByChannel_Id(id);
         channelRepository.deleteById(id);
+        log.info("채널 삭제 성공 : {}", id);
     }
 
 }

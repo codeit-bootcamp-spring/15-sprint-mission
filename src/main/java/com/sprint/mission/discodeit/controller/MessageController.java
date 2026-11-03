@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -27,6 +28,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "Message", description = "Message API")
 @RequiredArgsConstructor
 @RestController
@@ -56,6 +58,7 @@ public class MessageController {
             @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ){
+        log.debug("메세지 보내기 요청");
         List<BinaryContentCreateRequest> attachmentRequests =
                 attachments == null
                         ? new ArrayList<>()
@@ -95,6 +98,7 @@ public class MessageController {
     @PatchMapping("/{message-id}")
     public ResponseEntity<MessageDto> patchMessage(@PathVariable("message-id") UUID id ,
                                                              @RequestBody MessageUpdateRequest messageUpdateRequest){
+        log.debug("메세지 수정 요청");
         MessageDto messageDto = messageService.update(id, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);
     }
@@ -116,6 +120,7 @@ public class MessageController {
     })
     @DeleteMapping("/{message-id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") UUID uuid) {
+        log.debug("메세지 삭제 요청");
         messageService.delete(uuid);
         return ResponseEntity.noContent().build();
     }
