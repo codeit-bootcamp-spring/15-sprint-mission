@@ -151,6 +151,7 @@ public class BasicUserService implements UserService {
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
             throw new IllegalArgumentException("메일 형식이 아님.");
+            //@vaild 로 넘길 예정이라 방치
         }
     }
 }
