@@ -6,8 +6,9 @@ import java.util.UUID;
 public class FileLoadFailedException extends DiscodeitException {
 
 
-    public FileLoadFailedException(UUID binaryContentId) {
+    public FileLoadFailedException(Throwable cause, UUID binaryContentId) {
         super(ErrorCode.FILE_LOAD_FAILED, Map.of("binaryContentId",binaryContentId));
+        initCause(cause);
     }
 
 

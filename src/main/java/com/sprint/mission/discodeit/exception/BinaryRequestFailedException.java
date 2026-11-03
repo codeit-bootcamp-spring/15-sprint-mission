@@ -5,8 +5,9 @@ import java.util.Map;
 public class BinaryRequestFailedException extends DiscodeitException {
 
 
-    public BinaryRequestFailedException(String fileName) {
+    public BinaryRequestFailedException(Throwable cause, String fileName) {
         super(ErrorCode.BINARY_REQUEST_FAILED, Map.of("fileName",fileName));
+        initCause(cause);
     }
 
 

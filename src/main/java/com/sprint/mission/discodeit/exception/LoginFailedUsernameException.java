@@ -6,7 +6,7 @@ public class LoginFailedUsernameException extends DiscodeitException {
 
 
     public LoginFailedUsernameException() {
-        super(ErrorCode.LOGIN_FAILED_USERNAME, null);
+        super(ErrorCode.LOGIN_FAILED_USERNAME, Map.of());
     }
 
 
