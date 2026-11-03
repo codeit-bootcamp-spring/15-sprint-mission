@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.BinaryNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -30,7 +31,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentDto find(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("바이너리컨텐츠 id 없음 : " + id));
+                .orElseThrow(() -> new BinaryNotFoundException(id));
         return binaryContentMapper.toDto(binaryContent);
     }
 

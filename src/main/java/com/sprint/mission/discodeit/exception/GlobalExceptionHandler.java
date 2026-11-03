@@ -19,7 +19,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleBase(DiscodeitException e) {
 
         ErrorCode errorCode = e.getErrorCode();
-        log.warn("요청이 실패했습니다. code={}, message={}", errorCode.name(), e.getMessage());
+        log.warn("요청이 실패했습니다. code={}, message={}", errorCode.name(), errorCode.getMessage());
 
         return ResponseEntity.status(errorCode.getStatus())
                 .body(ErrorResponse.of(e));

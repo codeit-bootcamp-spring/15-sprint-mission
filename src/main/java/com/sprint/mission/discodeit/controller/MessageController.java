@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.exception.BinaryRequestFailedException;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -71,7 +72,7 @@ public class MessageController {
                                         file.getBytes()
                                 );
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,file.getOriginalFilename());
                             }
                         })
                         .toList();

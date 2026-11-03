@@ -5,6 +5,8 @@ import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -117,9 +119,9 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto update(UUID id, PublicChannelUpdateRequest publicChannelUpdateRequest) {
         Channel channel = channelRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : " + id));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
         if(channel.getType()==ChannelType.PRIVATE){
-            throw new IllegalArgumentException("private채널은 업데이트할 수 없습니다.");
+            throw new PrivateChannelUpdateException(id);
         }
         channel.update(publicChannelUpdateRequest.name(), publicChannelUpdateRequest.description());
 
@@ -132,7 +134,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public void delete(UUID id) {
         if (!channelRepository.existsById(id)) {
-            throw new NoSuchElementException("채널 id 없음 : " + id);
+            throw new ChannelNotFoundException(id);
         }
 
         //messageRepository.deleteAllByChannel_Id(id);
