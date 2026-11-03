@@ -19,7 +19,6 @@ spring:
     #        default_batch_fetch_size: 100
     open-in-view: false
 
-
 logging:
   level:
     root: info
@@ -31,3 +30,6 @@ discodeit:
     type: local
     local:
       root-path: .discodeit/storage
+      
+server:
+  port: 8081
