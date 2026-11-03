@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import com.sprint.mission.discodeit.dto.response.ErrorResponse;
 import java.time.Instant;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,27 +13,54 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ResponseEntity<String> handleException(IllegalArgumentException e) {
-    e.printStackTrace();
+  public ResponseEntity<ErrorResponse> handleException(IllegalArgumentException e) {
+
+    ErrorResponse response = new ErrorResponse(
+        Instant.now(),
+        "INVALID_ARGUMENT",
+        e.getMessage(),
+        Map.of(),
+        e.getClass().getSimpleName(),
+        400
+    );
+
     return ResponseEntity
         .status(HttpStatus.BAD_REQUEST)
-        .body(e.getMessage());
+        .body(response);
   }
 
   @ExceptionHandler(NoSuchElementException.class)
-  public ResponseEntity<String> handleException(NoSuchElementException e) {
-    e.printStackTrace();
+  public ResponseEntity<ErrorResponse> handleException(NoSuchElementException e) {
+
+    ErrorResponse response = new ErrorResponse(
+        Instant.now(),
+        "RESOURCE_NOT_FOUND",
+        e.getMessage(),
+        Map.of(),
+        e.getClass().getSimpleName(),
+        404
+    );
+
     return ResponseEntity
         .status(HttpStatus.NOT_FOUND)
-        .body(e.getMessage());
+        .body(response);
   }
 
   @ExceptionHandler(Exception.class)
-  public ResponseEntity<String> handleException(Exception e) {
-    e.printStackTrace();
+  public ResponseEntity<ErrorResponse> handleException(Exception e) {
+
+    ErrorResponse errorResponse = new ErrorResponse(
+        Instant.now(),
+        "INTERNAL_SERVER_ERROR",
+        "서버 내부 오류가 발생했습니다.",
+        Map.of(),
+        e.getClass().getSimpleName(),
+        500
+    );
+
     return ResponseEntity
         .status(HttpStatus.INTERNAL_SERVER_ERROR)
-        .body(e.getMessage());
+        .body(errorResponse);
   }
 
   @ExceptionHandler(DiscodeitException.class)
