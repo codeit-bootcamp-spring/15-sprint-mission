@@ -9,6 +9,9 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -28,7 +31,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 @Slf4j
 @RequiredArgsConstructor
@@ -48,10 +50,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : "+ messageCreateRequest.channelId()));
+                .orElseThrow(() -> new ChannelNotFoundException(messageCreateRequest.channelId()));
 
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : "+ messageCreateRequest.authorId()));
+                .orElseThrow(() -> new UserNotFoundException(messageCreateRequest.authorId()));
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
@@ -113,7 +115,7 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto update(UUID id,MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
+                .orElseThrow(() -> new MessageNotFoundException(id));
         message.update(messageUpdateRequest.newContent());
 
         MessageDto dto = messageMapper.toDto(message);
@@ -126,7 +128,7 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() ->
-                        new NoSuchElementException("메시지 id 없음 : " + id));
+                        new MessageNotFoundException(id));
         messageRepository.delete(message);
         log.info("메세지 삭제 성공 : {}", id);
 

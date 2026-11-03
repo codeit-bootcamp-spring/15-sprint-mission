@@ -1,6 +1,9 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.exception.FileLoadFailedException;
+import com.sprint.mission.discodeit.exception.FileSaveFailedException;
+import com.sprint.mission.discodeit.exception.StorageInitFailedException;
 import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,7 +50,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
             try {
                 Files.createDirectories(root);
             } catch (IOException e) {
-                throw new RuntimeException(e);
+                throw new StorageInitFailedException(e);
             }
         }
     }
@@ -61,7 +64,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
         try {
             Files.write(path, bytes);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new FileSaveFailedException(e,uuid);
         }
 
         log.info("파일 저장 완료 : {}, size={}kb", uuid, (bytes.length / 1024.0));
@@ -75,7 +78,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
         try {
             return Files.newInputStream(path);
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new FileLoadFailedException(e,uuid);
         }
 
     }

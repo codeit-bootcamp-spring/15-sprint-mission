@@ -7,6 +7,9 @@ import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.DuplicateUserEmailException;
+import com.sprint.mission.discodeit.exception.DuplicateUserNameException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -38,11 +41,11 @@ public class BasicUserService implements UserService {
     public UserDto create(UserCreateRequest userCreateRequest, Optional<BinaryContentCreateRequest> binaryContentCreateRequest) {
 
         if(userRepository.existsByUsername(userCreateRequest.username())){
-            throw new IllegalArgumentException("중복된 이름입니다" + userCreateRequest.username());
+            throw new DuplicateUserNameException(userCreateRequest.username());
         }
 
         if(userRepository.existsByEmail(userCreateRequest.email())){
-            throw new IllegalArgumentException("중복된 메일입니다" + userCreateRequest.email());
+            throw new DuplicateUserEmailException(userCreateRequest.email());
         }
         validateEmail(userCreateRequest.email());
 
@@ -86,20 +89,20 @@ public class BasicUserService implements UserService {
 
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         if (userUpdateRequest.newUsername() != null
                 && userRepository.existsByUsernameAndIdNot(
                 userUpdateRequest.newUsername(), id)) {
-            throw new IllegalArgumentException(
-                    "중복된 이름입니다: " + userUpdateRequest.newUsername());
+            throw new DuplicateUserNameException(
+                    userUpdateRequest.newUsername());
         }
 
         if (userUpdateRequest.newEmail() != null
                 && userRepository.existsByEmailAndIdNot(
                 userUpdateRequest.newEmail(), id)) {
-            throw new IllegalArgumentException(
-                    "중복된 메일입니다: " + userUpdateRequest.newEmail());
+            throw new DuplicateUserEmailException(
+                    userUpdateRequest.newEmail());
         }
 
         String email;
@@ -139,7 +142,7 @@ public class BasicUserService implements UserService {
     @Override
     public void delete(UUID id) {
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : " + id));
+                .orElseThrow(() -> new UserNotFoundException(id));
 
         userRepository.delete(user);
         log.info("회원탈퇴 완료 id : {}", id);

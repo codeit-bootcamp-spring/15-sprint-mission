@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.exception.BinaryRequestFailedException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -66,7 +67,7 @@ public class UserController {
                                         file.getBytes()
                                 );
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
                         });
 
@@ -111,7 +112,7 @@ public class UserController {
                                         file.getBytes()
                                 );
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
                         });
 

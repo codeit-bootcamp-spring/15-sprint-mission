@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -28,7 +29,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Override
     public UserStatusDto updateByUserId(UUID userId, UserStatusUpdateRequest userStatusUpdateRequest) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId).
-                orElseThrow(() -> new NoSuchElementException("유저의 스테이터스가 없음 userID : " + userId));
+                orElseThrow(() -> new UserStatusNotFoundException(userId));
 
         userStatus.update(userStatusUpdateRequest.newLastActiveAt());
         return userStatusMapper.toDto(userStatus);
