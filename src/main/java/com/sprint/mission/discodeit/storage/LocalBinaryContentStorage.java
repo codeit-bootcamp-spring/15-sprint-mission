@@ -64,7 +64,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage{
             throw new UncheckedIOException(e);
         }
 
-        log.info("파일 저장 완료 : {}, size={}kb", uuid, (bytes.length / 1024));
+        log.info("파일 저장 완료 : {}, size={}kb", uuid, (bytes.length / 1024.0));
         return uuid;
     }
 
