@@ -7,7 +7,7 @@ public class DuplicateUserEmailException extends DiscodeitException {
 
     public DuplicateUserEmailException(String email) {
 
-        super(ErrorCode.DUPLICATE_USER_EMAIL, Map.of("Email",email));
+        super(ErrorCode.DUPLICATE_USER_EMAIL, Map.of("email",email));
     }
 
 

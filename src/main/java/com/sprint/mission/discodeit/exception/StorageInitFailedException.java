@@ -5,8 +5,9 @@ import java.util.Map;
 public class StorageInitFailedException extends DiscodeitException {
 
 
-    public StorageInitFailedException() {
-        super(ErrorCode.STORAGE_INIT_FAILED, null);
+    public StorageInitFailedException(Throwable cause) {
+        super(ErrorCode.STORAGE_INIT_FAILED, Map.of());
+        initCause(cause);
     }
 
 

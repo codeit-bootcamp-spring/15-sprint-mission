@@ -6,7 +6,7 @@ public class LoginFailedPasswordException extends DiscodeitException {
 
 
     public LoginFailedPasswordException() {
-        super(ErrorCode.LOGIN_FAILED_PASSWORD, null);
+        super(ErrorCode.LOGIN_FAILED_PASSWORD, Map.of());
     }
 
 
