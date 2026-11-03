@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.global;
+package com.sprint.mission.discodeit.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

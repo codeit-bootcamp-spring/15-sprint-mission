@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.global;
+package com.sprint.mission.discodeit.exception;
 public class ApiError {
 
     private final String code;
