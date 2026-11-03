@@ -1,4 +1,4 @@
-package com.sprint.mission.discodeit.global;
+package com.sprint.mission.discodeit.exception;
 
 import java.time.Instant;
 

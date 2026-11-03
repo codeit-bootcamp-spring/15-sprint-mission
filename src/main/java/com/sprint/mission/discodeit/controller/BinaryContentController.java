@@ -6,14 +6,16 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Tag(name = "BinaryContent", description = "첨부 파일 API")
 @RequiredArgsConstructor
 @RestController
@@ -66,7 +68,8 @@ public class BinaryContentController {
     // todo 다운로드 추가 api/binaryContents/{binaryContentId}/download
 
     @GetMapping("{binaryContentId}/download")
-    public ResponseEntity<?> download(@PathVariable UUID binaryContentId){
+    public ResponseEntity<?> download(@PathVariable UUID binaryContentId, HttpServletRequest httpServletRequest){
+        log.debug("파일 다운로드 요청 IP : {}", httpServletRequest.getRemoteAddr());
         return binaryContentService.download(binaryContentId);
     }
 }
