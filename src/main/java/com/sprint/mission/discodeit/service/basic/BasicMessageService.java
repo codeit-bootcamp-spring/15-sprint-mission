@@ -18,6 +18,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -29,6 +30,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -66,7 +68,10 @@ public class BasicMessageService implements MessageService {
         Message message = new Message(channel,user,
                 messageCreateRequest.content(), attachments);
         messageRepository.save(message);
-        return messageMapper.toDto(message);
+
+        MessageDto dto = messageMapper.toDto(message);
+        log.info("메세지 보내기 성공 : {}", dto.id());
+        return dto;
     }
 
 
@@ -110,7 +115,10 @@ public class BasicMessageService implements MessageService {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
         message.update(messageUpdateRequest.newContent());
-        return messageMapper.toDto(message);
+
+        MessageDto dto = messageMapper.toDto(message);
+        log.info("메세지 수정 성공 : {}", dto.id());
+        return dto;
     }
 
     @Transactional
@@ -120,6 +128,7 @@ public class BasicMessageService implements MessageService {
                 .orElseThrow(() ->
                         new NoSuchElementException("메시지 id 없음 : " + id));
         messageRepository.delete(message);
+        log.info("메세지 삭제 성공 : {}", id);
 
     }
 }

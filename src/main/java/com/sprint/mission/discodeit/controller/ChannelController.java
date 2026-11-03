@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "Channel", description = "Channel API")
 @RequiredArgsConstructor
 @RestController
@@ -36,6 +38,7 @@ public class ChannelController {
     )
     @PostMapping("/public")
     public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
+        log.debug("공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(publicChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -53,6 +56,7 @@ public class ChannelController {
     )
     @PostMapping("/private")
     public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
+        log.debug("비공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(privateChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -82,7 +86,7 @@ public class ChannelController {
     public ResponseEntity<ChannelDto> patchChannel(
             @PathVariable("channel-id") UUID uuid, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-
+        log.debug("채널 수정 요청");
 
         ChannelDto channelDto = channelService.update(uuid, publicChannelUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(channelDto);
@@ -105,6 +109,7 @@ public class ChannelController {
     })
     @DeleteMapping("/{channel-id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable("channel-id") UUID uuid) {
+        log.debug("채널 삭제 요청");
         channelService.delete(uuid);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)
