@@ -5,6 +5,11 @@ spring:
   profiles:
     default: prod
 
+  servlet:
+    multipart:
+      max-file-size: 5MB
+      max-request-size: 101MB
+
   jpa:
     hibernate:
       ddl-auto: validate
