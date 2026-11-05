@@ -50,6 +50,11 @@ public class BasicChannelService implements ChannelService {
   @Transactional
   @Override
   public ChannelDto create(PrivateChannelCreateRequest request) {
+
+    if (request.participantIds().isEmpty()) {
+      throw new IllegalArgumentException("참여자가 없습니다.");
+    }
+
     log.info("비공개 채널명 생성 시작");
     Channel channel = new Channel(ChannelType.PRIVATE, null, null);
     channelRepository.save(channel);
