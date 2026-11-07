@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -37,7 +38,7 @@ public class ChannelController {
             description = "공개 채널 등록 성공"
     )
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
+    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody @Valid PublicChannelCreateRequest publicChannelCreateRequest) {
         log.debug("공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(publicChannelCreateRequest);
 
@@ -55,7 +56,7 @@ public class ChannelController {
             description = "비공개 채널 등록 성공"
     )
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
+    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody @Valid PrivateChannelCreateRequest privateChannelCreateRequest) {
         log.debug("비공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(privateChannelCreateRequest);
 
@@ -84,7 +85,7 @@ public class ChannelController {
     })
     @PatchMapping("/{channel-id}")
     public ResponseEntity<ChannelDto> patchChannel(
-            @PathVariable("channel-id") UUID uuid, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+            @PathVariable("channel-id") UUID uuid, @RequestBody @Valid PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
         log.debug("채널 수정 요청");
 

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,7 +45,7 @@ public class ReadStatusController {
             )
     })
     @PostMapping
-    public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody ReadStatusCreateRequest readStatusCreateRequest) {
+    public ResponseEntity<ReadStatusDto> createReadStatus(@RequestBody @Valid ReadStatusCreateRequest readStatusCreateRequest) {
         ReadStatusDto readStatusDto = readStatusService.create(readStatusCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -67,7 +68,7 @@ public class ReadStatusController {
     })
     @PatchMapping("/{readStatusId}")
     public ResponseEntity<ReadStatusDto> patchReadStatus(@PathVariable("readStatusId") UUID readStatusId,
-                                                      @RequestBody ReadStatusUpdateRequest request){
+                                                      @RequestBody @Valid ReadStatusUpdateRequest request){
         ReadStatusDto readStatusDto = readStatusService.update(readStatusId, request);
 
         return ResponseEntity.ok(readStatusDto);

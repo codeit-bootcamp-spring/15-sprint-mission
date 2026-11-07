@@ -12,6 +12,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
@@ -38,6 +40,7 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
+    private final Validator validator;
 
 
     @Operation(
@@ -57,7 +60,7 @@ public class MessageController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ){
         log.debug("메세지 보내기 요청");
@@ -67,11 +70,16 @@ public class MessageController {
                         : attachments.stream()
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
                                 throw new BinaryRequestFailedException(e,file.getOriginalFilename());
                             }
@@ -99,7 +107,7 @@ public class MessageController {
     })
     @PatchMapping("/{message-id}")
     public ResponseEntity<MessageDto> patchMessage(@PathVariable("message-id") UUID id ,
-                                                             @RequestBody MessageUpdateRequest messageUpdateRequest){
+                                                             @RequestBody @Valid MessageUpdateRequest messageUpdateRequest){
         log.debug("메세지 수정 요청");
         MessageDto messageDto = messageService.update(id, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);

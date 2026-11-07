@@ -25,6 +25,11 @@ public class ErrorResponse {
                 e.getClass().getName(), errorCode.getStatus().value());
     }
 
+    public static ErrorResponse of(ErrorCode errorCode, Map<String, Object> details, String exceptionType) {
+        return new ErrorResponse(Instant.now(), errorCode.getCode(), errorCode.getMessage(), details,
+                exceptionType, errorCode.getStatus().value());
+    }
+
     //valid용
     public static ErrorResponse of(ErrorCode errorCode,Map<String, Object> details){
         return new ErrorResponse(Instant.now(),errorCode.getCode(), errorCode.getMessage(),details,

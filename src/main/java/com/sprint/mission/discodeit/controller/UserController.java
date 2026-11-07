@@ -14,6 +14,9 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -36,6 +39,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
+    private final Validator validator;
 
     //유저 생성
     @Operation(
@@ -54,18 +58,23 @@ public class UserController {
 
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profile", required = false) MultipartFile profile)throws IOException {
         log.debug("회원가입 요청");
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
                                 throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
@@ -98,7 +107,7 @@ public class UserController {
     })
     @PatchMapping(path = "/{user-id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> patchUser(
-            @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
         log.debug("회원정보 업데이트 요청");
@@ -106,11 +115,16 @@ public class UserController {
                 Optional.ofNullable(profile)
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
                                 throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
@@ -179,7 +193,7 @@ public class UserController {
     })
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-                                                                  @RequestBody UserStatusUpdateRequest userStatusUpdateRequest){
+                                                                  @RequestBody @Valid UserStatusUpdateRequest userStatusUpdateRequest){
         UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,userStatusUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userStatusDto);
     }
