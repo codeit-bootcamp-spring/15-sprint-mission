@@ -1,0 +1,23 @@
+spring:
+  sql:
+    init:
+      mode: never
+  datasource:
+    url: jdbc:h2:mem:discodeit-test;MODE=PostgreSQL;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+
+logging:
+  level:
+    com.sprint.mission.discodeit: DEBUG
+    org.hibernate.SQL: DEBUG
+
+discodeit:
+  storage:
+    local:
+      root-path: ./build/test-storage
