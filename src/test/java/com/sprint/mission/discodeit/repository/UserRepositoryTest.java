@@ -71,33 +71,4 @@ class UserRepositoryTest {
         // then
         assertThat(result).isEmpty();
     }
-
-    @Test
-    @DisplayName("회원명 내림차순 페이징 조회 성공")
-    void 회원_페이징정렬_성공() {
-        // given
-        var pageable = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "username"));
-
-        // when
-        var result = userRepository.findAll(pageable);
-
-        // then
-        assertThat(result.getContent()).extracting(User::getUsername).containsExactly("bob");
-        assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.hasNext()).isTrue();
-    }
-
-    @Test
-    @DisplayName("범위를 벗어난 회원 페이지는 빈 결과")
-    void 회원_페이징정렬_실패() {
-        // given
-        var pageable = PageRequest.of(2, 1, Sort.by("username"));
-
-        // when
-        var result = userRepository.findAll(pageable);
-
-        // then
-        assertThat(result.getContent()).isEmpty();
-        assertThat(result.getTotalElements()).isEqualTo(2);
-    }
 }

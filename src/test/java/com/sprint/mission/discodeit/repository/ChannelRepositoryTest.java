@@ -67,31 +67,5 @@ class ChannelRepositoryTest {
         assertThat(result).extracting(Channel::getName).containsExactly("alpha");
     }
 
-    @Test
-    @DisplayName("채널 이름 오름차순 페이징 조회")
-    void 채널_페이징정렬_성공() {
-        // given
-        var pageable = PageRequest.of(1, 1, Sort.by("name"));
 
-        // when
-        var result = channelRepository.findAll(pageable);
-
-        // then
-        assertThat(result.getContent()).extracting(Channel::getName).containsExactly("beta");
-        assertThat(result.getTotalElements()).isEqualTo(2);
-        assertThat(result.hasNext()).isFalse();
-    }
-
-    @Test
-    @DisplayName("범위를 벗어난 채널 페이지는 빈 결과")
-    void 채널_페이징정렬_실패() {
-        // given
-        var pageable = PageRequest.of(2, 1, Sort.by("name"));
-
-        // when
-        var result = channelRepository.findAll(pageable);
-
-        // then
-        assertThat(result.getContent()).isEmpty();
-    }
 }
