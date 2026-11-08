@@ -47,7 +47,7 @@ public class BasicUserService implements UserService {
         if(userRepository.existsByEmail(userCreateRequest.email())){
             throw new DuplicateUserEmailException(userCreateRequest.email());
         }
-        validateEmail(userCreateRequest.email());
+
 
         //바이너리
         BinaryContent profile = binaryContentCreateRequest
@@ -111,7 +111,7 @@ public class BasicUserService implements UserService {
 
 
         email = userUpdateRequest.newEmail() == null ? user.getEmail() : userUpdateRequest.newEmail();
-        validateEmail(email);
+
 
         password = userUpdateRequest.newPassword() == null ? user.getPassword() : userUpdateRequest.newPassword();
         name = userUpdateRequest.newUsername() == null ? user.getUsername() : userUpdateRequest.newUsername();
@@ -150,12 +150,6 @@ public class BasicUserService implements UserService {
 
 
 
-    private void validateEmail(String email){
-        if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$")) {
 
-            throw new IllegalArgumentException("메일 형식이 아님.");
-            //@vaild 로 넘길 예정이라 방치
-        }
-    }
 }
 
