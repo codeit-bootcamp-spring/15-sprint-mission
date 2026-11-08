@@ -2,9 +2,11 @@ package com.sprint.mission.discodeit.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 
 public record UserUpdateRequest(
 
+    @Size(max = 50)
     @Schema(description = "변경할 로그인 사용자 이름")
     String newUsername,
 

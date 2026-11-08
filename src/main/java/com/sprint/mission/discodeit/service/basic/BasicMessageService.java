@@ -3,6 +3,9 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.base.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.*;
@@ -10,6 +13,7 @@ import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
@@ -21,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BasicMessageService implements MessageService {
 
   private final MessageRepository messageRepository;
@@ -33,11 +38,13 @@ public class BasicMessageService implements MessageService {
 
   public MessageDto create(MessageCreateRequest request,
       List<BinaryContentCreateRequest> attachments) {
+    log.info("메시지 생성 요청 : authorId = {}, channelId = {}, attachmentCount = {}", request.authorId(),
+        request.channelId(), attachments == null ? 0 : attachments.size());
     if (!channelRepository.existsById(request.channelId())) {
-      throw new IllegalArgumentException("존재하지 않는 채널입니다. " + request.channelId());
+      throw new ChannelNotFoundException(request.channelId());
     }
     if (!userRepository.existsById(request.authorId())) {
-      throw new IllegalArgumentException("존재하지 않는 유저입니다. " + request.authorId());
+      throw new UserNotFoundException(request.authorId());
     }
     List<BinaryContent> attachmentIds = new ArrayList<>();
     if (attachments != null) {
@@ -49,10 +56,19 @@ public class BasicMessageService implements MessageService {
         attachmentIds.add(file);
       }
     }
-    Channel channel = channelRepository.findById(request.channelId()).orElseThrow();
-    User user = userRepository.findById(request.authorId()).orElseThrow();
+    Channel channel = channelRepository.findById(request.channelId()).orElseThrow(
+        () -> new ChannelNotFoundException(request.channelId())
+    );
+    User user = userRepository.findById(request.authorId()).orElseThrow(
+        () -> new UserNotFoundException(request.authorId())
+    );
     Message message = new Message(request.content(), channel, user, attachmentIds);
-    return messageMapper.toDto(messageRepository.save(message));
+    Message savedMessage = messageRepository.save(message);
+    log.info(
+        "메시지 생성 완료 : messageId = {}, authorId = {}, channelId = {}, attachmentIds = {}",
+        savedMessage.getId(), user.getId(), channel.getId(),
+        attachmentIds.stream().map(BinaryContent::getId).toList());
+    return messageMapper.toDto(savedMessage);
   }
 
   @Transactional(readOnly = true)
@@ -70,19 +86,23 @@ public class BasicMessageService implements MessageService {
   }
 
   public MessageDto update(UUID messageId, MessageUpdateRequest request) {
+    log.info("메세지 수정 요청 : messageId = {}, updateContent = {}", messageId, request.content());
     Message message = messageRepository.findById(messageId)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Message"));
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
     message.update(request.content());
+    log.info("메세지 수정 완료 : messageId = {}, authorId = {}, newContent = {}", message.getId(),
+        message.getAuthor(), message.getContent());
     return messageMapper.toDto(messageRepository.save(message));
   }
 
-  public void delete(UUID id) {
-    Message message = messageRepository.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Message"));
+  public void delete(UUID messageId) {
+    log.info("메세지 삭제 요청 : messageId = {}", messageId);
+    Message message = messageRepository.findById(messageId)
+        .orElseThrow(() -> new MessageNotFoundException(messageId));
     List<BinaryContent> files = new ArrayList<>(message.getAttachments());
-    messageRepository.deleteById(id);
+    messageRepository.deleteById(messageId);
     binaryContentRepository.deleteAll(files);
-
+    log.info("메세ㅣ 삭제 완료 : messageId = {}", messageId);
   }
 
 }

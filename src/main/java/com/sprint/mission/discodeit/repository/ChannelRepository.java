@@ -30,4 +30,6 @@ public interface ChannelRepository extends JpaRepository<Channel, UUID> {
   );
 
   List<Channel> findAllByType(ChannelType type);
+
+  Optional<Channel> findByName(String name);
 }

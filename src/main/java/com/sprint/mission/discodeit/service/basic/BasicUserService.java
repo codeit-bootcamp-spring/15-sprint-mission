@@ -3,11 +3,15 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.UserDto;
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.base.*;
+import com.sprint.mission.discodeit.exception.user.DuplicateEmailException;
+import com.sprint.mission.discodeit.exception.user.DuplicateUsernameException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import java.time.*;
 import java.util.*;
@@ -16,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BasicUserService implements UserService {
 
   private final UserRepository users;
@@ -25,6 +30,8 @@ public class BasicUserService implements UserService {
   private final BinaryContentStorage binaryContentStorage;
 
   public UserDto create(UserCreateRequest request, BinaryContentCreateRequest profile) {
+    log.info("유저 생성 요청 : username = {}, userEmail = {}, profile = {}", request.username(),
+        request.email(), profile == null ? false : true);
     checkUnique(request.username(), request.email());
     BinaryContent image = null;
     if (profile != null) {
@@ -41,13 +48,15 @@ public class BasicUserService implements UserService {
     UserStatus status = new UserStatus(user, Instant.now());
     user.setStatus(status);
     users.save(user);
+    log.info("유저 생성 완료 : userId = {}, userName = {}, userEmail = {}", user.getId(),
+        user.getUsername(), user.getEmail());
     return userMapper.toDto(user);
   }
 
   @Transactional(readOnly = true)
   public UserDto find(UUID id) {
     return userMapper.toDto(users.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User")));
+        .orElseThrow(() -> new UserNotFoundException(id)));
   }
 
   @Transactional(readOnly = true)
@@ -61,9 +70,11 @@ public class BasicUserService implements UserService {
 
   public UserDto update(UUID userId, UserUpdateRequest request,
       BinaryContentCreateRequest profile) {
+    log.info("유저 정보 수정 요청 : userId = {}, newUserName = {}, newUserEmail = {}, profile = {}", userId,
+        request.newUsername(), request.newEmail(), profile == null ? false : true);
     // 1. DTO의 ID로 기존 사용자를 조회합니다.
     User user = users.findById(userId)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
+        .orElseThrow(() -> new UserNotFoundException(userId));
     checkUnique(request.newUsername(), request.newEmail());
     BinaryContent image = null;
     if (profile != null) {
@@ -85,13 +96,16 @@ public class BasicUserService implements UserService {
     if (image != null && previous != null) {
       binaries.delete(previous);
     }
-    return userMapper.toDto(user);
+    UserDto userDto = userMapper.toDto(user);
+    log.info("유저 정보 수정 완료 : userId = {}, profileUpdated = {}", user.getId(), image != null);
+    return userDto;
   }
 
   public void delete(UUID id) {
+    log.info("유저 삭제 요청 : userId = {}", id);
     // 1. 사용자에게 연결된 프로필 ID를 확보합니다.
     User user = users.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
+        .orElseThrow(() -> new UserNotFoundException(id));
     // 2. 프로필이 있는 경우 그 파일의 ID로 삭제합니다.
     if (user.getProfile() != null) {
       binaries.deleteById(user.getProfile().getId());
@@ -103,14 +117,15 @@ public class BasicUserService implements UserService {
     }
     // 4. 관련 데이터 정리 후 사용자를 삭제합니다.
     users.deleteById(id);
+    log.info("유저 삭제 완료 : userId = {}", id);
   }
 
   private void checkUnique(String username, String email) {
     if (users.existsByEmail(email)) {
-      throw new IllegalArgumentException("중복된 이메일 입니다.");
+      throw new DuplicateEmailException(email);
     }
     if (users.existsByUsername(username)) {
-      throw new IllegalArgumentException("중복된 유저 이름 입니다.");
+      throw new DuplicateUsernameException(username);
     }
   }
 }

@@ -5,11 +5,24 @@ spring:
     url: jdbc:postgresql://localhost:5432/discodeit
     username: discodeit_user
     password: discodeit1234
+    driver-class-name: org.postgresql.Driver
+  profiles:
+    active: local
+
+  servlet:
+    multipart:
+      # 파일 하나의 최대 업로드 크기
+      # 10MB는 예시이므로 과제에서 지정한 값이 있으면 변경
+      max-file-size: 10MB
+
+      # 파일과 폼 데이터를 포함한 요청 전체의 최대 크기
+      # 30MB는 예시이므로 과제에서 지정한 값이 있으면 변경
+      max-request-size: 30MB
 
   jpa:
     open-in-view: false
     hibernate:
-      ddl-auto: create
+      ddl-auto: update
     show-sql: false
     properties:
       hibernate:
@@ -18,13 +31,74 @@ spring:
 
 logging:
   level:
+    root: info
     org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: DEBUG
     org.springframework.orm.jpa.JpaTransactionManager: DEBUG
     org.hibernate.SQL: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss.SSS} %-5level [%thread] %logger{20} : %msg%n"
 
 discodeit:
   storage:
     type: local
     local:
       root-path: .discodeit/storage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        # HTTP로 접근할 수 있는 Actuator 엔드포인트 지정
+        # /actuator/health: 애플리케이션 상태 확인
+        # /actuator/info: 아래 info에 정의한 정보 확인
+        include: health,info
+
+  info:
+    env:
+      # 설정 파일의 info.* 값을 /actuator/info 응답에 포함
+      # /actuator/env 엔드포인트를 공개하는 설정은 아님
+      enabled: true
+
+info:
+  app:
+    # 애플리케이션 표시 이름
+    name: Discodeit
+
+    # 애플리케이션 표시 버전
+    # build.gradle의 version을 변경하는 설정은 아님
+    version: "1.7.0"
+
+    # 표시용 자바 버전 — 실제 실행 버전을 변경하지 않음
+    java-version: "17"
+
+    # 표시용 Spring Boot 버전 — 실제 의존성 버전을 변경하지 않음
+    spring-boot-version: "4.1.1"
+
+  datasource:
+    # ${...}: 기존 설정의 값을 가져오는 참조 문법
+    # 현재 적용된 DB 연결 주소 표시
+    url: ${spring.datasource.url}
+
+    # 현재 적용된 JDBC 드라이버 클래스 이름 표시
+    driver-class-name: ${spring.datasource.driver-class-name}
+
+  jpa:
+    # Hibernate의 스키마 관리 설정 표시
+    # 현재 프로젝트의 update: 기존 테이블 구조의 갱신을 시도
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+
+  storage:
+    # 파일 저장 방식 표시
+    type: ${discodeit.storage.type}
+
+    # 로컬 저장 경로 표시
+    # 상대 경로는 애플리케이션 실행 작업 디렉토리 기준
+    path: ${discodeit.storage.local.root-path}
+
+  multipart:
+    # 실제 설정된 개별 파일 크기 제한 표시
+    max-file-size: ${spring.servlet.multipart.max-file-size}
+
+    # 실제 설정된 요청 전체 크기 제한 표시
+    max-request-size: ${spring.servlet.multipart.max-request-size}

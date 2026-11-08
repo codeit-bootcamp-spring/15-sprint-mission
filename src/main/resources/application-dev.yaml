@@ -1,0 +1,7 @@
+server:
+  port: 8081
+
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: debug

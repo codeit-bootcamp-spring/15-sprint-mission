@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record ReadStatusUpdateRequest(
 
+    @NotNull
     @Schema(description = "요청의 마지막 읽음 시각")
     Instant newLastReadAt) {
 

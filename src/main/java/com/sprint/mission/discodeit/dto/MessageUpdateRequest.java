@@ -8,10 +8,6 @@ import java.util.UUID;
 
 public record MessageUpdateRequest(
 
-    @NotNull
-    @Schema(description = "수정 요청의 메시지 ID")
-    UUID id,
-
     @Schema(description = "변경할 메시지 내용")
     @NotBlank
     String content) {

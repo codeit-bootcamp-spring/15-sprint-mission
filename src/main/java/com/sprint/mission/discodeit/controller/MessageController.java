@@ -5,11 +5,15 @@ import com.sprint.mission.discodeit.dto.MessageCreateRequest;
 import com.sprint.mission.discodeit.dto.MessageDto;
 import com.sprint.mission.discodeit.dto.MessageUpdateRequest;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.exception.binaryContent.EmptyFileException;
+import com.sprint.mission.discodeit.exception.binaryContent.InvalidImageContentTypeException;
+import com.sprint.mission.discodeit.exception.binaryContent.MissingFileNameException;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -26,6 +30,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/messages")
+@Slf4j
 public class MessageController {
 
   public static final List<String> ALLOWED_EXTENSIONS = List.of("jpg", "jpeg", "png", "gif");
@@ -36,6 +41,9 @@ public class MessageController {
   public ResponseEntity<MessageDto> createMessage(
       @Valid @RequestPart("messageCreateRequest") MessageCreateRequest request,
       @RequestParam(required = false) List<MultipartFile> attachments) throws IOException {
+    log.debug("메세지 생성 API 요청 : authorId = {}, ChannelId = {}, content = {}, attachments = {}",
+        request.authorId(), request.channelId(), request.content(),
+        attachments == null ? 0 : attachments.size());
     List<BinaryContentCreateRequest> profile = new ArrayList<>();
     if (attachments != null && !attachments.isEmpty()) {
       for (MultipartFile file : attachments) {
@@ -53,16 +61,19 @@ public class MessageController {
   @Tag(name = "메세지 첨부파일 검증")
   private void validateImageFile(MultipartFile multipartFile) {
     if (multipartFile.isEmpty()) {
-      throw new IllegalArgumentException("파일이 비었습니다.");
+      throw new EmptyFileException();
     }
     String fileName = multipartFile.getOriginalFilename();
-    String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
-    if (!ALLOWED_EXTENSIONS.contains(extension)) {
-      throw new IllegalArgumentException("허용되지 않은 확장자 입니다.");
+    if (fileName == null || fileName.isBlank()) {
+      throw new MissingFileNameException();
     }
+    String extension = fileName.substring(fileName.lastIndexOf(".") + 1).toLowerCase();
     String contentType = multipartFile.getContentType();
+    if (!ALLOWED_EXTENSIONS.contains(extension)) {
+      throw new InvalidImageContentTypeException(extension, contentType);
+    }
     if (contentType == null || !contentType.startsWith("image/")) {
-      throw new IllegalArgumentException("이미지 파일만 업로드 가능합니다.");
+      throw new InvalidImageContentTypeException(extension, contentType);
     }
   }
 
@@ -70,8 +81,10 @@ public class MessageController {
   @PatchMapping("/{messageId}")
   public ResponseEntity<MessageDto> updateMessage(
       @PathVariable("messageId") UUID messageId,
-      @Valid @ModelAttribute MessageUpdateRequest request) {
+      @Valid @RequestBody MessageUpdateRequest request) {
+    log.debug("메세지 수정 API 요청 : messageId = {}", messageId);
     MessageDto message = messageService.update(messageId, request);
+    log.debug("메세지 수정 API 완료 : messageId = {}, newContent = {}", message.id(), message.content());
     return ResponseEntity.ok().body(message);
   }
 
@@ -89,6 +102,7 @@ public class MessageController {
   @DeleteMapping("/{messageId}")
   public ResponseEntity<Void> deleteMessage(
       @PathVariable("messageId") UUID messageId) {
+    log.debug("메세지 삭제 API 요청 : messageId = {}", messageId);
     messageService.delete(messageId);
     return ResponseEntity.noContent().build();
   }
