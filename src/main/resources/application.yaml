@@ -3,7 +3,10 @@ spring:
     name: discodeit
 
   profiles:
-    default: prod
+    default: dev
+
+  datasource:
+    driver-class-name: org.postgresql.Driver
 
   servlet:
     multipart:
@@ -36,3 +39,30 @@ discodeit:
     type: local
     local:
       root-path: ./file-data-map/BinaryContentStorage
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,loggers
+  info:
+    env:
+      enabled: true
+
+info:
+  app:
+    name: Discodeit
+    version: 1.7.0
+    java-version: ${java.version}
+    spring-boot-version: 4.1.1
+  datasource:
+    url: ${spring.datasource.url}
+    driver-class-name: ${spring.datasource.driver-class-name}
+  jpa:
+    ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+  storage:
+    type: ${discodeit.storage.type}
+    path: ${discodeit.storage.local.root-path}
+  multipart:
+    max-file-size: ${spring.servlet.multipart.max-file-size}
+    max-request-size: ${spring.servlet.multipart.max-request-size}
