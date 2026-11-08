@@ -1,5 +1,13 @@
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: ${SPRING_BOOT_ADMIN_CLIENT_URL:http://localhost:9090}
 server:
   port: 8082
+
 logging:
   level:
     root: info
