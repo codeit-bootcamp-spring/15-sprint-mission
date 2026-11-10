@@ -1,3 +1,14 @@
+create table binary_contents
+(
+    id           uuid primary key,
+    created_at   timestamptz  not null,
+    file_name    varchar(255) not null,
+    size         bigint       not null,
+    content_type varchar(100) not null,
+    bytes        bytea        not null
+);
+
+
 create table users
 (
     id         uuid primary key,
@@ -9,15 +20,6 @@ create table users
     profile_id uuid         REFERENCES binary_contents (id) on delete set null unique
 );
 
-create table binary_contents
-(
-    id           uuid primary key,
-    created_at   timestamptz  not null,
-    file_name    varchar(255) not null,
-    size         bigint       not null,
-    content_type varchar(100) not null,
-    bytes        bytea        not null
-);
 
 create table user_statuses
 (
@@ -45,7 +47,7 @@ create table messages
     id         uuid primary key,
     created_at timestamptz                                     not null,
     updated_at timestamptz,
-    contents   text,
+    content   text,
     channel_id uuid REFERENCES channels (id) on delete cascade not null,
     author_id  uuid                                            REFERENCES users (id) on delete set null
 );
@@ -57,7 +59,7 @@ create table read_statuses
     updated_at     timestamptz,
     user_id        uuid REFERENCES users (id) on delete cascade    not null,
     channel_id     uuid REFERENCES channels (id) on delete cascade not null,
-    last_active_at timestamptz                                     not null
+    last_read_at timestamptz                                     not null
 );
 
 create table message_attachments

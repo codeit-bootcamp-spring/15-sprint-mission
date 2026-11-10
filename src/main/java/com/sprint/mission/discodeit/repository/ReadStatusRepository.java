@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.base.ReadStatus;
-import com.sprint.mission.discodeit.entity.base.User;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -18,5 +17,12 @@ public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
   List<ReadStatus> findAllByChannelId(UUID channelId);
 
   Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId);
+
+  @EntityGraph(attributePaths = {
+      "user",
+      "user.profile",
+      "user.status"
+  })
+  List<ReadStatus> findAllByChannelIdIn(List<UUID> channelIds);
 
 }

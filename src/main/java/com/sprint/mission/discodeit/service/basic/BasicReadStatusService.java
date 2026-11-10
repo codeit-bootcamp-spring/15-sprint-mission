@@ -2,10 +2,16 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.*;
 import com.sprint.mission.discodeit.entity.base.*;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.NotChannelParticipantException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.readStatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -14,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class BasicReadStatusService implements ReadStatusService {
 
   private final ReadStatusRepository reads;
@@ -22,26 +29,32 @@ public class BasicReadStatusService implements ReadStatusService {
   private final ReadStatusMapper readStatusMapper;
 
   public ReadStatusDto create(ReadStatusCreateRequest request) {
+    log.info("읽음 상태 생성 요청 : userId = {}, channelId = {}, lastReadAt = {}", request.userId(),
+        request.channelId(), request.lastReadAt());
     User user = users.findById(request.userId())
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 User"));
+        .orElseThrow(() -> new UserNotFoundException(request.userId()));
     Channel channel = channels.findById(request.channelId())
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 Channel"));
+        .orElseThrow(() -> new ChannelNotFoundException(request.channelId()));
     Optional<ReadStatus> existing = reads.findByUserIdAndChannelId(request.userId(),
         request.channelId());
     // 읽음 상태를 새로 만들더라도 PRIVATE의 참여자 목록은 바꾸지 않습니다.
     if (channel.getType() == Channel.ChannelType.PRIVATE && existing.isEmpty()) {
-      throw new IllegalArgumentException("PRIVATE 채널의 참여자가 아닙니다.");
+      throw new NotChannelParticipantException(request.userId(), request.channelId());
     }
     if (existing.isPresent()) {
-      throw new IllegalArgumentException("이미 존재하는 읽음 상태입니다.");
+      throw new ReadStatusAlreadyExistsException();
     }
-    return readStatusMapper.toDto(reads.save(new ReadStatus(user, channel, request.lastReadAt())));
+    ReadStatus readStatus = reads.save(new ReadStatus(user, channel, request.lastReadAt()));
+    ReadStatusDto result = readStatusMapper.toDto(readStatus);
+    log.info("읽음 상태 생성 완료 : readStatusId = {}, userId = {}, channelId = {}", readStatus.getId(),
+        user.getId(), channel.getId());
+    return result;
   }
 
   @Transactional(readOnly = true)
   public ReadStatusDto find(UUID id) {
     return readStatusMapper.toDto(reads.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 ReadStatus: " + id)));
+        .orElseThrow(() -> new ReadStatusNotFoundException(id)));
   }
 
   @Transactional(readOnly = true)
@@ -57,7 +70,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
   private ReadStatus getEntity(UUID id) {
     return reads.findById(id)
-        .orElseThrow(() -> new NoSuchElementException("존재하지 않는 ReadStatus: " + id));
+        .orElseThrow(() -> new ReadStatusNotFoundException(id));
   }
 
   public ReadStatusDto update(UUID readStatusId, ReadStatusUpdateRequest request) {
@@ -67,6 +80,7 @@ public class BasicReadStatusService implements ReadStatusService {
   }
 
   public void delete(UUID id) {
+    log.info("읽음 상태 삭제 요청 : readStatusId = {}", id);
     reads.deleteById(id);
   }
 

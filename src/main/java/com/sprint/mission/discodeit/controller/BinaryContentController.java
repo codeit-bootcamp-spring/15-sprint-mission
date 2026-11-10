@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,6 +15,7 @@ import java.util.UUID;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/binaryContents")
+@Slf4j
 public class BinaryContentController {
 
   private final BinaryContentService binaryContentService;
@@ -30,6 +32,7 @@ public class BinaryContentController {
   @Tag(name = "첨부파일 다운로드")
   @GetMapping("/{binaryContentId}/download")
   public ResponseEntity<?> download(@PathVariable("binaryContentId") UUID binaryContentId) {
+    log.debug("첨부파일 다운로드 API 요청 : binaryContentId = {}", binaryContentId);
     BinaryContentDto dto = binaryContentService.find(binaryContentId);
     return binaryContentStorage.download(dto);
   }

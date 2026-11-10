@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: discodeit
+  boot:
+    admin:
+      client:
+        url: http://localhost:9090
+server:
+  port: 8081
+
+logging:
+  level:
+    root: info
+    com.sprint.mission.discodeit: debug

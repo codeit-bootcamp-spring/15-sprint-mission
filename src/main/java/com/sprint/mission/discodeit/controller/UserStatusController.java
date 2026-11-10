@@ -11,6 +11,5 @@ import org.springframework.web.bind.annotation.RestController;
 public class UserStatusController {
 
   private final UserStatusService userStatusService;
-
-
+  
 }

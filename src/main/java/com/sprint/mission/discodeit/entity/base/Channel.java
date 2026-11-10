@@ -1,11 +1,11 @@
 package com.sprint.mission.discodeit.entity.base;
 
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
-import java.time.Instant;
 import java.util.Objects;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -37,7 +37,7 @@ public class Channel extends BaseUpdatableEntity {
 
   public void update(String name, String description) {
     if (ChannelType.PRIVATE.equals(type)) {
-      throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+      throw new PrivateChannelUpdateException(this.getId());
     }
     if (name != null) {
       this.name = name;
