@@ -1,0 +1,14 @@
+server:
+  port: ${SERVER_PORT:8080}
+  #운영환경에서의 설정
+
+spring:
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info

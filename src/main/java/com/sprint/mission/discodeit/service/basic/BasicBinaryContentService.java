@@ -1,23 +1,23 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
 import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
-import com.sprint.mission.discodeit.dto.data.BinaryContentDto;
-import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
 
   private final BinaryContentRepository binaryContentRepository;
@@ -27,39 +27,32 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public BinaryContentDto create(BinaryContentCreateRequest request) {
+    log.info("파일 업로드 시작");
     String fileName = request.fileName();
     byte[] bytes = request.bytes();
     String contentType = request.contentType();
-
-    // 1. 메타 정보만 생성
     BinaryContent binaryContent = new BinaryContent(
         fileName,
         (long) bytes.length,
         contentType
     );
+    binaryContentRepository.save(binaryContent);
+    binaryContentStorage.put(binaryContent.getId(), bytes);
 
-    // 2. 메타 정보를 DB에 저장
-    BinaryContent savedContent = binaryContentRepository.save(binaryContent);
-
-    // 3. 실제 파일 데이터를 별도 저장소에 저장
-    binaryContentStorage.put(savedContent.getId(), bytes);
-
-    // 4. DTO 반환
-    return binaryContentMapper.toDto(savedContent);
+    log.info("파일 업로드 완료: fileName={}, contentType={}", fileName, contentType);
+    return binaryContentMapper.toDto(binaryContent);
   }
 
   @Override
   public BinaryContentDto find(UUID binaryContentId) {
     return binaryContentRepository.findById(binaryContentId)
         .map(binaryContentMapper::toDto)
-        .orElseThrow(() -> new NoSuchElementException(
-            "BinaryContent with id " + binaryContentId + " not found"));
+        .orElseThrow(() -> new BinaryContentNotFoundException());
   }
 
   @Override
   public List<BinaryContentDto> findAllByIdIn(List<UUID> binaryContentIds) {
-    return binaryContentRepository.findAllByIdIn(binaryContentIds)
-        .stream()
+    return binaryContentRepository.findAllById(binaryContentIds).stream()
         .map(binaryContentMapper::toDto)
         .toList();
   }
@@ -67,9 +60,12 @@ public class BasicBinaryContentService implements BinaryContentService {
   @Transactional
   @Override
   public void delete(UUID binaryContentId) {
+    log.info("파일 삭제 시작: binaryContentId={}", binaryContentId);
     if (!binaryContentRepository.existsById(binaryContentId)) {
-      throw new NoSuchElementException("BinaryContent with id " + binaryContentId + " not found");
+      log.warn("파일 삭제 실패: 파일을 찾을 수 없음 binaryContentId={}", binaryContentId);
+      throw new BinaryContentNotFoundException();
     }
     binaryContentRepository.deleteById(binaryContentId);
+    log.info("파일 삭제 완료: binaryContentId={}", binaryContentId);
   }
 }
