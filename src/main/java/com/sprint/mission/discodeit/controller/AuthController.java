@@ -1,19 +1,23 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.Request.LoginRequest;
-import com.sprint.mission.discodeit.dto.Response.UserDto;
+import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+@Slf4j
 @Tag(name = "Auth", description = "인증 API")
 @RequiredArgsConstructor
 @RestController
@@ -41,8 +45,11 @@ public class AuthController {
             )
     })
     @PostMapping("/login")
-    public ResponseEntity<UserDto> login(@RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<UserDto> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest httpServletRequest) {
+        log.debug("로그인 시도 : {}", httpServletRequest.getRemoteAddr());
         UserDto dto=authService.login(loginRequest);
+
+
 
         return ResponseEntity.ok(dto);
     }

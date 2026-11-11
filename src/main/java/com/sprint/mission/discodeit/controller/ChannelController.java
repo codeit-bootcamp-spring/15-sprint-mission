@@ -1,15 +1,17 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.Request.PrivateChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.PublicChannelCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.PublicChannelUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.ChannelDto;
+import com.sprint.mission.discodeit.dto.request.PrivateChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelCreateRequest;
+import com.sprint.mission.discodeit.dto.request.PublicChannelUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "Channel", description = "Channel API")
 @RequiredArgsConstructor
 @RestController
@@ -35,7 +38,8 @@ public class ChannelController {
             description = "공개 채널 등록 성공"
     )
     @PostMapping("/public")
-    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody PublicChannelCreateRequest publicChannelCreateRequest) {
+    public ResponseEntity<ChannelDto> createPublicChannel(@RequestBody @Valid PublicChannelCreateRequest publicChannelCreateRequest) {
+        log.debug("공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(publicChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -52,7 +56,8 @@ public class ChannelController {
             description = "비공개 채널 등록 성공"
     )
     @PostMapping("/private")
-    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody PrivateChannelCreateRequest privateChannelCreateRequest) {
+    public ResponseEntity<ChannelDto> createPrivateChannel(@RequestBody @Valid PrivateChannelCreateRequest privateChannelCreateRequest) {
+        log.debug("비공개 채널 생성 요청");
         ChannelDto channelDto = channelService.create(privateChannelCreateRequest);
 
         return ResponseEntity.status(HttpStatus.CREATED)
@@ -80,9 +85,9 @@ public class ChannelController {
     })
     @PatchMapping("/{channel-id}")
     public ResponseEntity<ChannelDto> patchChannel(
-            @PathVariable("channel-id") UUID uuid, @RequestBody PublicChannelUpdateRequest publicChannelUpdateRequest) {
+            @PathVariable("channel-id") UUID uuid, @RequestBody @Valid PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-
+        log.debug("채널 수정 요청");
 
         ChannelDto channelDto = channelService.update(uuid, publicChannelUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(channelDto);
@@ -105,6 +110,7 @@ public class ChannelController {
     })
     @DeleteMapping("/{channel-id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable("channel-id") UUID uuid) {
+        log.debug("채널 삭제 요청");
         channelService.delete(uuid);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

@@ -1,15 +1,19 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
-import com.sprint.mission.discodeit.dto.Response.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -17,15 +21,18 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicMessageService implements MessageService {
@@ -43,10 +50,10 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto create(MessageCreateRequest messageCreateRequest, List<BinaryContentCreateRequest> binaryContentCreateRequests) {
         Channel channel = channelRepository.findById(messageCreateRequest.channelId())
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : "+ messageCreateRequest.channelId()));
+                .orElseThrow(() -> new ChannelNotFoundException(messageCreateRequest.channelId()));
 
         User user = userRepository.findById(messageCreateRequest.authorId())
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : "+ messageCreateRequest.authorId()));
+                .orElseThrow(() -> new UserNotFoundException(messageCreateRequest.authorId()));
 
         List<BinaryContent> attachments = binaryContentCreateRequests.stream()
                 .map(attachmentRequest -> {
@@ -63,28 +70,23 @@ public class BasicMessageService implements MessageService {
         Message message = new Message(channel,user,
                 messageCreateRequest.content(), attachments);
         messageRepository.save(message);
-        return messageMapper.toDto(message);
+
+        MessageDto dto = messageMapper.toDto(message);
+        log.info("메세지 보내기 성공 : {}", dto.id());
+        return dto;
     }
 
 
     @Transactional(readOnly = true)
     @Override
-    public MessageCursorResponse<MessageDto> findAllByChannelId(
+    public PageResponse<MessageDto> findAllByChannelId(
             UUID channelId,
             Instant cursor,
             Pageable pageable
     ) {
-        Slice<Message> messages;
 
-        if (cursor == null) {
-            messages = messageRepository.findAllByChannelIdJoinUser(
-                    channelId, pageable
-            );
-        } else {
-            messages = messageRepository.findAllByChannelIdBeforeCursor(
-                    channelId, cursor, pageable
-            );
-        }
+        Slice<Message> messages = messageRepository.findAllByChannelIdWithCursor(
+                channelId, cursor, pageable);
 
         List<MessageDto> content = messages.getContent()
                 .stream()
@@ -100,11 +102,12 @@ public class BasicMessageService implements MessageService {
             nextCursor = lastMessage.getCreatedAt().toString();
         }
 
-        return new MessageCursorResponse<>(
+        return PageResponseMapper.from(
                 content,
                 nextCursor,
                 messages.getSize(),
-                messages.hasNext()
+                messages.hasNext(),
+                messageRepository.countByChannelId(channelId)
         );
     }
 
@@ -112,9 +115,12 @@ public class BasicMessageService implements MessageService {
     @Override
     public MessageDto update(UUID id,MessageUpdateRequest messageUpdateRequest) {
         Message message = messageRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("메세지 id 없음 : " + id));
+                .orElseThrow(() -> new MessageNotFoundException(id));
         message.update(messageUpdateRequest.newContent());
-        return messageMapper.toDto(message);
+
+        MessageDto dto = messageMapper.toDto(message);
+        log.info("메세지 수정 성공 : {}", dto.id());
+        return dto;
     }
 
     @Transactional
@@ -122,8 +128,9 @@ public class BasicMessageService implements MessageService {
     public void delete(UUID id) {
         Message message = messageRepository.findById(id)
                 .orElseThrow(() ->
-                        new NoSuchElementException("메시지 id 없음 : " + id));
+                        new MessageNotFoundException(id));
         messageRepository.delete(message);
+        log.info("메세지 삭제 성공 : {}", id);
 
     }
 }

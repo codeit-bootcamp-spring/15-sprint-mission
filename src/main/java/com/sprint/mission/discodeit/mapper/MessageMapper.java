@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.Response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.entity.Message;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;

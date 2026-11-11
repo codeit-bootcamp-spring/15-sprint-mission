@@ -1,16 +1,21 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.MessageUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.MessageCursorResponse;
-import com.sprint.mission.discodeit.dto.Response.MessageDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageCreateRequest;
+import com.sprint.mission.discodeit.dto.request.MessageUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.exception.BinaryRequestFailedException;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
@@ -22,11 +27,12 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
-import java.time.Instant;
 import java.util.ArrayList;
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "Message", description = "Message API")
 @RequiredArgsConstructor
 @RestController
@@ -34,6 +40,7 @@ import java.util.UUID;
 public class MessageController {
 
     private final MessageService messageService;
+    private final Validator validator;
 
 
     @Operation(
@@ -53,22 +60,28 @@ public class MessageController {
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<MessageDto> createMessage(
-            @RequestPart("messageCreateRequest") MessageCreateRequest messageCreateRequest,
+            @RequestPart("messageCreateRequest") @Valid MessageCreateRequest messageCreateRequest,
             @RequestPart(value = "attachments", required = false) List<MultipartFile> attachments
     ){
+        log.debug("메세지 보내기 요청");
         List<BinaryContentCreateRequest> attachmentRequests =
                 attachments == null
                         ? new ArrayList<>()
                         : attachments.stream()
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,file.getOriginalFilename());
                             }
                         })
                         .toList();
@@ -94,7 +107,8 @@ public class MessageController {
     })
     @PatchMapping("/{message-id}")
     public ResponseEntity<MessageDto> patchMessage(@PathVariable("message-id") UUID id ,
-                                                             @RequestBody MessageUpdateRequest messageUpdateRequest){
+                                                             @RequestBody @Valid MessageUpdateRequest messageUpdateRequest){
+        log.debug("메세지 수정 요청");
         MessageDto messageDto = messageService.update(id, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);
     }
@@ -116,6 +130,7 @@ public class MessageController {
     })
     @DeleteMapping("/{message-id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") UUID uuid) {
+        log.debug("메세지 삭제 요청");
         messageService.delete(uuid);
         return ResponseEntity.noContent().build();
     }
@@ -130,7 +145,7 @@ public class MessageController {
             description = "채널의 메세지 목록 조회 성공"
     )
     @GetMapping
-    public MessageCursorResponse<MessageDto> getAllByChannelId(
+    public PageResponse<MessageDto> getAllByChannelId(
             @RequestParam UUID channelId,
             @RequestParam(required = false) Instant cursor,
             @PageableDefault(

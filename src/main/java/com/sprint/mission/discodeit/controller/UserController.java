@@ -1,19 +1,24 @@
 package com.sprint.mission.discodeit.controller;
 
 
-import com.sprint.mission.discodeit.dto.Request.BinaryContentCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.UserCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.UserStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.Request.UserUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.UserDto;
-import com.sprint.mission.discodeit.dto.Response.UserStatusDto;
+import com.sprint.mission.discodeit.dto.request.BinaryContentCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserCreateRequest;
+import com.sprint.mission.discodeit.dto.request.UserStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.request.UserUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.exception.BinaryRequestFailedException;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.Validator;
+import jakarta.validation.ConstraintViolationException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -26,6 +31,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+@Slf4j
 @Tag(name = "User", description = "User API")
 @RequiredArgsConstructor
 @RestController
@@ -33,6 +39,7 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final UserStatusService userStatusService;
+    private final Validator validator;
 
     //유저 생성
     @Operation(
@@ -51,19 +58,25 @@ public class UserController {
 
     })
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") UserCreateRequest userCreateRequest,
+    public ResponseEntity<UserDto> createUser(@RequestPart("userCreateRequest") @Valid UserCreateRequest userCreateRequest,
                                               @RequestPart(value = "profile", required = false) MultipartFile profile)throws IOException {
+        log.debug("회원가입 요청");
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
                         });
 
@@ -94,21 +107,26 @@ public class UserController {
     })
     @PatchMapping(path = "/{user-id}",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> patchUser(
-            @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") UserUpdateRequest userUpdateRequest,
+            @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
-
+        log.debug("회원정보 업데이트 요청");
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
                             try {
-                                return new BinaryContentCreateRequest(
+                                BinaryContentCreateRequest request = new BinaryContentCreateRequest(
                                         file.getOriginalFilename(),
                                         file.getContentType(),
                                         file.getBytes()
                                 );
+                                var violations = validator.validate(request);
+                                if (!violations.isEmpty()) {
+                                    throw new ConstraintViolationException(violations);
+                                }
+                                return request;
                             } catch (IOException e) {
-                                throw new UncheckedIOException(e);
+                                throw new BinaryRequestFailedException(e,profile.getOriginalFilename());
                             }
                         });
 
@@ -136,6 +154,7 @@ public class UserController {
     @DeleteMapping("/{user-id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID uuid) {
         //UUID uuid = UUID.fromString(Id);
+        log.debug("탈퇴 요청");
         userService.delete(uuid);
         return ResponseEntity.noContent().build();
     }
@@ -151,6 +170,7 @@ public class UserController {
     )
     @GetMapping
     public ResponseEntity<List<UserDto>> getUsers() {
+        log.debug("전체 회원정보 조회 요청");
         List<UserDto> users = userService.findAll();
         return ResponseEntity.ok(users);
     }
@@ -173,7 +193,7 @@ public class UserController {
     })
     @PatchMapping("/{userId}/userStatus")
     public ResponseEntity<UserStatusDto> updateUserStatusByUserId(@PathVariable("userId") UUID userId,
-                                                                  @RequestBody UserStatusUpdateRequest userStatusUpdateRequest){
+                                                                  @RequestBody @Valid UserStatusUpdateRequest userStatusUpdateRequest){
         UserStatusDto userStatusDto = userStatusService.updateByUserId(userId,userStatusUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(userStatusDto);
     }

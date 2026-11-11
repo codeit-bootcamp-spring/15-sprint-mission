@@ -1,11 +1,15 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Request.ReadStatusCreateRequest;
-import com.sprint.mission.discodeit.dto.Request.ReadStatusUpdateRequest;
-import com.sprint.mission.discodeit.dto.Response.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.request.ReadStatusCreateRequest;
+import com.sprint.mission.discodeit.dto.request.ReadStatusUpdateRequest;
+import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.DuplicateReadStatusException;
+import com.sprint.mission.discodeit.exception.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -16,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -33,13 +36,13 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto create(ReadStatusCreateRequest readStatusCreateRequest) {
 
         Channel channel = channelRepository.findById(readStatusCreateRequest.channelId())
-                .orElseThrow(() -> new NoSuchElementException("채널 id 없음 : "+ readStatusCreateRequest.channelId()));
+                .orElseThrow(() -> new ChannelNotFoundException(readStatusCreateRequest.channelId()));
 
         User user = userRepository.findById(readStatusCreateRequest.userId())
-                .orElseThrow(() -> new NoSuchElementException("유저 id 없음 : "+ readStatusCreateRequest.userId()));
+                .orElseThrow(() -> new UserNotFoundException(readStatusCreateRequest.userId()));
 
         if(readStatusRepository.existsByUserIdAndChannelId(readStatusCreateRequest.userId(),readStatusCreateRequest.channelId())){
-            throw new IllegalArgumentException("해당 채널, 유저의 ReadStatus가 이미 존재합니다");
+            throw new DuplicateReadStatusException(readStatusCreateRequest.channelId(),readStatusCreateRequest.userId());
         }
 
         ReadStatus readStatus = new ReadStatus(user,channel,
@@ -62,7 +65,7 @@ public class BasicReadStatusService implements ReadStatusService {
     @Transactional
     @Override
     public ReadStatusDto update(UUID id, ReadStatusUpdateRequest readStatusUpdateRequest) {
-        ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(() -> new NoSuchElementException("ReadStatus id 없음 : " + id));
+        ReadStatus readStatus = readStatusRepository.findById(id).orElseThrow(() -> new ReadStatusNotFoundException(id));
         readStatus.update(readStatusUpdateRequest.newLastReadAt());
         return readStatusMapper.toDto(readStatus);
     }

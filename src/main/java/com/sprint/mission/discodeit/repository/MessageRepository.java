@@ -22,40 +22,14 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
         left join fetch u.profile
         left join fetch u.status
         where m.channel.id = :channelId
-                and (:cursor is null or m.createdAt < :cursor)
+                and (cast(:cursor as timestamp) is null or m.createdAt < :cursor)
         """)
     Slice<Message> findAllByChannelIdWithCursor(
             @Param("channelId") UUID channelId,
             @Param("cursor") Instant cursor,
             Pageable pageable);
 
-    @Query("""
-    select m
-    from Message m
-    left join fetch m.author u
-    left join fetch u.profile
-    left join fetch u.status
-    where m.channel.id = :channelId
-    """)
-    Slice<Message> findAllByChannelIdJoinUser(
-            @Param("channelId") UUID channelId,
-            Pageable pageable
-    );
-
-    @Query("""
-    select m
-    from Message m
-    left join fetch m.author u
-    left join fetch u.profile
-    left join fetch u.status
-    where m.channel.id = :channelId
-      and m.createdAt < :cursor
-    """)
-    Slice<Message> findAllByChannelIdBeforeCursor(
-            @Param("channelId") UUID channelId,
-            @Param("cursor") Instant cursor,
-            Pageable pageable
-    );
+    long countByChannelId(UUID channelId);
 
 
 

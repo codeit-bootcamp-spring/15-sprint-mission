@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.Response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.BinaryNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +17,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class BasicBinaryContentService implements BinaryContentService {
@@ -28,7 +31,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     @Transactional(readOnly = true)
     public BinaryContentDto find(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("바이너리컨텐츠 id 없음 : " + id));
+                .orElseThrow(() -> new BinaryNotFoundException(id));
         return binaryContentMapper.toDto(binaryContent);
     }
 
@@ -43,8 +46,11 @@ public class BasicBinaryContentService implements BinaryContentService {
     }// todo Ids에서 하나라도 노서치가 발생하면 익셉션을 던질지 고민중
 
 
+    @Transactional(readOnly = true)
     @Override
     public ResponseEntity<?> download(UUID id){
-        return binaryContentStorage.download(find(id));
+        ResponseEntity<?> response = binaryContentStorage.download(find(id));
+        log.info("파일 다운로드 준비 완료 : {}", id);
+        return response;
     }
 }
