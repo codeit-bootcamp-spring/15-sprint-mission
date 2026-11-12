@@ -30,8 +30,15 @@
     </encoder>
   </appender>
 
-  <!-- 개발 환경: 콘솔만 -->
+  <!-- 개발 환경: 콘솔 + 파일 -->
   <springProfile name="local">
+    <root level="INFO">
+      <appender-ref ref="CONSOLE"/>
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="dev">
     <root level="INFO">
       <appender-ref ref="CONSOLE"/>
       <appender-ref ref="FILE"/>

@@ -6,6 +6,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,15 +61,13 @@ class BasicMessageServiceTest {
   @Mock
   MessageRepository messageRepository;
   @Mock
-  BinaryContentRepository binaryContentRepository;
-  @Mock
   UserRepository userRepository;
   @Mock
   ChannelRepository channelRepository;
   @Mock
-  MessageMapper messageMapper;
+  BinaryContentRepository binaryContentRepository;
   @Mock
-  BinaryContentStorage binaryContentStorage;
+  MessageMapper messageMapper;
   @Mock
   PageResponseMapper pageResponseMapper;
   @InjectMocks
@@ -86,12 +86,12 @@ class BasicMessageServiceTest {
     UserDto userDto = new UserDto(authorId, "username", "user@naver.com", null, true);
     MessageDto messageDto = new MessageDto(UUID.randomUUID(), Instant.now(), Instant.now(),
         "content", channelId, userDto, null);
-    when(channelRepository.existsById(channelId)).thenReturn(true);
-    when(userRepository.existsById(authorId)).thenReturn(true);
-    when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
-    when(userRepository.findById(authorId)).thenReturn(Optional.of(user));
-    when(messageRepository.save(any(Message.class))).thenReturn(message);
-    when(messageMapper.toDto(message)).thenReturn(messageDto);
+    given(channelRepository.existsById(channelId)).willReturn(true);
+    given(userRepository.existsById(authorId)).willReturn(true);
+    given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
+    given(userRepository.findById(authorId)).willReturn(Optional.of(user));
+    given(messageRepository.save(any(Message.class))).willReturn(message);
+    given(messageMapper.toDto(message)).willReturn(messageDto);
     // when
     MessageDto result = messageService.create(messageCreateRequest, null);
     // then
@@ -105,8 +105,8 @@ class BasicMessageServiceTest {
     UUID channelId = UUID.randomUUID();
     UUID userId = UUID.randomUUID();
     MessageCreateRequest message = new MessageCreateRequest(channelId, userId, "content");
-    when(channelRepository.existsById(channelId)).thenReturn(true);
-    when(userRepository.existsById(userId)).thenReturn(false);
+    given(channelRepository.existsById(channelId)).willReturn(true);
+    given(userRepository.existsById(userId)).willReturn(false);
     // when then
     assertThatThrownBy(() -> messageService.create(message, List.of())).isInstanceOf(
         UserNotFoundException.class);
@@ -126,9 +126,9 @@ class BasicMessageServiceTest {
     MessageDto dto = new MessageDto(messageId, null, null, "newContent", channelId, userDto,
         List.of());
     MessageUpdateRequest request = new MessageUpdateRequest("newContent");
-    when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
-    when(messageMapper.toDto(message)).thenReturn(dto);
-    when(messageRepository.save(message)).thenReturn(message);
+    given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
+    given(messageMapper.toDto(message)).willReturn(dto);
+    given(messageRepository.save(message)).willReturn(message);
     // when
     MessageDto messageDto = messageService.update(messageId, request);
     // then
@@ -140,7 +140,7 @@ class BasicMessageServiceTest {
   void message_update_fail_case() {
     UUID messageId = UUID.randomUUID();
     MessageUpdateRequest request = new MessageUpdateRequest("newContent");
-    when(messageRepository.findById(messageId)).thenReturn(Optional.empty());
+    given(messageRepository.findById(messageId)).willReturn(Optional.empty());
     // when then
     assertThatThrownBy(() -> messageService.update(messageId, request)).isInstanceOf(
         MessageNotFoundException.class);
@@ -154,11 +154,11 @@ class BasicMessageServiceTest {
     User user = new User("username", "user@naver.com", "password", null);
     Channel channel = new Channel(ChannelType.PUBLIC, "channelName", "channelDesc");
     Message message = new Message("content", channel, user, List.of());
-    when(messageRepository.findById(messageId)).thenReturn(Optional.of(message));
+    given(messageRepository.findById(messageId)).willReturn(Optional.of(message));
     // when
     messageService.delete(messageId);
     // then
-    verify(messageRepository).deleteById(messageId);
+    then(messageRepository).should().deleteById(messageId);
   }
 
   @Test
@@ -190,16 +190,16 @@ class BasicMessageServiceTest {
     PageResponse<MessageDto> expected = new PageResponse<>(List.of(messageDto), null, 20, false,
         null);
 
-    when(messageRepository.findAllByChannelId(channelId, pageable)).thenReturn(messageSlice);
-    when(messageMapper.toDto(message)).thenReturn(messageDto);
-    when(pageResponseMapper.fromSlice(eq(dtoSlice), any())).thenReturn(expected);
+    given(messageRepository.findAllByChannelId(channelId, pageable)).willReturn(messageSlice);
+    given(messageMapper.toDto(message)).willReturn(messageDto);
+    given(pageResponseMapper.fromSlice(eq(dtoSlice), any())).willReturn(expected);
 
     // when
     PageResponse<MessageDto> result = messageService.findAllByChannelId(channelId, null, pageable);
 
     // then
-    verify(messageRepository).findAllByChannelId(channelId, pageable);
-    verify(messageMapper).toDto(message);
+    then(messageRepository).should().findAllByChannelId(channelId, pageable);
+    then(messageMapper).should().toDto(message);
     assertThat(result).isSameAs(expected);
     assertThat(result.content()).containsExactly(messageDto);
   }

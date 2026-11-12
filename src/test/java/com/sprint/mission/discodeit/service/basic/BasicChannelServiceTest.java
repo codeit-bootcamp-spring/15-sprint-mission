@@ -5,6 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -48,8 +50,6 @@ class BasicChannelServiceTest {
   @Mock
   MessageRepository messageRepository;
   @Mock
-  BinaryContentRepository binaryContentRepository;
-  @Mock
   ChannelMapper channelMapper;
   @Mock
   UserMapper userMapper;
@@ -63,11 +63,11 @@ class BasicChannelServiceTest {
     PublicChannelCreateRequest channel = new PublicChannelCreateRequest("channelName",
         "channelDesc");
     Channel savedChannel = new Channel(ChannelType.PUBLIC, channel.name(), channel.description());
-    when(channelRepository.save(any(Channel.class))).thenReturn(savedChannel);
+    given(channelRepository.save(any(Channel.class))).willReturn(savedChannel);
     // when
     channelService.createPublic(channel);
     // then
-    verify(channelRepository).save(any(Channel.class));
+    then(channelRepository).should().save(any(Channel.class));
   }
 
   @Test
@@ -79,11 +79,11 @@ class BasicChannelServiceTest {
     List<UUID> participantIds = List.of(userId);
     PrivateChannelCreateRequest channel = new PrivateChannelCreateRequest(participantIds);
     Channel savedChannel = new Channel(ChannelType.PRIVATE, null, null);
-    when(channelRepository.save(any(Channel.class))).thenReturn(savedChannel);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    given(channelRepository.save(any(Channel.class))).willReturn(savedChannel);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
     // when
     channelService.createPrivate(channel);
-    verify(channelRepository).save(any(Channel.class));
+    then(channelRepository).should().save(any(Channel.class));
   }
 
 
@@ -108,8 +108,8 @@ class BasicChannelServiceTest {
     channels.add(channel);
     ChannelDto expected = new ChannelDto(channel.getId(), ChannelType.PUBLIC, "channelName",
         "channelDesc", List.of(), null);
-    when(channelRepository.findVisibleChannels(userId, ChannelType.PUBLIC)).thenReturn(channels);
-    when(channelMapper.toDto(channel, List.of(), null)).thenReturn(expected);
+    given(channelRepository.findVisibleChannels(userId, ChannelType.PUBLIC)).willReturn(channels);
+    given(channelMapper.toDto(channel, List.of(), null)).willReturn(expected);
     // when
     List<ChannelDto> channelDto = channelService.findAllByUserId(userId);
     // then
@@ -127,9 +127,9 @@ class BasicChannelServiceTest {
         "newChannelDesc");
     ChannelDto channelDto = new ChannelDto(channelId, ChannelType.PUBLIC, "newChannelName",
         "newChannelDesc", List.of(), null);
-    when(channelRepository.findById(channelId)).thenReturn(Optional.of(channel));
-    when(channelMapper.toDto(channel)).thenReturn(channelDto);
-    when(channelRepository.save(channel)).thenReturn(channel);
+    given(channelRepository.findById(channelId)).willReturn(Optional.of(channel));
+    given(channelMapper.toDto(channel)).willReturn(channelDto);
+    given(channelRepository.save(channel)).willReturn(channel);
     // when
     ChannelDto updateChannelDto = channelService.update(channelId, updateRequest);
     // then
@@ -158,7 +158,7 @@ class BasicChannelServiceTest {
     // when
     channelService.delete(channelId);
     // then
-    verify(channelRepository).deleteById(channelId);
+    then(channelRepository).should().deleteById(channelId);
   }
 
   @Test
@@ -172,17 +172,17 @@ class BasicChannelServiceTest {
     ChannelDto dto = new ChannelDto(channel.getId(), ChannelType.PUBLIC, "channelName",
         "channelDesc", List.of(), null);
     List<Channel> channels = List.of(channel);
-    when(channelRepository.findVisibleChannels(userId, ChannelType.PUBLIC)).thenReturn(channels);
-    when(readStatusRepository.findAllByChannelIdIn(anyList())).thenReturn(List.of());
-    when(messageRepository.findLastMessageAtByChannelIds(anyList())).thenReturn(List.of());
-    when(channelMapper.toDto(channel, List.of(), null)).thenReturn(dto);
+    given(channelRepository.findVisibleChannels(userId, ChannelType.PUBLIC)).willReturn(channels);
+    given(readStatusRepository.findAllByChannelIdIn(anyList())).willReturn(List.of());
+    given(messageRepository.findLastMessageAtByChannelIds(anyList())).willReturn(List.of());
+    given(channelMapper.toDto(channel, List.of(), null)).willReturn(dto);
     // when
     List<ChannelDto> result = channelService.findAllByUserId(userId);
     // then
-    verify(channelRepository).findVisibleChannels(userId, ChannelType.PUBLIC);
-    verify(readStatusRepository).findAllByChannelIdIn(anyList());
-    verify(messageRepository).findLastMessageAtByChannelIds(anyList());
-    verify(channelMapper).toDto(channel, List.of(), null);
+    then(channelRepository).should().findVisibleChannels(userId, ChannelType.PUBLIC);
+    then(readStatusRepository).should().findAllByChannelIdIn(anyList());
+    then(messageRepository).should().findLastMessageAtByChannelIds(anyList());
+    then(channelMapper).should().toDto(channel, List.of(), null);
     assertThat(result).containsExactly(dto);
   }
 
