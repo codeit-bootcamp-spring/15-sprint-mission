@@ -2,7 +2,7 @@ spring:
   application:
     name: discodeit
   profiles:
-    active: dev
+    active: ${SPRING_PROFILES_ACTIVE}
   boot:
     admin:
       client:
