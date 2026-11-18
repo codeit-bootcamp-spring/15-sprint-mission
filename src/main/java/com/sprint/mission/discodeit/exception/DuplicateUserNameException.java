@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import java.util.Map;
 
-public class DuplicateUserNameException extends DiscodeitException {
+public class DuplicateUserNameException extends UserException {
 
 
     public DuplicateUserNameException(String userName) {

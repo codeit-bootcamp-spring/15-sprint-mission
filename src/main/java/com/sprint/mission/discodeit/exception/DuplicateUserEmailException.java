@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import java.util.Map;
 
-public class DuplicateUserEmailException extends DiscodeitException {
+public class DuplicateUserEmailException extends UserException {
 
 
     public DuplicateUserEmailException(String email) {

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import java.util.Map;
 
-public class StorageInitFailedException extends DiscodeitException {
+public class StorageInitFailedException extends BinaryContentException {
 
 
     public StorageInitFailedException(Throwable cause) {

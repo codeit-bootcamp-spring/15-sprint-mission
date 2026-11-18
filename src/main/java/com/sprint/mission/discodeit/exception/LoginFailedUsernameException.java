@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import java.util.Map;
 
-public class LoginFailedUsernameException extends DiscodeitException {
+public class LoginFailedUsernameException extends UserException {
 
 
     public LoginFailedUsernameException() {

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class FileLoadFailedException extends DiscodeitException {
+public class FileLoadFailedException extends BinaryContentException {
 
 
     public FileLoadFailedException(Throwable cause, UUID binaryContentId) {

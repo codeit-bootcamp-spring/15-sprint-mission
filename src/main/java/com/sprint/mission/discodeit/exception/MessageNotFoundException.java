@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class MessageNotFoundException extends DiscodeitException {
+public class MessageNotFoundException extends MessageException {
 
 
     public MessageNotFoundException(UUID messageId) {
