@@ -1,0 +1,8 @@
+.git
+.idea
+.gradle
+build
+.logs
+.env*
+file-data-map
+.aws
