@@ -1,51 +1,36 @@
 services:
   app:
     build: .
-    container_name: aws-practice-app
+    container_name: discodeit-kmg
     environment:
-      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/${POSTGRES_DB}
       SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
       SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
-      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
-      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
-      AWS_REGION: ${AWS_REGION}
-      S3_BUCKET: ${S3_BUCKET}
-
     ports:
-      - "8080:8080"
-
-  # ── 모니터링 스택: 수집기(Prometheus) + 화면(Grafana) ──────────────
-  prometheus:
-    image: prom/prometheus
-    container_name: prometheus
-    ports:
-      - "9090:9090"
+      - "8081:80"
     volumes:
-      # compose 전용 설정 — target 이 host.docker.internal 이 아니라 app:8080
-      - ./monitoring/compose/prometheus.yml:/etc/prometheus/prometheus.yml
+      - binary-content:/app/file-data-map/BinaryContentStorage
     depends_on:
-      - app
+      db:
+        condition: service_healthy
 
-  grafana:
-    image: grafana/grafana
-    container_name: grafana
-    ports:
-      - "3000:3000"
+  db:
+    image: postgres:16
     environment:
-      # 로그인 없이 바로 보기 — 수업 시연용. 실무에선 절대 이렇게 두지 않는다
-      GF_AUTH_ANONYMOUS_ENABLED: "true"
-      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
-      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${SPRING_DATASOURCE_USERNAME}
+      POSTGRES_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
     volumes:
-      # 데이터소스만 compose 전용(주소가 prometheus:9090), 나머지는 demo 와 공유
-      - ./monitoring/compose/grafana-datasource.yml:/etc/grafana/provisioning/datasources/datasource.yml
-      - ./monitoring/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards
-      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
-    depends_on:
-      - prometheus
-
+      - postgres-data:/var/lib/postgresql/data
+      - ./src/main/resources/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -h 127.0.0.1 -U \"$${POSTGRES_USER}\" -d \"$${POSTGRES_DB}\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
 
 volumes:
-  bookstore-data:
-
+  binary-content:
+  postgres-data:

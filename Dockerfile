@@ -1,12 +1,23 @@
-FROM amazoncorretto:17 AS build
+## 빌드만을 담당하는 레이어
+FROM amazoncorretto:17 AS builder
 WORKDIR /app
 
 RUN yum install -y findutils && yum clean all
 
-COPY . .
-RUN chmod +x gradlew && ./gradlew bootJar --no-daemon
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle settings.gradle ./
+RUN chmod +x gradlew
+RUN ./gradlew dependencies --no-daemon
 
+COPY src src
+RUN ./gradlew build --no-daemon -x test
+
+## 실행만을 담당하는 레이어
 FROM amazoncorretto:17
+
+HEALTHCHECK --interval=5s --timeout=3s --start-period=20s --retries=3 CMD curl -f http://localhost:${SERVER_PORT}/actuator/health || exit 1
+
 WORKDIR /app
 
 ENV PROJECT_NAME=discodeit \
@@ -14,7 +25,7 @@ ENV PROJECT_NAME=discodeit \
     JVM_OPTS="" \
     SERVER_PORT=80
 
-COPY --from=build /app/build/libs/ ./build/libs/
+COPY --from=builder /app/build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar ./
 
 EXPOSE 80
-CMD ["sh", "-c", "exec java $JVM_OPTS -jar \"build/libs/${PROJECT_NAME}-${PROJECT_VERSION}.jar\""]
+CMD ["sh", "-c", "exec java $JVM_OPTS -jar \"${PROJECT_NAME}-${PROJECT_VERSION}.jar\""]
