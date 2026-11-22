@@ -8,7 +8,6 @@ spring:
       client:
         instance:
           name: discodeit
-
   servlet:
     multipart:
       # 파일 하나의 최대 업로드 크기
@@ -41,9 +40,15 @@ logging:
 
 discodeit:
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: .discodeit/storage
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 
 management:
   endpoints:
@@ -102,3 +107,8 @@ info:
 
     # 실제 설정된 요청 전체 크기 제한 표시
     max-request-size: ${spring.servlet.multipart.max-request-size}
+
+app:
+  s3:
+    bucket: ${S3_BUCKET:discodeit-binary-content-storage-khs}
+    region: ${AWS_REGION:ap-northeast-2}

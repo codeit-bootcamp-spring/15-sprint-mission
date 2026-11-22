@@ -2,7 +2,7 @@ spring:
   application:
     name: discodeit
   datasource:
-    url: jdbc:postgresql://${SPRING_DATASOURCE_URL}:5432/discodeit
+    url: ${SPRING_DATASOURCE_URL}
     username: ${SPRING_DATASOURCE_USERNAME}
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
