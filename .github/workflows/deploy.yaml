@@ -1,5 +1,5 @@
 name: deploy
-
+#
 on:
   push:
     branches: [ release ]
@@ -43,22 +43,58 @@ jobs:
           echo "image=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: 현재 태스크 정의 내려받기
+        id: task-definition
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
         run: |
-          aws ecs describe-task-definition --task-definition $TASK_FAMILY \
-            --query taskDefinition > task-definition.json
+          aws ecs describe-task-definition --task-definition "$TASK_FAMILY" \
+            --query taskDefinition --output json > task-definition.json
+
+          image_repository="$REGISTRY/$ECR_REPOSITORY"
+          if ! container_name=$(jq -er --arg repo "$image_repository" '
+            [.containerDefinitions[]
+              | select(.image == $repo or
+                  (.image | startswith($repo + ":") or startswith($repo + "@")))
+              | .name]
+            | if length == 1 then .[0] else empty end
+          ' task-definition.json); then
+            echo "::error::Expected exactly one container using $image_repository in $TASK_FAMILY."
+            jq -r '.containerDefinitions[] | "\(.name) -> \(.image)"' task-definition.json
+            exit 1
+          fi
+
+          echo "container-name=$container_name" >> "$GITHUB_OUTPUT"
 
       - name: 태스크 정의에 새 이미지 끼우기
         id: render
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
           task-definition: task-definition.json
-          container-name: aws-practice  # 본인 컨테이너 이름
+          container-name: ${{ steps.task-definition.outputs.container-name }}
           image: ${{ steps.build-image.outputs.image }}
 
       - name: ECS에 배포하고 안정화까지 대기
+        id: ecs-deploy
         uses: aws-actions/amazon-ecs-deploy-task-definition@v2
         with:
           task-definition: ${{ steps.render.outputs.task-definition }}
           cluster: ${{ env.ECS_CLUSTER }}
           service: ${{ env.ECS_SERVICE }}
           wait-for-service-stability: true
+
+      - name: ECS 배포 실패 원인 확인
+        if: ${{ failure() && steps.ecs-deploy.outcome == 'failure' }}
+        continue-on-error: true
+        run: |
+          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
+            --query 'services[0].events[:10].{time:createdAt,message:message}' --output table
+
+          stopped_tasks=$(aws ecs list-tasks --cluster "$ECS_CLUSTER" \
+            --service-name "$ECS_SERVICE" --desired-status STOPPED --max-items 20 \
+            --query 'taskArns' --output text)
+          if [[ -n "$stopped_tasks" && "$stopped_tasks" != "None" ]]; then
+            read -r -a task_arns <<< "$stopped_tasks"
+            aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "${task_arns[@]}" \
+              --query 'tasks[].{taskDefinition:taskDefinitionArn,stoppedAt:stoppedAt,reason:stoppedReason,containers:containers[].{name:name,exitCode:exitCode,reason:reason}}' \
+              --output json
+          fi
