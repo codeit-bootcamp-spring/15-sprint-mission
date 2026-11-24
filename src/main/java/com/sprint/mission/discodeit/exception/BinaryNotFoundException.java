@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class BinaryNotFoundException extends DiscodeitException {
+public class BinaryNotFoundException extends BinaryContentException {
 
 
     public BinaryNotFoundException(UUID binaryContentId) {

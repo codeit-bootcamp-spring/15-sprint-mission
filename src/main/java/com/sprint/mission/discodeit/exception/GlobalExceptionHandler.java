@@ -2,19 +2,23 @@ package com.sprint.mission.discodeit.exception;
 
 import lombok.extern.slf4j.Slf4j;
 import jakarta.validation.ConstraintViolationException;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
+
+// Spring MVC가 기본 예외를 등록하고 예외별 HTTP 상태와 헤더를 결정합니다.
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(DiscodeitException.class)
     public ResponseEntity<ErrorResponse> handleBase(DiscodeitException e) {
@@ -26,9 +30,9 @@ public class GlobalExceptionHandler {
                 .body(ErrorResponse.of(e));
     }
 
-    @ExceptionHandler(MethodArgumentNotValidException.class )
-    public ResponseEntity<ErrorResponse> handleValidation(MethodArgumentNotValidException e) {
-
+    @Override
+    protected ResponseEntity<Object> handleMethodArgumentNotValid(
+            MethodArgumentNotValidException e, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
         Map<String, Object> errors = new HashMap<>();
         e.getBindingResult().getFieldErrors()
                 .forEach(fe -> errors.put(fe.getField(),fe.getDefaultMessage()));
@@ -37,15 +41,23 @@ public class GlobalExceptionHandler {
                 .map(entry -> entry.getKey() + "=" + entry.getValue())
                 .toList());
 
-        return ResponseEntity.status(ErrorCode.INVALID_INPUT.getStatus())
-                // 필드별 메시지는 errors 에 담습니다. getFieldErrors() 의 순서는 보장되지 않으므로
-                // message 에는 고정 문구를 씁니다.
-                .body(ErrorResponse.of(ErrorCode.INVALID_INPUT, errors));
+        return handleExceptionInternal(e, ErrorResponse.of(ErrorCode.INVALID_INPUT, errors),
+                headers, status, request);
     }
 
+    @Override
+    protected ResponseEntity<Object> handleExceptionInternal(
+            Exception e, Object body, HttpHeaders headers, HttpStatusCode status, WebRequest request) {
+        ErrorResponse response = body instanceof ErrorResponse errorResponse
+                ? errorResponse
+                : ErrorResponse.fromHttpStatus(status, e.getClass().getName());
 
+        if (status.is5xxServerError()) {
+            log.error("요청 처리 중 서버 오류가 발생했습니다. status={}", status.value(), e);
+        }
 
-
+        return super.handleExceptionInternal(e, response, headers, status, request);
+    }
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolation(ConstraintViolationException e) {
         Map<String, Object> errors = new HashMap<>();

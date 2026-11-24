@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class PrivateChannelUpdateException extends DiscodeitException {
+public class PrivateChannelUpdateException extends ChannelException {
 
 
     public PrivateChannelUpdateException(UUID channelId) {

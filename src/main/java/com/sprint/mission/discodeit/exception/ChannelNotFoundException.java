@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class ChannelNotFoundException extends DiscodeitException {
+public class ChannelNotFoundException extends ChannelException {
 
 
 

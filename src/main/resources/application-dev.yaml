@@ -4,9 +4,18 @@ spring:
     username: discodeit_user
     password: discodeit1234
 
+  jpa:
+    show-sql: true
+
 server:
   port: 8080
 
 logging:
   level:
     com.sprint.mission.discodeit: DEBUG
+    org.hibernate.orm.jdbc.bind: TRACE
+
+management:
+  info:
+    env:
+      enabled: true

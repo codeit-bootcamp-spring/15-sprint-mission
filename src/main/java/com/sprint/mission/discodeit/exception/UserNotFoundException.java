@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class UserNotFoundException extends DiscodeitException {
+public class UserNotFoundException extends UserException {
 
 
     public UserNotFoundException(UUID userId) {

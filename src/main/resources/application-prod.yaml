@@ -1,8 +1,11 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/discodeit
-    username: discodeit_user
-    password: discodeit1234
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+  jpa:
+    show-sql: false
 
 server:
   port: 8081
@@ -10,3 +13,9 @@ server:
 logging:
   level:
     com.sprint.mission.discodeit: INFO
+    org.hibernate.orm.jdbc.bind: "OFF"
+
+management:
+  info:
+    env:
+      enabled: false

@@ -108,7 +108,7 @@ public class MessageController {
     @PatchMapping("/{message-id}")
     public ResponseEntity<MessageDto> patchMessage(@PathVariable("message-id") UUID id ,
                                                              @RequestBody @Valid MessageUpdateRequest messageUpdateRequest){
-        log.debug("메세지 수정 요청");
+        log.debug("메세지 수정 요청 : {}", id);
         MessageDto messageDto = messageService.update(id, messageUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);
     }
@@ -130,7 +130,7 @@ public class MessageController {
     })
     @DeleteMapping("/{message-id}")
     public ResponseEntity<Void> deleteMessage(@PathVariable("message-id") UUID uuid) {
-        log.debug("메세지 삭제 요청");
+        log.debug("메세지 삭제 요청 : {}", uuid);
         messageService.delete(uuid);
         return ResponseEntity.noContent().build();
     }

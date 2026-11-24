@@ -1,0 +1,100 @@
+name: deploy
+#
+on:
+  push:
+    branches: [ release ]
+
+permissions:
+  id-token: write     # OIDC 신분증(토큰) 발급 허용 — 이 줄이 없으면 인증 실패
+  contents: read
+
+env:
+  AWS_REGION: ap-northeast-2
+  ECR_REPOSITORY: discodeit  # 네이밍컨벤션 8
+  ECS_CLUSTER: discodeit-cluster # 네이밍컨벤션 10
+  ECS_SERVICE: discodeit-service # 네이밍컨벤션 13
+  TASK_FAMILY: discodeit-task  # 네이밍컨벤션 11
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 코드 받기
+        uses: actions/checkout@v4
+
+      - name: AWS 인증 (OIDC — 키 없음)
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::279102686634:role/github-actions-discodeit  # 네이밍컨벤션 14
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: ECR 로그인
+        id: ecr-login
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: 이미지 빌드하고 push (태그 = 커밋 해시)
+        id: build-image
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
+          docker push $REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+          echo "image=$REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+
+      - name: 현재 태스크 정의 내려받기
+        id: task-definition
+        env:
+          REGISTRY: ${{ steps.ecr-login.outputs.registry }}
+        run: |
+          aws ecs describe-task-definition --task-definition "$TASK_FAMILY" \
+            --query taskDefinition --output json > task-definition.json
+
+          image_repository="$REGISTRY/$ECR_REPOSITORY"
+          if ! container_name=$(jq -er --arg repo "$image_repository" '
+            [.containerDefinitions[]
+              | select(.image == $repo or
+                  (.image | startswith($repo + ":") or startswith($repo + "@")))
+              | .name]
+            | if length == 1 then .[0] else empty end
+          ' task-definition.json); then
+            echo "::error::Expected exactly one container using $image_repository in $TASK_FAMILY."
+            jq -r '.containerDefinitions[] | "\(.name) -> \(.image)"' task-definition.json
+            exit 1
+          fi
+
+          echo "container-name=$container_name" >> "$GITHUB_OUTPUT"
+
+      - name: 태스크 정의에 새 이미지 끼우기
+        id: render
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{ steps.task-definition.outputs.container-name }}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: ECS에 배포하고 안정화까지 대기
+        id: ecs-deploy
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v2
+        with:
+          task-definition: ${{ steps.render.outputs.task-definition }}
+          cluster: ${{ env.ECS_CLUSTER }}
+          service: ${{ env.ECS_SERVICE }}
+          wait-for-service-stability: true
+
+      - name: ECS 배포 실패 원인 확인
+        if: ${{ failure() && steps.ecs-deploy.outcome == 'failure' }}
+        continue-on-error: true
+        run: |
+          aws ecs describe-services --cluster "$ECS_CLUSTER" --services "$ECS_SERVICE" \
+            --query 'services[0].events[:10].{time:createdAt,message:message}' --output table
+
+          stopped_tasks=$(aws ecs list-tasks --cluster "$ECS_CLUSTER" \
+            --service-name "$ECS_SERVICE" --desired-status STOPPED --max-items 20 \
+            --query 'taskArns' --output text)
+          if [[ -n "$stopped_tasks" && "$stopped_tasks" != "None" ]]; then
+            read -r -a task_arns <<< "$stopped_tasks"
+            aws ecs describe-tasks --cluster "$ECS_CLUSTER" --tasks "${task_arns[@]}" \
+              --query 'tasks[].{taskDefinition:taskDefinitionArn,stoppedAt:stoppedAt,reason:stoppedReason,containers:containers[].{name:name,exitCode:exitCode,reason:reason}}' \
+              --output json
+          fi

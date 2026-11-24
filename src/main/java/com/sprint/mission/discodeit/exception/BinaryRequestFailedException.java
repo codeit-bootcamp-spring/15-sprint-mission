@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.exception;
 
 import java.util.Map;
 
-public class BinaryRequestFailedException extends DiscodeitException {
+public class BinaryRequestFailedException extends BinaryContentException {
 
 
     public BinaryRequestFailedException(Throwable cause, String fileName) {

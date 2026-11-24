@@ -87,7 +87,7 @@ public class ChannelController {
     public ResponseEntity<ChannelDto> patchChannel(
             @PathVariable("channel-id") UUID uuid, @RequestBody @Valid PublicChannelUpdateRequest publicChannelUpdateRequest) {
 
-        log.debug("채널 수정 요청");
+        log.debug("채널 수정 요청 : {}", uuid);
 
         ChannelDto channelDto = channelService.update(uuid, publicChannelUpdateRequest);
         return ResponseEntity.status(HttpStatus.OK).body(channelDto);
@@ -110,7 +110,7 @@ public class ChannelController {
     })
     @DeleteMapping("/{channel-id}")
     public ResponseEntity<Void> deleteChannel(@PathVariable("channel-id") UUID uuid) {
-        log.debug("채널 삭제 요청");
+        log.debug("채널 삭제 요청 : {}", uuid);
         channelService.delete(uuid);
         return ResponseEntity
                 .status(HttpStatus.NO_CONTENT)

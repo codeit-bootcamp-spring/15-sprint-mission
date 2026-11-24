@@ -110,7 +110,7 @@ public class UserController {
             @PathVariable("user-id") UUID uuid, @RequestPart("userUpdateRequest") @Valid UserUpdateRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile) throws IOException {
 
-        log.debug("회원정보 업데이트 요청");
+        log.debug("회원정보 업데이트 요청 : {}", uuid);
         Optional<BinaryContentCreateRequest> binaryRequest =
                 Optional.ofNullable(profile)
                         .map(file -> {
@@ -154,7 +154,7 @@ public class UserController {
     @DeleteMapping("/{user-id}")
     public ResponseEntity<Void> deleteUser(@PathVariable("user-id") UUID uuid) {
         //UUID uuid = UUID.fromString(Id);
-        log.debug("탈퇴 요청");
+        log.debug("탈퇴 요청 : {}",uuid);
         userService.delete(uuid);
         return ResponseEntity.noContent().build();
     }

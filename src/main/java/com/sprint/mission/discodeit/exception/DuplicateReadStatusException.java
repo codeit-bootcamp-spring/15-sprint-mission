@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.exception;
 import java.util.Map;
 import java.util.UUID;
 
-public class DuplicateReadStatusException extends DiscodeitException {
+public class DuplicateReadStatusException extends StatusException {
 
 
     public DuplicateReadStatusException(UUID channelId, UUID userId) {

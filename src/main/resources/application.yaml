@@ -1,9 +1,12 @@
 spring:
+  config:
+    import: "optional:file:./.env[.properties]"
+
   application:
     name: discodeit
 
   profiles:
-    default: dev
+    default: prod
 
   datasource:
     driver-class-name: org.postgresql.Driver
@@ -16,7 +19,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-    show-sql: true
 
     properties:
       hibernate:
@@ -28,7 +30,6 @@ spring:
 
 logging:
   level:
-    org.hibernate.orm.jdbc.bind: trace
     org.springframework.transaction.interceptor: TRACE
     org.springframework.orm.jpa.JpaTransactionManager: DEBUG
     root: INFO
@@ -36,18 +37,21 @@ logging:
 
 discodeit:
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: ./file-data-map/BinaryContentStorage
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:./file-data-map/BinaryContentStorage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY}
+      secret-key: ${AWS_S3_SECRET_KEY}
+      region: ${AWS_S3_REGION}
+      bucket: ${AWS_S3_BUCKET}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics,loggers
-  info:
-    env:
-      enabled: true
 
 info:
   app:

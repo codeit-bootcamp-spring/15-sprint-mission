@@ -19,5 +19,6 @@ logging:
 
 discodeit:
   storage:
+    type: local
     local:
       root-path: ./build/test-storage
