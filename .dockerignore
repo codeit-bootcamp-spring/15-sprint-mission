@@ -1,0 +1,14 @@
+.git
+.gradle
+build
+.idea
+.vscode
+*.iml
+.DS_Store
+.env
+.env.*
+!.env.example
+.logs
+logs
+*.log
+.discodeit

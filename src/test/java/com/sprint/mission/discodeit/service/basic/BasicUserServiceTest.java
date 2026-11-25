@@ -36,6 +36,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.AdditionalMatchers.aryEq;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.then;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,8 +51,6 @@ class BasicUserServiceTest {
   @Mock
   BinaryContentRepository binaryContentRepository;
   @Mock
-  UserStatusRepository userStatusRepository;
-  @Mock
   UserMapper userMapper;
   @Mock
   BinaryContentStorage binaryContentStorage;
@@ -63,12 +63,12 @@ class BasicUserServiceTest {
   void user_create_success_case01() {
     // given
     UserCreateRequest request = new UserCreateRequest("username", "user@naver.com", "password");
-    when(userRepository.existsByEmail(request.email())).thenReturn(false);
-    when(userRepository.existsByUsername(request.username())).thenReturn(false);
+    given(userRepository.existsByEmail(request.email())).willReturn(false);
+    given(userRepository.existsByUsername(request.username())).willReturn(false);
     // when
     userService.create(request, null);
     // then
-    verify(userRepository).save(any(User.class));
+    then(userRepository).should().save(any(User.class));
   }
 
 
@@ -85,23 +85,23 @@ class BasicUserServiceTest {
     UUID profileId = UUID.randomUUID();
     BinaryContent savedProfile = mock(BinaryContent.class);
 
-    when(userRepository.existsByEmail(request.email())).thenReturn(false);
-    when(userRepository.existsByUsername(request.username())).thenReturn(false);
-    when(binaryContentRepository.save(any(BinaryContent.class)))
-        .thenReturn(savedProfile);
-    when(savedProfile.getId()).thenReturn(profileId);
+    given(userRepository.existsByEmail(request.email())).willReturn(false);
+    given(userRepository.existsByUsername(request.username())).willReturn(false);
+    given(binaryContentRepository.save(any(BinaryContent.class)))
+        .willReturn(savedProfile);
+    given(savedProfile.getId()).willReturn(profileId);
 
     // when
     userService.create(request, profile);
 
     // then
     ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
-    verify(userRepository).save(userCaptor.capture());
+    then(userRepository).should().save(userCaptor.capture());
 
     User savedUser = userCaptor.getValue();
     assertThat(savedUser.getProfile()).isSameAs(savedProfile);
 
-    verify(binaryContentStorage).put(eq(profileId), aryEq(bytes));
+    then(binaryContentStorage).should().put(eq(profileId), aryEq(bytes));
   }
 
   @Test
@@ -109,11 +109,11 @@ class BasicUserServiceTest {
   void user_create_fail_case() {
     // given
     UserCreateRequest request = new UserCreateRequest("username", "user@naver.com", "password");
-    when(userRepository.existsByEmail(request.email())).thenReturn(true);
+    given(userRepository.existsByEmail(request.email())).willReturn(true);
     // when then
     assertThatThrownBy(() -> userService.create(request, null))
         .isInstanceOf(DuplicateEmailException.class);
-    verify(userRepository, never()).save(any(User.class));
+    then(userRepository).should(never()).save(any(User.class));
   }
 
   @Test
@@ -126,14 +126,14 @@ class BasicUserServiceTest {
         "newPassword");
     UserDto userDto = new UserDto(userId, updateUser.newUsername(), updateUser.newEmail(), null,
         true);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(userMapper.toDto(user)).thenReturn(userDto);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(userMapper.toDto(user)).willReturn(userDto);
     // when
     UserDto result = userService.update(userId, updateUser, null);
     // then
     assertThat(user.getUsername()).isEqualTo(updateUser.newUsername());
     assertThat(user.getEmail()).isEqualTo(updateUser.newEmail());
-    verify(userRepository).findById(userId);
+    then(userRepository).should().findById(userId);
     assertThat(userDto).isEqualTo(result);
   }
 
@@ -144,8 +144,8 @@ class BasicUserServiceTest {
     UUID userId = UUID.randomUUID();
     User user = new User("username", "user@naver.com", "password", null);
     UserUpdateRequest updateUser = new UserUpdateRequest("username", null, null);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-    when(userRepository.existsByUsername(updateUser.newUsername())).thenReturn(true);
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
+    given(userRepository.existsByUsername(updateUser.newUsername())).willReturn(true);
     // when then
     assertThatThrownBy(() -> userService.update(userId, updateUser, null)).isInstanceOf(
         DuplicateUsernameException.class);
@@ -158,25 +158,9 @@ class BasicUserServiceTest {
     // given
     UUID userId = UUID.randomUUID();
     User user = new User("username", "user@naver.com", "password", null);
-    when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+    given(userRepository.findById(userId)).willReturn(Optional.of(user));
     // when
     userService.delete(userId);
-    verify(userRepository).deleteById(userId);
+    then(userRepository).should().deleteById(userId);
   }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

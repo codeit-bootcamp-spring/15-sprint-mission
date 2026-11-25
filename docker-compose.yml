@@ -1,0 +1,35 @@
+services:
+  app:
+    build: .
+    image: discodeit:local
+    container_name: discodeit-app
+    environment:
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      SERVER_PORT: "80"
+
+      SPRING_DATASOURCE_URL: jdbc:postgresql://${SPRING_DATASOURCE_URL:-host.docker.internal}:5432/discodeit
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME:-chichi}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD:-vmflwma1!}
+
+      SPRING_SQL_INIT_MODE: never
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO:-create}
+
+      DISCODEIT_STORAGE_TYPE: ${STORAGE_TYPE:-local}
+      DISCODEIT_STORAGE_LOCAL_ROOT_PATH: /app/storage
+
+      AWS_S3_ACCESS_KEY: ${AWS_S3_ACCESS_KEY:-}
+      AWS_S3_SECRET_KEY: ${AWS_S3_SECRET_KEY:-}
+      AWS_S3_REGION: ${AWS_S3_REGION:-}
+      AWS_S3_BUCKET: ${AWS_S3_BUCKET:-}
+      AWS_S3_PRESIGNED_URL_EXPIRATION: ${AWS_S3_PRESIGNED_URL_EXPIRATION:-600}
+
+      JVM_OPTS: ${JVM_OPTS:-}
+    ports:
+      - "8081:80"
+    volumes:
+      - binary-content:/app/storage
+
+
+volumes:
+  binary-content:
+  postgres-data:

@@ -4,8 +4,7 @@ create table binary_contents
     created_at   timestamptz  not null,
     file_name    varchar(255) not null,
     size         bigint       not null,
-    content_type varchar(100) not null,
-    bytes        bytea        not null
+    content_type varchar(100) not null
 );
 
 
@@ -30,8 +29,6 @@ create table user_statuses
     last_active_at timestamptz not null
 );
 
-create type type as enum ('PUBLIC','PRIVATE');
-
 create table channels
 (
     id          uuid primary key,
@@ -39,7 +36,7 @@ create table channels
     updated_at  timestamptz,
     name        varchar(100),
     description varchar(500),
-    type        type        not null
+    type        varchar(10) not null check (type in ('PUBLIC', 'PRIVATE'))
 );
 
 create table messages

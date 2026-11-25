@@ -1,10 +1,12 @@
 spring:
   application:
     name: discodeit
-  boot:
-    admin:
-      client:
-        url: http://localhost:9090
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
 server:
   port: 8081
 
